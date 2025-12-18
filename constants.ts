@@ -3,17 +3,17 @@ import { Conversation, MessageType, SenderType, Partner, CommissionRecord, Couns
 
 export const MOCK_COUNSELORS: Counselor[] = [
     { 
-        id: 's1', name: 'Jessica Wu', avatar: 'https://ui-avatars.com/api/?name=Jessica+Wu&background=ffb6c1&color=fff', 
+        id: 's1', name: 'Jessica Wu', avatar: 'https://ui-avatars.com/api/?name=Jessica+Wu&background=6366f1&color=fff', 
         role: 'Senior Counselor', department: 'RPL', totalSales: 45000, commissionEarned: 4500, activeDeals: 12, 
         lastActive: new Date(), status: 'online', tasks: []
     },
     { 
-        id: 's2', name: 'Tom Hardy', avatar: 'https://ui-avatars.com/api/?name=Tom+Hardy&background=add8e6&color=fff', 
+        id: 's2', name: 'Tom Hardy', avatar: 'https://ui-avatars.com/api/?name=Tom+Hardy&background=0f172a&color=fff', 
         role: 'Junior Counselor', department: 'Admissions', totalSales: 32000, commissionEarned: 3200, activeDeals: 18, 
         lastActive: new Date(), status: 'busy', tasks: []
     },
     { 
-        id: 's3', name: 'Amanda Lee', avatar: 'https://ui-avatars.com/api/?name=Amanda+Lee&background=90ee90&color=fff', 
+        id: 's3', name: 'Amanda Lee', avatar: 'https://ui-avatars.com/api/?name=Amanda+Lee&background=10b981&color=fff', 
         role: 'Migration Agent', department: 'Legal', totalSales: 58000, commissionEarned: 5800, activeDeals: 8, 
         lastActive: new Date(), status: 'online', tasks: []
     },
@@ -25,7 +25,7 @@ export const MOCK_PARTNERS: Partner[] = [
 ];
 
 export const MOCK_CONVERSATIONS: Conversation[] = [
-  // --- EXISTING 15 FILES ---
+  // --- RPL CATEGORY (13 FILES) ---
   {
     id: 'c1', assignedCounselorId: 's1', partnerId: 'p1',
     client: {
@@ -83,42 +83,6 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     sentiment: 'urgent', visaRiskLevel: 'medium', activities: [], documents: [], messages: [],
   },
   {
-    id: 'c8', assignedCounselorId: 's1', partnerId: 'p1',
-    client: {
-        id: 'u8', name: 'Maria Garcia', avatar: 'https://picsum.photos/seed/maria/200/200',
-        email: 'maria.g@example.com', phone: '+61 477 222 333', location: 'Melbourne, VIC',
-        visaStatus: 'Visitor 600', visaExpiry: '2024-10-30', qualificationTarget: 'Cert III in Early Childhood',
-        experienceYears: 4, educationHistory: []
-    },
-    // Fixed: 'medi_review' is not a valid ApplicationStage, changed to 'mediator_review'
-    source: 'sub_agent', subAgentName: 'VisaReady', superAgentStatus: 'not_started', unreadCount: 0, status: 'active', priority: 'medium', currentStage: 'mediator_review', lastActive: new Date(), progressStage: 55, currentStep: 'Mediator Review', paymentTotal: 1800, paymentPaid: 1800,
-    sentiment: 'positive', visaRiskLevel: 'medium', activities: [], documents: [], messages: [],
-  },
-  {
-    id: 'c9', assignedCounselorId: 's1', partnerId: 'p1',
-    client: {
-        id: 'u9', name: 'Wei Zhang', avatar: 'https://picsum.photos/seed/wei/200/200',
-        email: 'wei.z@example.com', phone: '+61 466 555 444', location: 'Hobart, TAS',
-        visaStatus: 'Student 500', visaExpiry: '2025-07-20', qualificationTarget: 'Diploma of ICT Support',
-        experienceYears: 7, educationHistory: []
-    },
-    source: 'direct', superAgentStatus: 'processing', unreadCount: 0, status: 'active', priority: 'low', currentStage: 'certified', lastActive: new Date(), progressStage: 100, currentStep: 'Certified', paymentTotal: 3200, paymentPaid: 3200,
-    sentiment: 'neutral', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
-  },
-  {
-    id: 'c10', assignedCounselorId: 's1', partnerId: 'p1',
-    client: {
-        id: 'u10', name: 'Fatima Al-Farsi', avatar: 'https://picsum.photos/seed/fatima/200/200',
-        email: 'fatima.f@example.com', phone: '+61 455 111 222', location: 'Gold Coast, QLD',
-        visaStatus: 'Subclass 482', visaExpiry: '2026-11-01', qualificationTarget: 'Cert IV in Business Admin',
-        experienceYears: 5, educationHistory: []
-    },
-    source: 'sub_agent', subAgentName: 'Elite', superAgentStatus: 'not_started', unreadCount: 0, status: 'active', priority: 'medium', currentStage: 'evidence_collection', lastActive: new Date(), progressStage: 25, currentStep: 'Evidence Collection', paymentTotal: 2000, paymentPaid: 500,
-    sentiment: 'neutral', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
-  },
-
-  // --- NEW RPL FILES (6 MORE) ---
-  {
     id: 'c16', assignedCounselorId: 's1', partnerId: 'p1',
     client: {
         id: 'u16', name: 'Rohan Gupta', avatar: 'https://picsum.photos/seed/rohan/200/200',
@@ -126,8 +90,9 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
         visaStatus: 'Student 500', visaExpiry: '2025-03-10', qualificationTarget: 'Cert III in Plumbing',
         experienceYears: 12, educationHistory: []
     },
-    source: 'direct', superAgentStatus: 'not_started', unreadCount: 0, status: 'active', priority: 'high', currentStage: 'evidence_collection', lastActive: new Date(), progressStage: 15, currentStep: 'Evidence Collection', paymentTotal: 4800, paymentPaid: 1000,
+    source: 'direct', unreadCount: 0, status: 'active', priority: 'high', currentStage: 'evidence_collection', lastActive: new Date(), progressStage: 15, currentStep: 'Evidence Collection', paymentTotal: 4800, paymentPaid: 1000,
     sentiment: 'urgent', visaRiskLevel: 'high', activities: [], documents: [], messages: [],
+    superAgentStatus: 'not_started'
   },
   {
     id: 'c17', assignedCounselorId: 's1', partnerId: 'p1',
@@ -137,8 +102,9 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
         visaStatus: 'Student 500', visaExpiry: '2025-10-05', qualificationTarget: 'Cert III in Painting',
         experienceYears: 8, educationHistory: []
     },
-    source: 'direct', superAgentStatus: 'not_started', unreadCount: 0, status: 'active', priority: 'medium', currentStage: 'evidence_collection', lastActive: new Date(), progressStage: 35, currentStep: 'Evidence Collection', paymentTotal: 3500, paymentPaid: 1500,
+    source: 'direct', unreadCount: 0, status: 'active', priority: 'medium', currentStage: 'evidence_collection', lastActive: new Date(), progressStage: 35, currentStep: 'Evidence Collection', paymentTotal: 3500, paymentPaid: 1500,
     sentiment: 'positive', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
+    superAgentStatus: 'not_started'
   },
   {
     id: 'c18', assignedCounselorId: 's1', partnerId: 'p1',
@@ -184,8 +150,32 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     source: 'direct', superAgentStatus: 'not_started', unreadCount: 0, status: 'active', priority: 'low', currentStage: 'lead', lastActive: new Date(), progressStage: 5, currentStep: 'Intake Enquiry', paymentTotal: 3100, paymentPaid: 0,
     sentiment: 'neutral', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
   },
+  {
+    id: 'c26', assignedCounselorId: 's1', partnerId: 'p1',
+    client: {
+        id: 'u26', name: 'Carlos Santos', avatar: 'https://picsum.photos/seed/carlos/200/200',
+        email: 'carlos.s@example.com', phone: '+61 433 111 222', location: 'Sydney, NSW',
+        visaStatus: 'Student 500', visaExpiry: '2025-01-10', qualificationTarget: 'Cert III in Tiling',
+        experienceYears: 10, educationHistory: []
+    },
+    source: 'sub_agent', subAgentName: 'TradeLink', unreadCount: 0, status: 'active', priority: 'high', currentStage: 'evidence_collection', lastActive: new Date(), progressStage: 22, currentStep: 'Evidence Collection', paymentTotal: 4200, paymentPaid: 1000,
+    sentiment: 'anxious', visaRiskLevel: 'medium', activities: [], documents: [], messages: [],
+    superAgentStatus: 'not_started'
+  },
+  {
+    id: 'c27', assignedCounselorId: 's1', partnerId: 'p1',
+    client: {
+        id: 'u27', name: 'Sven Lindholm', avatar: 'https://picsum.photos/seed/sven/200/200',
+        email: 'sven.l@example.com', phone: '+61 422 333 444', location: 'Gold Coast, QLD',
+        visaStatus: 'Subclass 417', visaExpiry: '2024-12-05', qualificationTarget: 'Cert III in Bricklaying',
+        experienceYears: 4, educationHistory: []
+    },
+    source: 'direct', unreadCount: 0, status: 'lead', priority: 'low', currentStage: 'lead', lastActive: new Date(), progressStage: 5, currentStep: 'Initial Lead', paymentTotal: 3800, paymentPaid: 0,
+    sentiment: 'neutral', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
+    superAgentStatus: 'not_started'
+  },
 
-  // --- ADMISSIONS CATEGORY (9 TOTAL FILES) ---
+  // --- ADMISSIONS CATEGORY (12 FILES) ---
   {
     id: 'c4', assignedCounselorId: 's2', partnerId: 'p3',
     client: {
@@ -260,7 +250,7 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
         visaStatus: 'Visitor 600', visaExpiry: '2024-11-20', qualificationTarget: 'PhD in Education',
         experienceYears: 5, educationHistory: []
     },
-    source: 'direct', superAgentStatus: 'processing', unreadCount: 0, status: 'active', priority: 'medium', currentStage: 'conditional_offer', lastActive: new Date(), progressStage: 65, currentStep: 'Offer Received', paymentTotal: 60000, paymentPaid: 20000,
+    source: 'direct', superAgentStatus: 'not_started', unreadCount: 0, status: 'active', priority: 'medium', currentStage: 'conditional_offer', lastActive: new Date(), progressStage: 65, currentStep: 'Offer Received', paymentTotal: 60000, paymentPaid: 20000,
     sentiment: 'positive', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
   },
   {
@@ -306,6 +296,17 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     },
     source: 'sub_agent', subAgentName: 'Global Ed', superAgentStatus: 'processing', unreadCount: 0, status: 'active', priority: 'medium', currentStage: 'app_lodged', lastActive: new Date(), progressStage: 45, currentStep: 'App Lodged', paymentTotal: 38000, paymentPaid: 5000,
     sentiment: 'positive', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
+  },
+  {
+    id: 'c28', assignedCounselorId: 's2', partnerId: 'p3',
+    client: {
+        id: 'u28', name: 'Lucas Meyer', avatar: 'https://picsum.photos/seed/lucas/200/200',
+        email: 'lucas.m@example.com', phone: '+61 411 222 333', location: 'Perth, WA',
+        visaStatus: 'Student 500', visaExpiry: '2026-06-20', qualificationTarget: 'Bachelor of Cyber Security',
+        experienceYears: 0, educationHistory: []
+    },
+    source: 'direct', superAgentStatus: 'not_started', unreadCount: 0, status: 'active', priority: 'medium', currentStage: 'app_lodged', lastActive: new Date(), progressStage: 40, currentStep: 'App Lodged', paymentTotal: 33000, paymentPaid: 5000,
+    sentiment: 'neutral', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
   }
 ];
 
