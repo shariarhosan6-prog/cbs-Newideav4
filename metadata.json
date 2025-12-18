@@ -1,0 +1,7 @@
+{
+  "name": "Copy of Stitch RPL CRM",
+  "description": "A Next-Gen Conversational AI-Powered CRM for RPL Agents. Features a Messenger-style interface with deep AI integration for document analysis and workflow automation.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
