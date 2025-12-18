@@ -51,20 +51,17 @@ function App() {
     }));
 
     // 2. Automated Partner Email Trigger
-    // Check if we are moving to a submission stage
     const isSubmission = newStage === 'rto_submission' || newStage === 'app_lodged';
     
     if (isSubmission) {
       const partner = MOCK_PARTNERS.find(p => p.id === (conv.partnerId || 'p1'));
       if (partner) {
-        // AI Generate the email content
         const emailContent = await generatePartnerEmail(
           conv.client,
           partner,
           conv.documents.filter(d => d.status === 'verified')
         );
 
-        // Add System Message to Chat
         const systemMsg = {
           id: `sys_email_${Date.now()}`,
           sender: SenderType.SYSTEM,
@@ -74,7 +71,6 @@ function App() {
           thread: 'source' as MessageThread
         };
 
-        // Add a secondary system message to the Upstream thread
         const upstreamMsg = {
           id: `sys_up_${Date.now()}`,
           sender: SenderType.SUPER_AGENT,
@@ -110,15 +106,12 @@ function App() {
       return c;
     }));
 
-    // NLP Trigger for "Send this to RTO" style commands
     if (text.toLowerCase().includes("send this to") || text.toLowerCase().includes("submit to")) {
-        // AI extracts target and triggers submission
         setTimeout(() => {
             handleUpdateStatus(selectedId, selectedConversation.currentStage.includes('app') ? 'app_lodged' : 'rto_submission');
         }, 1000);
     }
 
-    // AI Automation Simulation for Document analysis
     setTimeout(async () => {
        if (thread === 'source' && type === MessageType.DOCUMENT && fileData) {
             const analysis = await analyzeDocumentMock(fileData.name);
@@ -163,7 +156,7 @@ function App() {
   const renderContent = () => {
     switch (currentView) {
       case 'dashboard': return <Dashboard />;
-      case 'pipeline': return <Kanban onSelectCard={handleSelectFromPipeline} />;
+      case 'pipeline': return <Kanban conversations={conversations} onSelectCard={handleSelectFromPipeline} />;
       case 'team': return <TeamManagement />;
       case 'inbox':
         return (

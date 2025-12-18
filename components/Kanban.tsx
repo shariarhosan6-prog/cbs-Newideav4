@@ -1,17 +1,18 @@
 
 import React, { useState } from 'react';
-import { ApplicationStage, ApplicationCard, ApplicationType } from '../types';
+import { ApplicationStage, ApplicationCard, ApplicationType, Conversation } from '../types';
 import { 
     MoreHorizontal, Plus, Search, Filter, CalendarClock, FileText, 
     User, GraduationCap, Briefcase, ChevronDown, MessageSquare,
-    Zap, ExternalLink
+    Zap, ExternalLink, AlertCircle
 } from 'lucide-react';
 
 interface Props {
+  conversations: Conversation[]; // Consuming live state from parent
   onSelectCard?: (id: string) => void;
 }
 
-const Kanban: React.FC<Props> = ({ onSelectCard }) => {
+const Kanban: React.FC<Props> = ({ conversations, onSelectCard }) => {
   const [activePipeline, setActivePipeline] = useState<ApplicationType>('rpl');
 
   // --- CONFIGURATION: RPL PIPELINE ---
@@ -32,28 +33,28 @@ const Kanban: React.FC<Props> = ({ onSelectCard }) => {
     { id: 'coe_issued', label: 'CoE Issued', color: 'bg-green-50' },
   ];
 
-  // --- MOCK DATA ---
-  const allCards: ApplicationCard[] = [
-    { 
-        id: 'c1', type: 'rpl', clientName: 'Sarah Jenkins', qualification: 'Dip. Project Mgmt', stage: 'mediator_review', 
-        tags: ['Direct'], value: '$2,500', daysInStage: 2, missingDocs: 1, counselorId: 'Jessica Wu' 
-    },
-    { 
-        id: 'c2', type: 'rpl', clientName: 'Michael Chen', qualification: 'Cert IV Cookery', stage: 'evidence_collection', 
-        tags: ['Global Ed'], value: '$3,200', daysInStage: 14, missingDocs: 4, counselorId: 'David Kim' 
-    },
-    { 
-        id: 'a1', type: 'admission', clientName: 'Kenji Tanaka', qualification: 'Master of IT (Monash)', stage: 'conditional_offer', 
-        tags: ['Sub-Agent'], value: '$35,000', daysInStage: 3, missingDocs: 1, counselorId: 'Jessica Wu' 
-    },
-    { 
-        id: 'a2', type: 'admission', clientName: 'Sophie Martin', qualification: 'Bachelor of Design (RMIT)', stage: 'app_lodged', 
-        tags: ['Direct'], value: '$28,000', daysInStage: 1, missingDocs: 0, counselorId: 'Amanda Lee' 
-    },
-  ];
-
   const currentStages = activePipeline === 'rpl' ? RPL_STAGES : ADMISSION_STAGES;
-  const filteredCards = allCards.filter(card => card.type === activePipeline);
+
+  // Map Live Conversations to ApplicationCards
+  const mappedCards: ApplicationCard[] = conversations.map(c => {
+      const isRpl = c.client.qualificationTarget.toLowerCase().includes('cert') || c.client.qualificationTarget.toLowerCase().includes('dip');
+      const type: ApplicationType = isRpl ? 'rpl' : 'admission';
+      
+      return {
+          id: c.id,
+          type: type,
+          clientName: c.client.name,
+          qualification: c.client.qualificationTarget,
+          stage: c.currentStage,
+          tags: [c.source === 'sub_agent' ? (c.subAgentName || 'Sub-Agent') : 'Direct'],
+          value: `$${c.paymentTotal.toLocaleString()}`,
+          daysInStage: Math.floor((Date.now() - c.lastActive.getTime()) / (1000 * 60 * 60 * 24)) || 1,
+          missingDocs: c.documents.filter(d => d.status === 'missing').length,
+          counselorId: c.assignedCounselorId
+      };
+  });
+
+  const filteredCards = mappedCards.filter(card => card.type === activePipeline);
 
   const totalValue = filteredCards.reduce((acc, card) => {
       const val = parseFloat(card.value.replace(/[^0-9.-]+/g,""));
@@ -129,7 +130,7 @@ const Kanban: React.FC<Props> = ({ onSelectCard }) => {
                                     <div 
                                         key={card.id} 
                                         onClick={() => onSelectCard?.(card.id)}
-                                        className="group bg-white p-5 rounded-[28px] border border-slate-200 shadow-sm hover:shadow-2xl hover:border-indigo-300 cursor-pointer transition-all relative overflow-hidden active:scale-[0.98]"
+                                        className={`group bg-white p-5 rounded-[28px] border border-slate-200 shadow-sm hover:shadow-2xl hover:border-indigo-300 cursor-pointer transition-all relative overflow-hidden active:scale-[0.98] ${card.stage === 'rto_submission' ? 'ring-2 ring-orange-200 animate-pulse' : ''}`}
                                     >
                                         <div className="flex justify-between items-start mb-4">
                                             <div className="flex flex-wrap gap-1.5">
@@ -153,7 +154,7 @@ const Kanban: React.FC<Props> = ({ onSelectCard }) => {
 
                                         {card.missingDocs > 0 && (
                                             <div className="mt-4 px-3 py-1.5 bg-orange-50 rounded-xl flex items-center gap-2 border border-orange-100">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></div>
+                                                <AlertCircle className="w-3 h-3 text-orange-500" />
                                                 <span className="text-[10px] font-black text-orange-600 uppercase tracking-widest">{card.missingDocs} Docs Missing</span>
                                             </div>
                                         )}

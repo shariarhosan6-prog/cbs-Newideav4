@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Conversation, DocumentStatus, EducationEntry, ActivityLog, ApplicationStage } from '../types';
 import { 
     User, FileText, GraduationCap, History, CheckCircle, Clock, 
-    ShieldCheck, Zap, MoreHorizontal, ChevronDown, Rocket
+    ShieldCheck, Zap, MoreHorizontal, ChevronDown, Rocket, AlertTriangle, Plus, Send
 } from 'lucide-react';
 
 interface Props {
@@ -17,6 +17,8 @@ interface Props {
 const ClientIntelligence: React.FC<Props> = ({ conversation, isOpen, onAddDocument, onAddEducation, onUpdateStatus }) => {
     const [activeSection, setActiveSection] = useState<'profile' | 'docs' | 'activity'>('profile');
     const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
+    const [gapExplanations, setGapExplanations] = useState<Record<string, string>>({});
+    const [showGapInput, setShowGapInput] = useState<string | null>(null);
     
     const verifiedCount = conversation.documents.filter(d => d.status === 'verified').length;
     const progressPercent = Math.round((verifiedCount / conversation.documents.length) * 100) || 0;
@@ -25,6 +27,91 @@ const ClientIntelligence: React.FC<Props> = ({ conversation, isOpen, onAddDocume
     const ADM_STAGES: ApplicationStage[] = ['lead', 'app_lodged', 'conditional_offer', 'gte_assessment', 'coe_issued'];
     const availableStages = conversation.client.qualificationTarget.toLowerCase().includes('cert') || conversation.client.qualificationTarget.toLowerCase().includes('dip') 
         ? RPL_STAGES : ADM_STAGES;
+
+    // Study Gap Detection Logic
+    const sortedEducation = [...conversation.client.educationHistory].sort((a, b) => a.startYear - b.startYear);
+    
+    const renderTimelineWithGaps = () => {
+        const timelineElements: React.ReactNode[] = [];
+        
+        sortedEducation.forEach((edu, index) => {
+            // Add the education entry
+            timelineElements.push(
+                <div key={edu.id} className="relative pl-7 border-l-2 border-slate-100 pb-2 group last:pb-0">
+                    <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-white border-2 border-slate-200 flex items-center justify-center">
+                        <div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div>
+                    </div>
+                    <p className="text-xs font-black text-slate-800 leading-none">{edu.level}</p>
+                    <p className="text-[11px] font-bold text-slate-400 mt-1.5 uppercase tracking-tight">{edu.institution}</p>
+                    <p className="text-[10px] text-slate-400 mt-1 font-medium">{edu.startYear} — {edu.endYear}</p>
+                </div>
+            );
+
+            // Check for gap after this entry
+            const nextEdu = sortedEducation[index + 1];
+            if (nextEdu) {
+                const gapYears = nextEdu.startYear - edu.endYear;
+                if (gapYears >= 1) {
+                    const gapId = `gap-${edu.id}-${nextEdu.id}`;
+                    timelineElements.push(
+                        <div key={gapId} className="relative pl-7 border-l-2 border-slate-100 py-4 my-2">
+                            <div className="absolute -left-[9px] top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-amber-50 border-2 border-amber-200 flex items-center justify-center">
+                                <AlertTriangle className="w-2.5 h-2.5 text-amber-500" />
+                            </div>
+                            
+                            <div className="bg-amber-50/50 border border-amber-100 rounded-xl p-3 animate-in fade-in slide-in-from-left-2">
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className="text-[10px] font-black text-amber-600 uppercase tracking-widest flex items-center gap-1.5">
+                                        Significant Study Gap ({gapYears} {gapYears === 1 ? 'Year' : 'Years'})
+                                    </span>
+                                </div>
+                                
+                                {gapExplanations[gapId] ? (
+                                    <div className="text-[11px] text-slate-600 bg-white p-2 rounded-lg border border-amber-100 italic">
+                                        "{gapExplanations[gapId]}"
+                                    </div>
+                                ) : (
+                                    <>
+                                        {showGapInput === gapId ? (
+                                            <div className="flex gap-2">
+                                                <input 
+                                                    type="text" 
+                                                    placeholder="Reason for gap..."
+                                                    className="flex-1 text-[11px] bg-white border border-amber-200 rounded-lg px-2 py-1 outline-none focus:ring-2 focus:ring-amber-200 transition-all"
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') {
+                                                            setGapExplanations({ ...gapExplanations, [gapId]: (e.target as HTMLInputElement).value });
+                                                            setShowGapInput(null);
+                                                        }
+                                                    }}
+                                                    autoFocus
+                                                />
+                                                <button 
+                                                    onClick={() => setShowGapInput(null)}
+                                                    className="p-1 text-slate-400 hover:text-slate-600"
+                                                >
+                                                    <XCircle className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <button 
+                                                onClick={() => setShowGapInput(gapId)}
+                                                className="flex items-center gap-1.5 text-[10px] font-bold text-amber-700 hover:text-amber-900 transition-colors"
+                                            >
+                                                <Plus className="w-3 h-3" /> Add Gap Explanation (Required for Compliance)
+                                            </button>
+                                        )}
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    );
+                }
+            }
+        });
+        
+        return timelineElements;
+    };
 
     return (
         <div className="h-full bg-slate-50 flex flex-col overflow-hidden border-l border-slate-100">
@@ -119,17 +206,8 @@ const ClientIntelligence: React.FC<Props> = ({ conversation, isOpen, onAddDocume
                             <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-widest mb-6 flex items-center gap-2">
                                 <GraduationCap className="w-5 h-5 text-indigo-500" /> Academic Timeline
                             </h4>
-                            <div className="space-y-6">
-                                {conversation.client.educationHistory.map((edu) => (
-                                    <div key={edu.id} className="relative pl-7 border-l-2 border-slate-100 pb-2 group last:pb-0">
-                                        <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-white border-2 border-slate-200 flex items-center justify-center">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div>
-                                        </div>
-                                        <p className="text-xs font-black text-slate-800 leading-none">{edu.level}</p>
-                                        <p className="text-[11px] font-bold text-slate-400 mt-1.5 uppercase tracking-tight">{edu.institution}</p>
-                                        <p className="text-[10px] text-slate-400 mt-1 font-medium">{edu.startYear} — {edu.endYear}</p>
-                                    </div>
-                                ))}
+                            <div className="space-y-2">
+                                {renderTimelineWithGaps()}
                             </div>
                         </div>
                     </div>
@@ -199,5 +277,12 @@ const ClientIntelligence: React.FC<Props> = ({ conversation, isOpen, onAddDocume
         </div>
     );
 };
+
+// Internal icon for closing input
+const XCircle = ({ className }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        <circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/>
+    </svg>
+);
 
 export default ClientIntelligence;
