@@ -101,6 +101,8 @@ export interface Conversation {
   // AI Intelligent Fields
   sentiment?: 'positive' | 'neutral' | 'anxious' | 'urgent';
   visaRiskLevel?: 'low' | 'medium' | 'high' | 'critical';
+  // Custom Categorization
+  customCategory?: string;
 }
 
 export interface Message {

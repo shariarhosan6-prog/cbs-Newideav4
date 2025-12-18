@@ -19,6 +19,7 @@ function App() {
   const [selectedId, setSelectedId] = useState<string>(MOCK_CONVERSATIONS[0].id);
   const [rightPanelOpen, setRightPanelOpen] = useState(true);
   const [jumpHighlight, setJumpHighlight] = useState(false);
+  const [categories, setCategories] = useState<string[]>(['Urgent Follow-ups', 'Prospects', 'Onboarding', 'Waiting on RTO']);
 
   const selectedConversation = conversations.find(c => c.id === selectedId) || conversations[0];
   const unreadCount = conversations.reduce((acc, curr) => acc + curr.unreadCount, 0);
@@ -34,7 +35,6 @@ function App() {
     const conv = conversations.find(c => c.id === id);
     if (!conv) return;
 
-    // 1. Update the conversation state
     setConversations(prev => prev.map(c => {
       if (c.id === id) {
         return { 
@@ -50,7 +50,6 @@ function App() {
       return c;
     }));
 
-    // 2. Automated Partner Email Trigger
     const isSubmission = newStage === 'rto_submission' || newStage === 'app_lodged';
     
     if (isSubmission) {
@@ -85,6 +84,19 @@ function App() {
           return c;
         }));
       }
+    }
+  };
+
+  const handleMoveToCategory = (id: string, category: string | undefined) => {
+    setConversations(prev => prev.map(c => {
+      if (c.id === id) return { ...c, customCategory: category };
+      return c;
+    }));
+  };
+
+  const handleAddCategory = (name: string) => {
+    if (name && !categories.includes(name)) {
+      setCategories(prev => [...prev, name]);
     }
   };
 
@@ -162,7 +174,15 @@ function App() {
         return (
           <div className="flex h-full w-full overflow-hidden relative">
             <div className={`hidden lg:block h-full transition-all duration-500 ${jumpHighlight ? 'ring-4 ring-indigo-500/20' : ''}`}>
-                <ConversationList conversations={conversations} selectedId={selectedId} onSelect={(id) => { setSelectedId(id); }} isOpen={true} />
+                <ConversationList 
+                    conversations={conversations} 
+                    selectedId={selectedId} 
+                    onSelect={(id) => { setSelectedId(id); }} 
+                    isOpen={true} 
+                    categories={categories}
+                    onMoveToCategory={handleMoveToCategory}
+                    onAddCategory={handleAddCategory}
+                />
             </div>
             <div className="flex-1 flex flex-col h-full relative overflow-hidden min-w-0 bg-white">
                  <ChatWindow 
