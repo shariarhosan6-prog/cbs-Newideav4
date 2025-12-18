@@ -45,6 +45,8 @@ export interface ApplicationCard {
   daysInStage: number;
   missingDocs: number;
   counselorId: string;
+  // Added partnerId to fix the property access error in Kanban.tsx
+  partnerId?: string;
 }
 
 export interface ActivityLog {

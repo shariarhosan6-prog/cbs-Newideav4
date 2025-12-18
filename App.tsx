@@ -10,16 +10,21 @@ import Partners from './components/Partners';
 import Finance from './components/Finance';
 import TeamManagement from './components/TeamManagement';
 import { MOCK_CONVERSATIONS, MOCK_COUNSELORS, MOCK_PARTNERS } from './constants';
-import { Conversation, MessageType, SenderType, MessageThread, ViewState, ApplicationStage } from './types';
+import { Conversation, MessageType, SenderType, MessageThread, ViewState, ApplicationStage, Counselor, TeamTask, Partner } from './types';
 import { analyzeDocumentMock, generatePartnerEmail } from './services/geminiService';
 
 function App() {
   const [currentView, setCurrentView] = useState<ViewState>('dashboard');
   const [conversations, setConversations] = useState<Conversation[]>(MOCK_CONVERSATIONS);
+  const [counselors, setCounselors] = useState<Counselor[]>(MOCK_COUNSELORS);
+  const [partners, setPartners] = useState<Partner[]>(MOCK_PARTNERS);
   const [selectedId, setSelectedId] = useState<string>(MOCK_CONVERSATIONS[0].id);
   const [rightPanelOpen, setRightPanelOpen] = useState(true);
   const [jumpHighlight, setJumpHighlight] = useState(false);
   const [categories, setCategories] = useState<string[]>(['Urgent Follow-ups', 'Prospects', 'Onboarding', 'Waiting on RTO']);
+  
+  // Filtering state
+  const [pipelinePartnerFilter, setPipelinePartnerFilter] = useState<string | null>(null);
 
   const selectedConversation = conversations.find(c => c.id === selectedId) || conversations[0];
   const unreadCount = conversations.reduce((acc, curr) => acc + curr.unreadCount, 0);
@@ -53,7 +58,7 @@ function App() {
     const isSubmission = newStage === 'rto_submission' || newStage === 'app_lodged';
     
     if (isSubmission) {
-      const partner = MOCK_PARTNERS.find(p => p.id === (conv.partnerId || 'p1'));
+      const partner = partners.find(p => p.id === (conv.partnerId || 'p1'));
       if (partner) {
         const emailContent = await generatePartnerEmail(
           conv.client,
@@ -148,7 +153,7 @@ function App() {
   };
 
   const handleAssignCounselor = (counselorId: string) => {
-      const staff = MOCK_COUNSELORS.find(s => s.id === counselorId);
+      const staff = counselors.find(s => s.id === counselorId);
       if (!staff) return;
 
       const newLog = {
@@ -165,11 +170,77 @@ function App() {
       }));
   };
 
+  const handleAddTask = (counselorId: string, task: Omit<TeamTask, 'id' | 'status'>) => {
+    setCounselors(prev => prev.map(c => {
+      if (c.id === counselorId) {
+        return {
+          ...c,
+          tasks: [
+            ...c.tasks,
+            { ...task, id: `task_${Date.now()}`, status: 'pending' as const }
+          ]
+        };
+      }
+      return c;
+    }));
+  };
+
+  const handleToggleTaskStatus = (counselorId: string, taskId: string) => {
+    setCounselors(prev => prev.map(c => {
+      if (c.id === counselorId) {
+        return {
+          ...c,
+          tasks: c.tasks.map(t => t.id === taskId ? { ...t, status: t.status === 'pending' ? 'completed' : 'pending' } : t)
+        };
+      }
+      return c;
+    }));
+  };
+
+  const handleDeleteTask = (counselorId: string, taskId: string) => {
+    setCounselors(prev => prev.map(c => {
+      if (c.id === counselorId) {
+        return {
+          ...c,
+          tasks: c.tasks.filter(t => t.id !== taskId)
+        };
+      }
+      return c;
+    }));
+  };
+
+  const handleUpdatePartner = (updatedPartner: Partner) => {
+    setPartners(prev => prev.map(p => p.id === updatedPartner.id ? updatedPartner : p));
+  };
+
+  const handleAddPartner = (newPartner: Partner) => {
+    setPartners(prev => [...prev, newPartner]);
+  };
+  
+  const handleViewPartnerApplications = (partnerId: string) => {
+    setPipelinePartnerFilter(partnerId);
+    setCurrentView('pipeline');
+  };
+
   const renderContent = () => {
     switch (currentView) {
       case 'dashboard': return <Dashboard />;
-      case 'pipeline': return <Kanban conversations={conversations} onSelectCard={handleSelectFromPipeline} />;
-      case 'team': return <TeamManagement />;
+      case 'pipeline': return (
+        <Kanban 
+          conversations={conversations} 
+          onSelectCard={handleSelectFromPipeline} 
+          filterPartnerId={pipelinePartnerFilter}
+          onClearFilter={() => setPipelinePartnerFilter(null)}
+        />
+      );
+      case 'team': return (
+        <TeamManagement 
+          staff={counselors} 
+          onAddTask={handleAddTask} 
+          onToggleTaskStatus={handleToggleTaskStatus}
+          onDeleteTask={handleDeleteTask}
+        />
+      );
       case 'inbox':
         return (
           <div className="flex h-full w-full overflow-hidden relative">
@@ -205,7 +276,14 @@ function App() {
             </div>
           </div>
         );
-      case 'partners': return <Partners />;
+      case 'partners': return (
+        <Partners 
+          partners={partners} 
+          onUpdatePartner={handleUpdatePartner}
+          onAddPartner={handleAddPartner}
+          onViewApplications={handleViewPartnerApplications}
+        />
+      );
       case 'finance': return <Finance />;
       default: return <Dashboard />;
     }
@@ -214,7 +292,7 @@ function App() {
   return (
     <div className="flex h-screen bg-slate-50 overflow-hidden font-sans selection:bg-indigo-500 selection:text-white">
       <div className="hidden lg:block h-full shrink-0">
-        <Sidebar currentView={currentView} onChangeView={setCurrentView} unreadCount={unreadCount} />
+        <Sidebar currentView={currentView} onChangeView={(v) => { setCurrentView(v); setPipelinePartnerFilter(null); }} unreadCount={unreadCount} />
       </div>
       <main className="flex-1 h-full relative overflow-hidden flex flex-col">
          {renderContent()}

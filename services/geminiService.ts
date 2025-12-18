@@ -1,8 +1,9 @@
 
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 import { Message, SenderType, ClientProfile, Partner, DocumentStatus } from "../types";
 
 // Initialize the Google GenAI client
+// The API key must be obtained exclusively from the environment variable process.env.API_KEY.
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const getSmartSuggestions = async (
@@ -20,24 +21,29 @@ export const getSmartSuggestions = async (
       .map(m => `${m.sender}: ${m.content}`)
       .join('\n');
 
-    const prompt = `
-      You are an AI assistant for an RPL (Recognition of Prior Learning) Agent.
-      Client Name: ${clientName}
-      Target Qualification: ${qualification}
-      
-      Recent Chat History:
-      ${recentHistory}
-
-      Generate 3 short, professional, and friendly quick-reply suggestions for the agent to send next. 
-      The replies should move the process forward (e.g., asking for docs, confirming receipt, payment reminder).
-      Return ONLY the suggestions as a JSON array of strings.
-    `;
-
+    // Using ai.models.generateContent directly as per guidelines
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
-      contents: prompt,
+      contents: `
+        Client Name: ${clientName}
+        Target Qualification: ${qualification}
+        
+        Recent Chat History:
+        ${recentHistory}
+
+        Generate 3 short, professional, and friendly quick-reply suggestions for the agent to send next. 
+        The replies should move the process forward (e.g., asking for docs, confirming receipt, payment reminder).
+      `,
       config: {
-        responseMimeType: 'application/json'
+        systemInstruction: "You are an AI assistant for an RPL (Recognition of Prior Learning) Agent.",
+        responseMimeType: 'application/json',
+        // Defining responseSchema for more structured and reliable output
+        responseSchema: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.STRING
+          }
+        }
       }
     });
 
@@ -62,17 +68,23 @@ export const analyzeDocumentMock = async (fileName: string): Promise<{ type: str
   }
 
   try {
-     const prompt = `
-      Analyze the filename "${fileName}". 
-      Predict the document type (e.g., Resume, ID, Reference, Transcript) and provide a fake 1-sentence summary of what this document likely contains for an RPL application.
-      Return JSON: { "type": string, "confidence": number (0-100), "summary": string }
-    `;
+     const prompt = `Analyze the filename "${fileName}". Predict the document type (e.g., Resume, ID, Reference, Transcript) and provide a fake 1-sentence summary of what this document likely contains for an RPL application.`;
 
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: prompt,
       config: {
-        responseMimeType: 'application/json'
+        responseMimeType: 'application/json',
+        // Using Type for responseSchema structure
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            type: { type: Type.STRING },
+            confidence: { type: Type.NUMBER },
+            summary: { type: Type.STRING }
+          },
+          required: ["type", "confidence", "summary"]
+        }
       }
     });
 
@@ -105,7 +117,6 @@ export const generatePartnerEmail = async (
   try {
     const docList = verifiedDocs.map(d => d.name).join(', ');
     const prompt = `
-      You are an AI specialized in the education and migration industry. 
       Generate a professional email to a partner (${partner.type}) regarding a student application submission.
       
       Details:
@@ -115,16 +126,22 @@ export const generatePartnerEmail = async (
       - Partner Contact: ${partner.contactPerson}
       - Documents being sent: ${docList}
       - Current Visa: ${client.visaStatus}
-      
-      The email should be professional, polite, and clear. 
-      Return JSON: { "subject": string, "body": string }
     `;
 
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: prompt,
       config: {
-        responseMimeType: 'application/json'
+        systemInstruction: "You are an AI specialized in the education and migration industry.",
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            subject: { type: Type.STRING },
+            body: { type: Type.STRING }
+          },
+          required: ["subject", "body"]
+        }
       }
     });
 

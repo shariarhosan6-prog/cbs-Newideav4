@@ -1,20 +1,34 @@
 
 import React, { useState } from 'react';
-import { MOCK_COUNSELORS } from '../constants';
-import { Counselor } from '../types';
-// Fixed missing icon imports: MoreHorizontal and ChevronRight
+import { Counselor, TeamTask } from '../types';
 import { 
-    Users, TrendingUp, Clock, Activity, Search, Star, ShieldCheck, Mail, 
-    ExternalLink, Flame, Briefcase, Zap, Plus, Filter, LayoutGrid, List,
-    ChevronDown, AlertTriangle, CheckSquare, Layers, MoreHorizontal, ChevronRight
+    Users, TrendingUp, Search, ShieldCheck, Mail, Flame, Briefcase, Zap, Plus, 
+    LayoutGrid, List, AlertTriangle, Layers, MoreHorizontal, ChevronRight,
+    X, Calendar, CheckSquare, Trash2
 } from 'lucide-react';
 
-const TeamManagement: React.FC = () => {
+interface Props {
+  staff: Counselor[];
+  onAddTask: (counselorId: string, task: Omit<TeamTask, 'id' | 'status'>) => void;
+  onToggleTaskStatus: (counselorId: string, taskId: string) => void;
+  onDeleteTask: (counselorId: string, taskId: string) => void;
+}
+
+const TeamManagement: React.FC<Props> = ({ staff, onAddTask, onToggleTaskStatus, onDeleteTask }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterDepartment, setFilterDepartment] = useState<'all' | 'RPL' | 'Admissions' | 'Legal'>('all');
     const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
+    const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+    
+    // New Task Form State
+    const [newTask, setNewTask] = useState({
+        title: '',
+        priority: 'medium' as 'high' | 'medium' | 'low',
+        dueDate: new Date().toISOString().split('T')[0],
+        counselorId: ''
+    });
 
-    const filteredStaff = MOCK_COUNSELORS.filter(s => {
+    const filteredStaff = staff.filter(s => {
         const matchesSearch = s.name.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesDept = filterDepartment === 'all' || s.department === filterDepartment;
         return matchesSearch && matchesDept;
@@ -22,9 +36,99 @@ const TeamManagement: React.FC = () => {
 
     const totalDeals = filteredStaff.reduce((acc, curr) => acc + curr.activeDeals, 0);
     const avgLoad = filteredStaff.length > 0 ? (totalDeals / filteredStaff.length).toFixed(1) : 0;
+    
+    const allTasks = filteredStaff.flatMap(s => s.tasks.map(t => ({ ...t, counselorName: s.name, counselorId: s.id })));
+
+    const handleCreateTask = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!newTask.title || !newTask.counselorId) return;
+        
+        onAddTask(newTask.counselorId, {
+            title: newTask.title,
+            priority: newTask.priority,
+            dueDate: new Date(newTask.dueDate)
+        });
+        
+        setNewTask({ title: '', priority: 'medium', dueDate: new Date().toISOString().split('T')[0], counselorId: '' });
+        setIsTaskModalOpen(false);
+    };
 
     return (
-        <div className="flex-1 bg-slate-50 h-full overflow-y-auto">
+        <div className="flex-1 bg-slate-50 h-full overflow-y-auto relative">
+            
+            {/* Task Assignment Modal */}
+            {isTaskModalOpen && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
+                    <div className="bg-white rounded-[32px] w-full max-w-md shadow-2xl border border-slate-100 p-8 animate-in zoom-in-95 duration-300">
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
+                                <Plus className="w-5 h-5 text-indigo-600" /> Assign New Task
+                            </h3>
+                            <button onClick={() => setIsTaskModalOpen(false)} className="p-2 hover:bg-slate-100 rounded-full text-slate-400">
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+                        
+                        <form onSubmit={handleCreateTask} className="space-y-4">
+                            <div>
+                                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Task Title</label>
+                                <input 
+                                    autoFocus
+                                    required
+                                    value={newTask.title}
+                                    onChange={e => setNewTask({...newTask, title: e.target.value})}
+                                    placeholder="e.g., Review compliance for Cert III"
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all"
+                                />
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Priority</label>
+                                    <select 
+                                        value={newTask.priority}
+                                        onChange={e => setNewTask({...newTask, priority: e.target.value as any})}
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all appearance-none"
+                                    >
+                                        <option value="low">Low</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="high">High</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Due Date</label>
+                                    <input 
+                                        type="date"
+                                        value={newTask.dueDate}
+                                        onChange={e => setNewTask({...newTask, dueDate: e.target.value})}
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Assign To</label>
+                                <select 
+                                    required
+                                    value={newTask.counselorId}
+                                    onChange={e => setNewTask({...newTask, counselorId: e.target.value})}
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all appearance-none"
+                                >
+                                    <option value="" disabled>Select Staff Member</option>
+                                    {staff.map(s => (
+                                        <option key={s.id} value={s.id}>{s.name} ({s.department})</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <button type="submit" className="w-full bg-slate-900 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-indigo-600 transition-all shadow-xl shadow-slate-200 mt-4 active:scale-95">
+                                Confirm Assignment
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            )}
+
             {/* Super Admin Header */}
             <div className="p-8 bg-white border-b border-slate-100 flex flex-col lg:flex-row justify-between items-start lg:items-center sticky top-0 z-30 gap-6 shadow-sm backdrop-blur-md bg-white/90">
                 <div>
@@ -40,7 +144,6 @@ const TeamManagement: React.FC = () => {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3">
-                    {/* Dept Switcher */}
                     <div className="bg-slate-100 p-1 rounded-xl flex items-center border border-slate-200">
                         {['all', 'RPL', 'Admissions'].map((dept) => (
                             <button
@@ -82,7 +185,7 @@ const TeamManagement: React.FC = () => {
                                 <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
                                     {filteredStaff.filter(s => s.status === 'online').length} Online
                                 </span>
-                                <span className="text-[10px] font-bold text-slate-400 tracking-tight">Active sessions currently</span>
+                                <span className="text-[10px] font-bold text-slate-400 tracking-tight">Current Workforce Status</span>
                             </div>
                         </div>
                     </div>
@@ -147,19 +250,19 @@ const TeamManagement: React.FC = () => {
 
                         {viewMode === 'grid' ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
-                                {filteredStaff.map((staff) => (
-                                    <div key={staff.id} className="bg-white rounded-[32px] p-6 border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group cursor-pointer">
+                                {filteredStaff.map((staffMember) => (
+                                    <div key={staffMember.id} className="bg-white rounded-[32px] p-6 border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group cursor-pointer">
                                         <div className="flex items-start justify-between mb-6">
                                             <div className="flex items-center gap-4">
                                                 <div className="relative">
-                                                    <img src={staff.avatar} className="w-16 h-16 rounded-[24px] object-cover border-4 border-slate-50 group-hover:scale-110 transition-transform" />
-                                                    <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-4 border-white ${staff.status === 'online' ? 'bg-emerald-500' : staff.status === 'busy' ? 'bg-orange-500' : 'bg-slate-400'}`}></div>
+                                                    <img src={staffMember.avatar} className="w-16 h-16 rounded-[24px] object-cover border-4 border-slate-50 group-hover:scale-110 transition-transform" />
+                                                    <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-4 border-white ${staffMember.status === 'online' ? 'bg-emerald-500' : staffMember.status === 'busy' ? 'bg-orange-500' : 'bg-slate-400'}`}></div>
                                                 </div>
                                                 <div>
-                                                    <h4 className="font-black text-slate-900 text-lg leading-tight">{staff.name}</h4>
+                                                    <h4 className="font-black text-slate-900 text-lg leading-tight">{staffMember.name}</h4>
                                                     <div className="flex items-center gap-2 mt-1">
-                                                        <span className="text-[10px] font-black text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full uppercase tracking-tighter">{staff.role}</span>
-                                                        <span className="text-[10px] font-bold text-slate-400 uppercase">{staff.department}</span>
+                                                        <span className="text-[10px] font-black text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full uppercase tracking-tighter">{staffMember.role}</span>
+                                                        <span className="text-[10px] font-bold text-slate-400 uppercase">{staffMember.department}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -170,32 +273,32 @@ const TeamManagement: React.FC = () => {
                                             <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 group-hover:bg-white transition-colors">
                                                 <span className="block text-[10px] font-black text-slate-400 uppercase mb-2">Active Files</span>
                                                 <div className="flex items-end gap-2">
-                                                    <span className={`text-2xl font-black ${staff.activeDeals > 15 ? 'text-orange-600' : 'text-slate-900'}`}>{staff.activeDeals}</span>
+                                                    <span className={`text-2xl font-black ${staffMember.activeDeals > 15 ? 'text-orange-600' : 'text-slate-900'}`}>{staffMember.activeDeals}</span>
                                                     <span className="text-[10px] font-bold text-slate-400 mb-1.5">/ 20 Max</span>
                                                 </div>
                                                 <div className="w-full h-1.5 bg-slate-200 rounded-full mt-2 overflow-hidden">
-                                                    <div className={`h-full rounded-full transition-all duration-1000 ${staff.activeDeals > 15 ? 'bg-orange-500' : 'bg-indigo-600'}`} style={{width: `${(staff.activeDeals/20)*100}%`}}></div>
+                                                    <div className={`h-full rounded-full transition-all duration-1000 ${staffMember.activeDeals > 15 ? 'bg-orange-500' : 'bg-indigo-600'}`} style={{width: `${(staffMember.activeDeals/20)*100}%`}}></div>
                                                 </div>
                                             </div>
                                             <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 group-hover:bg-white transition-colors">
                                                 <span className="block text-[10px] font-black text-slate-400 uppercase mb-2">Revenue</span>
-                                                <span className="text-xl font-black text-slate-900">${(staff.totalSales / 1000).toFixed(0)}k</span>
+                                                <span className="text-xl font-black text-slate-900">${(staffMember.totalSales / 1000).toFixed(0)}k</span>
                                                 <p className="text-[10px] font-bold text-emerald-600 mt-1">+12.5% MTD</p>
                                             </div>
                                         </div>
 
-                                        {staff.tasks.length > 0 && (
+                                        {staffMember.tasks.some(t => t.status === 'pending') && (
                                             <div className="mb-6 p-4 bg-orange-50/50 rounded-2xl border border-orange-100">
                                                 <p className="text-[10px] font-black text-orange-600 uppercase mb-2 flex items-center gap-1.5">
                                                     <AlertTriangle className="w-3 h-3" /> Critical Blocker
                                                 </p>
-                                                <p className="text-xs font-bold text-slate-700 truncate">{staff.tasks[0].title}</p>
+                                                <p className="text-xs font-bold text-slate-700 truncate">{staffMember.tasks.find(t => t.status === 'pending')?.title}</p>
                                             </div>
                                         )}
 
                                         <div className="flex items-center gap-2 pt-4 border-t border-slate-50">
                                             <button className="flex-1 py-3 bg-slate-900 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-indigo-600 transition-all shadow-lg shadow-slate-200 active:scale-95">
-                                                View Profile
+                                                Manage Tasks ({staffMember.tasks.length})
                                             </button>
                                             <button className="p-3 bg-slate-100 text-slate-500 rounded-2xl hover:bg-slate-200 transition-all">
                                                 <Mail className="w-4 h-4" />
@@ -258,61 +361,81 @@ const TeamManagement: React.FC = () => {
                     {/* RIGHT: TEAM ANALYTICS & FEED */}
                     <div className="space-y-8">
                         {/* TEAM TASK MASTER */}
-                        <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
-                            <h4 className="font-black text-slate-800 uppercase tracking-widest text-xs mb-6 flex items-center justify-between">
-                                Team Taskboard
-                                <button className="text-indigo-600 hover:text-indigo-800 transition-colors"><Plus className="w-4 h-4" /></button>
+                        <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-col h-[500px]">
+                            <h4 className="font-black text-slate-800 uppercase tracking-widest text-xs mb-6 flex items-center justify-between shrink-0">
+                                Operational Taskboard
+                                <button onClick={() => setIsTaskModalOpen(true)} className="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-600 hover:text-white transition-all">
+                                    <Plus className="w-4 h-4" />
+                                </button>
                             </h4>
-                            <div className="space-y-4">
-                                {[
-                                    { title: "Review Visa Subclass 186 changes", priority: "high", staff: "Amanda L." },
-                                    { title: "Weekly Admissions Audit", priority: "medium", staff: "Tom H." },
-                                    { title: "Onboard 2 new Sub-Agents", priority: "high", staff: "Jessica W." }
-                                ].map((task, i) => (
-                                    <div key={i} className="flex gap-4 group cursor-pointer hover:bg-slate-50 p-2 rounded-xl transition-colors">
-                                        <div className="mt-1">
-                                            <div className="w-5 h-5 rounded-lg border-2 border-slate-200 flex items-center justify-center group-hover:border-indigo-600 transition-colors">
-                                                <div className="w-2.5 h-2.5 rounded-sm bg-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <p className="text-xs font-bold text-slate-800 leading-tight mb-1 group-hover:text-indigo-600 transition-colors">{task.title}</p>
-                                            <div className="flex items-center gap-2">
-                                                <span className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded ${task.priority === 'high' ? 'bg-red-50 text-red-600' : 'bg-orange-50 text-orange-600'}`}>
-                                                    {task.priority}
-                                                </span>
-                                                <span className="text-[9px] font-bold text-slate-400">Assigned: {task.staff}</span>
-                                            </div>
-                                        </div>
+                            
+                            <div className="flex-1 overflow-y-auto custom-scrollbar space-y-4 pr-1">
+                                {allTasks.length === 0 ? (
+                                    <div className="h-full flex flex-col items-center justify-center text-center opacity-40">
+                                        <CheckSquare className="w-12 h-12 mb-2" />
+                                        <p className="text-xs font-bold">No active tasks</p>
                                     </div>
-                                ))}
+                                ) : (
+                                    allTasks.map((task) => (
+                                        <div key={task.id} className={`p-4 rounded-2xl border transition-all group ${task.status === 'completed' ? 'bg-slate-50 border-slate-100 grayscale opacity-60' : 'bg-white border-slate-100 hover:border-indigo-200 hover:shadow-md'}`}>
+                                            <div className="flex items-start gap-3">
+                                                <button 
+                                                    onClick={() => onToggleTaskStatus(task.counselorId, task.id)}
+                                                    className={`mt-1 w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all ${task.status === 'completed' ? 'bg-indigo-600 border-indigo-600' : 'border-slate-200 hover:border-indigo-600'}`}
+                                                >
+                                                    {task.status === 'completed' && <CheckSquare className="w-3.5 h-3.5 text-white" />}
+                                                </button>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className={`text-xs font-bold leading-tight mb-2 ${task.status === 'completed' ? 'line-through text-slate-400' : 'text-slate-800'}`}>
+                                                        {task.title}
+                                                    </p>
+                                                    <div className="flex flex-wrap items-center gap-2">
+                                                        <span className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded ${task.priority === 'high' ? 'bg-red-50 text-red-600' : task.priority === 'medium' ? 'bg-orange-50 text-orange-600' : 'bg-blue-50 text-blue-600'}`}>
+                                                            {task.priority}
+                                                        </span>
+                                                        <span className="text-[9px] font-bold text-slate-400 flex items-center gap-1">
+                                                            <Calendar className="w-3 h-3" /> {new Date(task.dueDate).toLocaleDateString()}
+                                                        </span>
+                                                        <span className="text-[9px] font-bold text-indigo-500 bg-indigo-50 px-2 rounded-full">@{task.counselorName}</span>
+                                                    </div>
+                                                </div>
+                                                <button 
+                                                    onClick={() => onDeleteTask(task.counselorId, task.id)}
+                                                    className="opacity-0 group-hover:opacity-100 p-1 text-slate-300 hover:text-red-500 transition-all"
+                                                >
+                                                    <Trash2 className="w-3.5 h-3.5" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
                             </div>
                         </div>
 
                         {/* WORKLOAD OPTIMIZER HEATMAP */}
-                        <div className="bg-slate-900 rounded-[32px] p-6 text-white shadow-2xl relative overflow-hidden">
-                            <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-indigo-600 rounded-full blur-3xl opacity-30"></div>
+                        <div className="bg-slate-900 rounded-[32px] p-6 text-white shadow-2xl relative overflow-hidden group hover:shadow-indigo-500/10 transition-shadow">
+                            <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-indigo-600 rounded-full blur-3xl opacity-30 group-hover:opacity-50 transition-opacity"></div>
                             <h4 className="font-black uppercase tracking-widest text-[11px] mb-2 relative z-10 flex items-center gap-2">
                                 <Zap className="w-4 h-4 text-indigo-400" />
                                 Workload Optimizer
                             </h4>
-                            <p className="text-xs text-slate-400 mb-6 relative z-10 font-medium">Auto-balancing recommendation based on staff saturation.</p>
+                            <p className="text-xs text-slate-400 mb-6 relative z-10 font-medium">Auto-balancing recommendations based on real-time saturation levels.</p>
                             
                             <div className="space-y-4 relative z-10">
-                                {MOCK_COUNSELORS.slice(0, 3).map((staff, i) => (
+                                {staff.slice(0, 4).map((member, i) => (
                                     <div key={i} className="flex items-center justify-between">
                                         <div className="flex items-center gap-3">
-                                            <div className={`w-2 h-2 rounded-full ${staff.activeDeals > 15 ? 'bg-red-500 animate-pulse' : 'bg-emerald-500'}`}></div>
-                                            <span className="text-xs font-bold text-slate-300">{staff.name}</span>
+                                            <div className={`w-2 h-2 rounded-full ${member.activeDeals > 15 ? 'bg-red-500 animate-pulse' : 'bg-emerald-500'}`}></div>
+                                            <span className="text-xs font-bold text-slate-300">{member.name}</span>
                                         </div>
                                         <div className="text-[10px] font-black uppercase tracking-tighter text-slate-500">
-                                            {staff.activeDeals > 15 ? 'Critical' : 'Balanced'}
+                                            {member.activeDeals > 15 ? 'Overloaded' : 'Optimum'}
                                         </div>
                                     </div>
                                 ))}
                             </div>
                             
-                            <button className="w-full mt-8 py-3 bg-white text-slate-900 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:scale-[1.02] transition-transform active:scale-95 shadow-xl">
+                            <button className="w-full mt-8 py-3 bg-white text-slate-900 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:scale-[1.02] transition-transform active:scale-95 shadow-xl relative z-10">
                                 Balance Loads
                             </button>
                         </div>

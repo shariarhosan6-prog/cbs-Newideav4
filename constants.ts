@@ -22,6 +22,12 @@ export const MOCK_COUNSELORS: Counselor[] = [
 export const MOCK_PARTNERS: Partner[] = [
   { id: 'p1', name: 'StudyPath RTO', type: 'RTO', contactPerson: 'David Ross', email: 'admissions@studypath.edu.au', activeStudents: 12, commissionRate: '25%', status: 'active', logo: 'https://ui-avatars.com/api/?name=Study+Path&background=6366f1&color=fff' },
   { id: 'p3', name: 'Victoria University', type: 'University', contactPerson: 'Mark Sloan', email: 'international@vu.edu.au', activeStudents: 45, commissionRate: '15%', status: 'active', logo: 'https://ui-avatars.com/api/?name=Victoria+Uni&background=000&color=fff' },
+  { id: 'p4', name: 'University of Melbourne', type: 'University', contactPerson: 'Sarah Higgins', email: 'apply@unimelb.edu.au', activeStudents: 88, commissionRate: '10%', status: 'active', logo: 'https://ui-avatars.com/api/?name=UoM&background=012169&color=fff' },
+  { id: 'p5', name: 'Monash University', type: 'University', contactPerson: 'Michael Tan', email: 'scen@monash.edu', activeStudents: 62, commissionRate: '12%', status: 'active', logo: 'https://ui-avatars.com/api/?name=Monash&background=000&color=fff' },
+  { id: 'p6', name: 'UNSW Sydney', type: 'University', contactPerson: 'Emily Chen', email: 'int.apps@unsw.edu.au', activeStudents: 54, commissionRate: '11%', status: 'active', logo: 'https://ui-avatars.com/api/?name=UNSW&background=ffcc00&color=000' },
+  { id: 'p7', name: 'Australian Institute of Business', type: 'RTO', contactPerson: 'Greg Wills', email: 'enrol@aib.edu.au', activeStudents: 22, commissionRate: '30%', status: 'active', logo: 'https://ui-avatars.com/api/?name=AIB&background=ef4444&color=fff' },
+  { id: 'p8', name: 'The University of Queensland', type: 'University', contactPerson: 'Dr. John Vane', email: 'admission@uq.edu.au', activeStudents: 31, commissionRate: '10%', status: 'active', logo: 'https://ui-avatars.com/api/?name=UQ&background=51247a&color=fff' },
+  { id: 'p9', name: 'SkillSet Australia', type: 'RTO', contactPerson: 'Leila Moss', email: 'admin@skillset.com.au', activeStudents: 15, commissionRate: '20%', status: 'active', logo: 'https://ui-avatars.com/api/?name=SkillSet&background=10b981&color=fff' },
 ];
 
 export const MOCK_CONVERSATIONS: Conversation[] = [
@@ -72,7 +78,7 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     sentiment: 'neutral', visaRiskLevel: 'low', activities: [], documents: [{ id: 'd50', name: 'Ref Letter', status: 'verified' }], messages: [],
   },
   {
-    id: 'c7', assignedCounselorId: 's1', partnerId: 'p1',
+    id: 'c7', assignedCounselorId: 's1', partnerId: 'p4',
     client: {
         id: 'u7', name: 'Ahmed Khan', avatar: 'https://picsum.photos/seed/ahmed/200/200',
         email: 'ahmed.k@example.com', phone: '+61 488 111 000', location: 'Sydney, NSW',
@@ -83,7 +89,7 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     sentiment: 'urgent', visaRiskLevel: 'medium', activities: [], documents: [], messages: [],
   },
   {
-    id: 'c16', assignedCounselorId: 's1', partnerId: 'p1',
+    id: 'c16', assignedCounselorId: 's1', partnerId: 'p4',
     client: {
         id: 'u16', name: 'Rohan Gupta', avatar: 'https://picsum.photos/seed/rohan/200/200',
         email: 'rohan.g@example.com', phone: '+61 433 999 000', location: 'Darwin, NT',
@@ -95,7 +101,7 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     superAgentStatus: 'not_started'
   },
   {
-    id: 'c17', assignedCounselorId: 's1', partnerId: 'p1',
+    id: 'c17', assignedCounselorId: 's1', partnerId: 'p5',
     client: {
         id: 'u17', name: 'Liam Wilson', avatar: 'https://picsum.photos/seed/liam/200/200',
         email: 'liam.w@example.com', phone: '+61 422 777 666', location: 'Sunshine Coast, QLD',
@@ -107,7 +113,7 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     superAgentStatus: 'not_started'
   },
   {
-    id: 'c18', assignedCounselorId: 's1', partnerId: 'p1',
+    id: 'c18', assignedCounselorId: 's1', partnerId: 'p5',
     client: {
         id: 'u18', name: 'Diego Torres', avatar: 'https://picsum.photos/seed/diego/200/200',
         email: 'diego.t@example.com', phone: '+61 411 555 333', location: 'Sydney, NSW',
@@ -118,7 +124,7 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     sentiment: 'neutral', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
   },
   {
-    id: 'c19', assignedCounselorId: 's1', partnerId: 'p1',
+    id: 'c19', assignedCounselorId: 's1', partnerId: 'p6',
     client: {
         id: 'u19', name: 'Anya Ivanova', avatar: 'https://picsum.photos/seed/anya/200/200',
         email: 'anya.i@example.com', phone: '+61 400 333 111', location: 'Melbourne, VIC',
@@ -129,7 +135,7 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     sentiment: 'anxious', visaRiskLevel: 'high', activities: [], documents: [], messages: [{ id: 'anya_m1', sender: SenderType.CLIENT, type: MessageType.TEXT, content: "Can I use my overseas transcript for RPL?", timestamp: new Date(), read: false, thread: 'source' }],
   },
   {
-    id: 'c20', assignedCounselorId: 's1', partnerId: 'p1',
+    id: 'c20', assignedCounselorId: 's1', partnerId: 'p7',
     client: {
         id: 'u20', name: 'Raj Patel', avatar: 'https://picsum.photos/seed/raj/200/200',
         email: 'raj.p@example.com', phone: '+61 499 111 222', location: 'Perth, WA',
@@ -140,7 +146,7 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     sentiment: 'positive', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
   },
   {
-    id: 'c21', assignedCounselorId: 's1', partnerId: 'p1',
+    id: 'c21', assignedCounselorId: 's1', partnerId: 'p7',
     client: {
         id: 'u21', name: 'Hassan Mahmoud', avatar: 'https://picsum.photos/seed/hassan/200/200',
         email: 'hassan.m@example.com', phone: '+61 488 222 333', location: 'Adelaide, SA',
@@ -151,7 +157,7 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     sentiment: 'neutral', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
   },
   {
-    id: 'c26', assignedCounselorId: 's1', partnerId: 'p1',
+    id: 'c26', assignedCounselorId: 's1', partnerId: 'p8',
     client: {
         id: 'u26', name: 'Carlos Santos', avatar: 'https://picsum.photos/seed/carlos/200/200',
         email: 'carlos.s@example.com', phone: '+61 433 111 222', location: 'Sydney, NSW',
@@ -163,7 +169,7 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     superAgentStatus: 'not_started'
   },
   {
-    id: 'c27', assignedCounselorId: 's1', partnerId: 'p1',
+    id: 'c27', assignedCounselorId: 's1', partnerId: 'p8',
     client: {
         id: 'u27', name: 'Sven Lindholm', avatar: 'https://picsum.photos/seed/sven/200/200',
         email: 'sven.l@example.com', phone: '+61 422 333 444', location: 'Gold Coast, QLD',
