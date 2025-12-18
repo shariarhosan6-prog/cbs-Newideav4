@@ -17,7 +17,6 @@ export enum SenderType {
 export type LeadSource = 'direct' | 'sub_agent';
 export type MessageThread = 'source' | 'upstream'; 
 
-// CRM specific types
 export type ViewState = 'dashboard' | 'pipeline' | 'inbox' | 'partners' | 'finance' | 'team';
 
 export type ApplicationType = 'rpl' | 'admission';
@@ -85,13 +84,13 @@ export interface Conversation {
   source: LeadSource;
   subAgentName?: string;
   assignedCounselorId: string;
-  partnerId?: string; // ID of the RTO or University partner
+  partnerId?: string;
   superAgentStatus: 'not_started' | 'processing' | 'submitted' | 'accepted';
   messages: Message[];
   unreadCount: number;
   status: 'active' | 'lead' | 'review' | 'completed';
   priority: 'high' | 'medium' | 'low';
-  currentStage: ApplicationStage; // Synced with ApplicationCard stage
+  currentStage: ApplicationStage;
   lastActive: Date;
   progressStage: number;
   currentStep: string;
@@ -99,6 +98,9 @@ export interface Conversation {
   paymentTotal: number;
   paymentPaid: number;
   activities: ActivityLog[];
+  // AI Intelligent Fields
+  sentiment?: 'positive' | 'neutral' | 'anxious' | 'urgent';
+  visaRiskLevel?: 'low' | 'medium' | 'high' | 'critical';
 }
 
 export interface Message {
