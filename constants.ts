@@ -12,312 +12,207 @@ export const MOCK_COUNSELORS: Counselor[] = [
         role: 'Junior Counselor', department: 'Admissions', totalSales: 32000, commissionEarned: 3200, activeDeals: 18, 
         lastActive: new Date(), status: 'busy', tasks: []
     },
-    { 
-        id: 's3', name: 'Amanda Lee', avatar: 'https://ui-avatars.com/api/?name=Amanda+Lee&background=10b981&color=fff', 
-        role: 'Migration Agent', department: 'Legal', totalSales: 58000, commissionEarned: 5800, activeDeals: 8, 
-        lastActive: new Date(), status: 'online', tasks: []
-    },
 ];
 
 export const MOCK_PARTNERS: Partner[] = [
   { id: 'p1', name: 'StudyPath RTO', type: 'RTO', contactPerson: 'David Ross', email: 'admissions@studypath.edu.au', activeStudents: 12, commissionRate: '25%', status: 'active', logo: 'https://ui-avatars.com/api/?name=Study+Path&background=6366f1&color=fff' },
   { id: 'p3', name: 'Victoria University', type: 'University', contactPerson: 'Mark Sloan', email: 'international@vu.edu.au', activeStudents: 45, commissionRate: '15%', status: 'active', logo: 'https://ui-avatars.com/api/?name=Victoria+Uni&background=000&color=fff' },
-  { id: 'p4', name: 'University of Melbourne', type: 'University', contactPerson: 'Sarah Higgins', email: 'apply@unimelb.edu.au', activeStudents: 88, commissionRate: '10%', status: 'active', logo: 'https://ui-avatars.com/api/?name=UoM&background=012169&color=fff' },
-  { id: 'p5', name: 'Monash University', type: 'University', contactPerson: 'Michael Tan', email: 'scen@monash.edu', activeStudents: 62, commissionRate: '12%', status: 'active', logo: 'https://ui-avatars.com/api/?name=Monash&background=000&color=fff' },
-  { id: 'p6', name: 'UNSW Sydney', type: 'University', contactPerson: 'Emily Chen', email: 'int.apps@unsw.edu.au', activeStudents: 54, commissionRate: '11%', status: 'active', logo: 'https://ui-avatars.com/api/?name=UNSW&background=ffcc00&color=000' },
-  { id: 'p7', name: 'Australian Institute of Business', type: 'RTO', contactPerson: 'Greg Wills', email: 'enrol@aib.edu.au', activeStudents: 22, commissionRate: '30%', status: 'active', logo: 'https://ui-avatars.com/api/?name=AIB&background=ef4444&color=fff' },
-  { id: 'p8', name: 'The University of Queensland', type: 'University', contactPerson: 'Dr. John Vane', email: 'admission@uq.edu.au', activeStudents: 31, commissionRate: '10%', status: 'active', logo: 'https://ui-avatars.com/api/?name=UQ&background=51247a&color=fff' },
-  { id: 'p9', name: 'SkillSet Australia', type: 'RTO', contactPerson: 'Leila Moss', email: 'admin@skillset.com.au', activeStudents: 15, commissionRate: '20%', status: 'active', logo: 'https://ui-avatars.com/api/?name=SkillSet&background=10b981&color=fff' },
 ];
 
 export const MOCK_CONVERSATIONS: Conversation[] = [
-  // --- RPL CATEGORY (13 FILES) ---
   {
     id: 'c1', assignedCounselorId: 's1', partnerId: 'p1',
     client: {
       id: 'u1', name: 'Sarah Jenkins', avatar: 'https://picsum.photos/seed/sarah/200/200',
       email: 'sarah.j@example.com', phone: '+61 400 123 456', location: 'Melbourne, VIC',
       visaStatus: 'Subclass 482', visaExpiry: '2024-11-15', qualificationTarget: 'Diploma of Project Management',
-      experienceYears: 5, educationHistory: [{ id: 'e1', level: 'Year 12', institution: 'Melbourne High', startYear: 2014, endYear: 2015 }, { id: 'e2', level: 'Bachelor', institution: 'RMIT', startYear: 2016, endYear: 2019 }]
+      experienceYears: 5, educationHistory: []
     },
-    source: 'direct', superAgentStatus: 'processing', unreadCount: 1, status: 'active', priority: 'high', currentStage: 'mediator_review', lastActive: new Date(), progressStage: 60, currentStep: 'Mediator Review', paymentTotal: 2500, paymentPaid: 1250,
-    sentiment: 'anxious', visaRiskLevel: 'high', activities: [], documents: [{ id: 'd1', name: 'Resume', status: 'verified' }, { id: 'd2', name: 'USI', status: 'missing' }],
-    messages: [{ id: 'm1', sender: SenderType.CLIENT, type: MessageType.TEXT, content: "My visa is expiring soon, can we hurry?", timestamp: new Date(), read: false, thread: 'source' }],
+    source: 'sub_agent', subAgentName: 'Global Ed Bangladesh', superAgentStatus: 'processing', unreadCount: 1, status: 'active', priority: 'high', currentStage: 'mediator_review', lastActive: new Date(), progressStage: 60, currentStep: 'Onshore Processing', paymentTotal: 4500, paymentPaid: 2500,
+    sentiment: 'anxious', visaRiskLevel: 'high', activities: [], documents: [{ id: 'd1', name: 'Resume', status: 'verified' }],
+    messages: [{ id: 'm1', sender: SenderType.CLIENT, type: MessageType.TEXT, content: "I am now in Sydney, can we start my RPL?", timestamp: new Date(), read: false, thread: 'source' }],
+    journey: [
+        { id: 'j1', serviceType: 'admission', title: 'Subclass 500 BD-Offshore', status: 'completed', startDate: new Date(2023, 5, 1) },
+        { id: 'j2', serviceType: 'rpl', title: 'Dip. Project Mgmt Onshore', status: 'active', startDate: new Date() }
+    ],
+    isB2BSettled: true, onshoreStatus: 'landed'
   },
   {
-    id: 'c2', assignedCounselorId: 's2', partnerId: 'p1',
+    id: 'c2', assignedCounselorId: 's1', partnerId: 'p3',
     client: {
-      id: 'u2', name: 'Michael Chen', avatar: 'https://picsum.photos/seed/michael/200/200',
-      email: 'm.chen@example.com', phone: '+61 411 987 654', location: 'Sydney, NSW',
-      visaStatus: 'Student 500', visaExpiry: '2025-06-20', qualificationTarget: 'Cert IV in Commercial Cookery',
+      id: 'u2', name: 'Rafiqul Islam', avatar: 'https://ui-avatars.com/api/?name=Rafiqul+Islam&background=random',
+      email: 'rafiq.bd@example.com', phone: '+880 1711 223344', location: 'Dhaka, Bangladesh',
+      visaStatus: 'Applying', visaExpiry: '', qualificationTarget: 'Master of IT',
+      experienceYears: 2, educationHistory: []
+    },
+    source: 'sub_agent', subAgentName: 'Elite Careers BD', superAgentStatus: 'not_started', unreadCount: 0, status: 'lead', priority: 'medium', currentStage: 'lead', lastActive: new Date(), progressStage: 10, currentStep: 'Offshore Intake', paymentTotal: 22000, paymentPaid: 0,
+    sentiment: 'neutral', visaRiskLevel: 'medium', activities: [], documents: [], messages: [],
+    journey: [{ id: 'j3', serviceType: 'admission', title: 'Masters Admission (BD)', status: 'active', startDate: new Date() }],
+    isB2BSettled: false, onshoreStatus: 'offshore'
+  },
+  {
+    id: 'c3', assignedCounselorId: 's2', partnerId: 'p1',
+    client: {
+      id: 'u3', name: 'Michael Chen', avatar: 'https://ui-avatars.com/api/?name=Michael+Chen&background=random',
+      email: 'm.chen@example.com', phone: '+61 411 222 333', location: 'Brisbane, QLD',
+      visaStatus: 'Student 500', visaExpiry: '2025-12-01', qualificationTarget: 'Cert IV Commercial Cookery',
+      experienceYears: 4, educationHistory: []
+    },
+    source: 'direct', superAgentStatus: 'processing', unreadCount: 0, status: 'active', priority: 'low', currentStage: 'evidence_collection', lastActive: new Date(Date.now() - 86400000), progressStage: 40, currentStep: 'Evidence Phase', paymentTotal: 3500, paymentPaid: 1000,
+    sentiment: 'positive', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
+    journey: [{ id: 'j4', serviceType: 'rpl', title: 'Chef RPL Onshore', status: 'active', startDate: new Date() }],
+    isB2BSettled: true, onshoreStatus: 'landed'
+  },
+  {
+    id: 'c4', assignedCounselorId: 's1',
+    client: {
+      id: 'u4', name: 'Tanvir Ahmed', avatar: 'https://ui-avatars.com/api/?name=Tanvir+Ahmed&background=random',
+      email: 'tanvir@example.com', phone: '+61 455 666 777', location: 'Sydney, NSW',
+      visaStatus: 'Graduate 485', visaExpiry: '2026-06-15', qualificationTarget: 'Subclass 189/190 Consultation',
+      experienceYears: 6, educationHistory: []
+    },
+    source: 'sub_agent', subAgentName: 'Global Ed Bangladesh', superAgentStatus: 'not_started', unreadCount: 0, status: 'active', priority: 'high', currentStage: 'lead', lastActive: new Date(), progressStage: 5, currentStep: 'Migration Plan', paymentTotal: 1500, paymentPaid: 1500,
+    sentiment: 'urgent', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
+    journey: [
+        { id: 'j5', serviceType: 'admission', title: 'Subclass 500 Completed', status: 'completed', startDate: new Date(2021, 1, 1) },
+        { id: 'j6', serviceType: 'visa', title: 'PR Pathway Onshore', status: 'active', startDate: new Date() }
+    ],
+    isB2BSettled: true, onshoreStatus: 'landed'
+  },
+  {
+    id: 'c5', assignedCounselorId: 's2',
+    client: {
+      id: 'u5', name: 'Anika Rahman', avatar: 'https://ui-avatars.com/api/?name=Anika+Rahman&background=random',
+      email: 'anika@example.com', phone: '+880 1819 000000', location: 'Chittagong, BD',
+      visaStatus: 'Applying', visaExpiry: '', qualificationTarget: 'Bachelor of Nursing',
+      experienceYears: 0, educationHistory: []
+    },
+    source: 'sub_agent', subAgentName: 'BD Scholars', superAgentStatus: 'processing', unreadCount: 3, status: 'review', priority: 'medium', currentStage: 'app_lodged', lastActive: new Date(), progressStage: 50, currentStep: 'Visa Lodged', paymentTotal: 28000, paymentPaid: 2000,
+    sentiment: 'anxious', visaRiskLevel: 'medium', activities: [], documents: [], 
+    messages: [{ id: 'm_anika', sender: SenderType.CLIENT, type: MessageType.TEXT, content: "Did we get the biometrics request?", timestamp: new Date(), read: false, thread: 'source' }],
+    journey: [{ id: 'j7', serviceType: 'admission', title: 'Nursing Offshore BD', status: 'active', startDate: new Date() }],
+    isB2BSettled: false, onshoreStatus: 'offshore'
+  },
+  {
+    id: 'c6', assignedCounselorId: 's1',
+    client: {
+      id: 'u6', name: 'Suresh Kumar', avatar: 'https://ui-avatars.com/api/?name=Suresh+Kumar&background=random',
+      email: 'suresh@example.com', phone: '+61 433 111 222', location: 'Perth, WA',
+      visaStatus: 'Student 500', visaExpiry: '2025-01-10', qualificationTarget: 'Course Transfer to Automotive',
       experienceYears: 3, educationHistory: []
     },
-    source: 'sub_agent', subAgentName: 'Global Ed', superAgentStatus: 'not_started', unreadCount: 0, status: 'lead', priority: 'medium', currentStage: 'lead', lastActive: new Date(Date.now() - 3600000 * 5), progressStage: 10, currentStep: 'Initial Assessment', paymentTotal: 3000, paymentPaid: 0,
-    sentiment: 'neutral', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
+    source: 'direct', superAgentStatus: 'not_started', unreadCount: 0, status: 'active', priority: 'medium', currentStage: 'lead', lastActive: new Date(), progressStage: 20, currentStep: 'Release Letter', paymentTotal: 500, paymentPaid: 0,
+    sentiment: 'neutral', visaRiskLevel: 'medium', activities: [], documents: [], messages: [],
+    journey: [{ id: 'j8', serviceType: 'onshore_transfer', title: 'Automotive Switch', status: 'active', startDate: new Date() }],
+    isB2BSettled: true, onshoreStatus: 'landed'
   },
   {
-    id: 'c3', assignedCounselorId: 's1', partnerId: 'p1',
+    id: 'c7', assignedCounselorId: 's2',
     client: {
-        id: 'u3', name: 'David Brown', avatar: 'https://picsum.photos/seed/david/200/200',
-        email: 'd.brown@example.com', phone: '+61 422 111 222', location: 'Brisbane, QLD',
-        visaStatus: 'Subclass 485', visaExpiry: '2025-08-10', qualificationTarget: 'Cert III in Carpentry',
-        experienceYears: 10, educationHistory: []
+      id: 'u7', name: 'Mehedi Hasan', avatar: 'https://ui-avatars.com/api/?name=Mehedi+Hasan&background=random',
+      email: 'mehedi@example.com', phone: '+61 477 888 999', location: 'Adelaide, SA',
+      visaStatus: 'Student 500', visaExpiry: '2025-08-30', qualificationTarget: 'Cert III Wall & Floor Tiling',
+      experienceYears: 8, educationHistory: []
     },
-    source: 'direct', superAgentStatus: 'not_started', unreadCount: 0, status: 'active', priority: 'low', currentStage: 'evidence_collection', lastActive: new Date(Date.now() - 86400000), progressStage: 30, currentStep: 'Evidence Collection', paymentTotal: 4500, paymentPaid: 1000,
-    sentiment: 'positive', visaRiskLevel: 'low', activities: [], documents: [{ id: 'd30', name: 'Work Photos', status: 'pending' }], messages: [],
-  },
-  {
-    id: 'c5', assignedCounselorId: 's3', partnerId: 'p1',
-    client: {
-        id: 'u5', name: 'Samuel Lee', avatar: 'https://picsum.photos/seed/samuel/200/200',
-        email: 'sam.lee@example.com', phone: '+61 499 888 777', location: 'Perth, WA',
-        visaStatus: 'Subclass 482', visaExpiry: '2026-01-20', qualificationTarget: 'Dip. of Leadership & Mgmt',
-        experienceYears: 8, educationHistory: []
-    },
-    source: 'direct', superAgentStatus: 'processing', unreadCount: 0, status: 'active', priority: 'medium', currentStage: 'rto_submission', lastActive: new Date(), progressStage: 85, currentStep: 'RTO Processing', paymentTotal: 2200, paymentPaid: 2200,
-    sentiment: 'neutral', visaRiskLevel: 'low', activities: [], documents: [{ id: 'd50', name: 'Ref Letter', status: 'verified' }], messages: [],
-  },
-  {
-    id: 'c7', assignedCounselorId: 's1', partnerId: 'p4',
-    client: {
-        id: 'u7', name: 'Ahmed Khan', avatar: 'https://picsum.photos/seed/ahmed/200/200',
-        email: 'ahmed.k@example.com', phone: '+61 488 111 000', location: 'Sydney, NSW',
-        visaStatus: 'Graduate 485', visaExpiry: '2025-09-12', qualificationTarget: 'Cert III in Electrotechnology',
-        experienceYears: 6, educationHistory: []
-    },
-    source: 'direct', superAgentStatus: 'not_started', unreadCount: 0, status: 'active', priority: 'high', currentStage: 'evidence_collection', lastActive: new Date(), progressStage: 20, currentStep: 'Evidence Collection', paymentTotal: 5000, paymentPaid: 2500,
-    sentiment: 'urgent', visaRiskLevel: 'medium', activities: [], documents: [], messages: [],
-  },
-  {
-    id: 'c16', assignedCounselorId: 's1', partnerId: 'p4',
-    client: {
-        id: 'u16', name: 'Rohan Gupta', avatar: 'https://picsum.photos/seed/rohan/200/200',
-        email: 'rohan.g@example.com', phone: '+61 433 999 000', location: 'Darwin, NT',
-        visaStatus: 'Student 500', visaExpiry: '2025-03-10', qualificationTarget: 'Cert III in Plumbing',
-        experienceYears: 12, educationHistory: []
-    },
-    source: 'direct', unreadCount: 0, status: 'active', priority: 'high', currentStage: 'evidence_collection', lastActive: new Date(), progressStage: 15, currentStep: 'Evidence Collection', paymentTotal: 4800, paymentPaid: 1000,
-    sentiment: 'urgent', visaRiskLevel: 'high', activities: [], documents: [], messages: [],
-    superAgentStatus: 'not_started'
-  },
-  {
-    id: 'c17', assignedCounselorId: 's1', partnerId: 'p5',
-    client: {
-        id: 'u17', name: 'Liam Wilson', avatar: 'https://picsum.photos/seed/liam/200/200',
-        email: 'liam.w@example.com', phone: '+61 422 777 666', location: 'Sunshine Coast, QLD',
-        visaStatus: 'Student 500', visaExpiry: '2025-10-05', qualificationTarget: 'Cert III in Painting',
-        experienceYears: 8, educationHistory: []
-    },
-    source: 'direct', unreadCount: 0, status: 'active', priority: 'medium', currentStage: 'evidence_collection', lastActive: new Date(), progressStage: 35, currentStep: 'Evidence Collection', paymentTotal: 3500, paymentPaid: 1500,
+    source: 'sub_agent', subAgentName: 'Global Ed Bangladesh', superAgentStatus: 'submitted', unreadCount: 0, status: 'active', priority: 'low', currentStage: 'rto_submission', lastActive: new Date(), progressStage: 90, currentStep: 'RTO Pending', paymentTotal: 4200, paymentPaid: 4200,
     sentiment: 'positive', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
-    superAgentStatus: 'not_started'
+    journey: [
+        { id: 'j9', serviceType: 'admission', title: 'Offshore Admission BD', status: 'completed', startDate: new Date(2022, 10, 1) },
+        { id: 'j10', serviceType: 'rpl', title: 'Tiling RPL Onshore', status: 'active', startDate: new Date() }
+    ],
+    isB2BSettled: true, onshoreStatus: 'landed'
   },
   {
-    id: 'c18', assignedCounselorId: 's1', partnerId: 'p5',
+    id: 'c8', assignedCounselorId: 's1',
     client: {
-        id: 'u18', name: 'Diego Torres', avatar: 'https://picsum.photos/seed/diego/200/200',
-        email: 'diego.t@example.com', phone: '+61 411 555 333', location: 'Sydney, NSW',
-        visaStatus: 'Subclass 482', visaExpiry: '2026-04-20', qualificationTarget: 'Cert III in Automotive',
-        experienceYears: 15, educationHistory: []
+      id: 'u8', name: 'Zoya Khan', avatar: 'https://ui-avatars.com/api/?name=Zoya+Khan&background=random',
+      email: 'zoya@example.com', phone: '+880 1611 000111', location: 'Dhaka, BD',
+      visaStatus: 'Applying', visaExpiry: '', qualificationTarget: 'Master of Professional Accounting',
+      experienceYears: 1, educationHistory: []
     },
-    source: 'sub_agent', subAgentName: 'TradeLink', superAgentStatus: 'processing', unreadCount: 0, status: 'active', priority: 'low', currentStage: 'mediator_review', lastActive: new Date(), progressStage: 50, currentStep: 'Mediator Review', paymentTotal: 5200, paymentPaid: 2600,
+    source: 'sub_agent', subAgentName: 'Elite Careers BD', superAgentStatus: 'not_started', unreadCount: 0, status: 'lead', priority: 'medium', currentStage: 'gte_assessment', lastActive: new Date(), progressStage: 35, currentStep: 'GTE Assessment', paymentTotal: 32000, paymentPaid: 0,
     sentiment: 'neutral', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
+    journey: [{ id: 'j11', serviceType: 'admission', title: 'MPA Offshore BD', status: 'active', startDate: new Date() }],
+    isB2BSettled: false, onshoreStatus: 'offshore'
   },
   {
-    id: 'c19', assignedCounselorId: 's1', partnerId: 'p6',
+    id: 'c9', assignedCounselorId: 's1',
     client: {
-        id: 'u19', name: 'Anya Ivanova', avatar: 'https://picsum.photos/seed/anya/200/200',
-        email: 'anya.i@example.com', phone: '+61 400 333 111', location: 'Melbourne, VIC',
-        visaStatus: 'Student 500', visaExpiry: '2024-12-25', qualificationTarget: 'Diploma of Early Childhood',
-        experienceYears: 6, educationHistory: []
+      id: 'u9', name: 'Liton Das', avatar: 'https://ui-avatars.com/api/?name=Liton+Das&background=random',
+      email: 'liton@example.com', phone: '+61 400 999 888', location: 'Melbourne, VIC',
+      visaStatus: 'Graduate 485', visaExpiry: '2025-03-20', qualificationTarget: 'Cert III Painting & Decorating',
+      experienceYears: 10, educationHistory: []
     },
-    source: 'direct', superAgentStatus: 'not_started', unreadCount: 1, status: 'active', priority: 'high', currentStage: 'evidence_collection', lastActive: new Date(), progressStage: 20, currentStep: 'Evidence Collection', paymentTotal: 2800, paymentPaid: 800,
-    sentiment: 'anxious', visaRiskLevel: 'high', activities: [], documents: [], messages: [{ id: 'anya_m1', sender: SenderType.CLIENT, type: MessageType.TEXT, content: "Can I use my overseas transcript for RPL?", timestamp: new Date(), read: false, thread: 'source' }],
+    source: 'sub_agent', subAgentName: 'BD Scholars', superAgentStatus: 'not_started', unreadCount: 0, status: 'active', priority: 'high', currentStage: 'evidence_collection', lastActive: new Date(), progressStage: 30, currentStep: 'Evidence Phase', paymentTotal: 3800, paymentPaid: 500,
+    sentiment: 'urgent', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
+    journey: [{ id: 'j12', serviceType: 'rpl', title: 'Painting RPL Onshore', status: 'active', startDate: new Date() }],
+    isB2BSettled: true, onshoreStatus: 'landed'
   },
   {
-    id: 'c20', assignedCounselorId: 's1', partnerId: 'p7',
+    id: 'c10', assignedCounselorId: 's2',
     client: {
-        id: 'u20', name: 'Raj Patel', avatar: 'https://picsum.photos/seed/raj/200/200',
-        email: 'raj.p@example.com', phone: '+61 499 111 222', location: 'Perth, WA',
-        visaStatus: 'Subclass 485', visaExpiry: '2025-07-15', qualificationTarget: 'Diploma of Hospitality Mgmt',
-        experienceYears: 9, educationHistory: []
+      id: 'u10', name: 'Fatima Zohra', avatar: 'https://ui-avatars.com/api/?name=Fatima+Zohra&background=random',
+      email: 'fatima@example.com', phone: '+880 1911 333444', location: 'Sylhet, BD',
+      visaStatus: 'Applying', visaExpiry: '', qualificationTarget: 'Dip. of Early Childhood Education',
+      experienceYears: 0, educationHistory: []
     },
-    source: 'sub_agent', subAgentName: 'Global Ed', superAgentStatus: 'processing', unreadCount: 0, status: 'active', priority: 'medium', currentStage: 'rto_submission', lastActive: new Date(), progressStage: 80, currentStep: 'RTO Processing', paymentTotal: 3400, paymentPaid: 3400,
-    sentiment: 'positive', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
+    source: 'sub_agent', subAgentName: 'Sylhet Global', superAgentStatus: 'not_started', unreadCount: 0, status: 'lead', priority: 'low', currentStage: 'lead', lastActive: new Date(), progressStage: 5, currentStep: 'Document Prep', paymentTotal: 12000, paymentPaid: 0,
+    sentiment: 'neutral', visaRiskLevel: 'medium', activities: [], documents: [], messages: [],
+    journey: [{ id: 'j13', serviceType: 'admission', title: 'Childcare Offshore BD', status: 'active', startDate: new Date() }],
+    isB2BSettled: false, onshoreStatus: 'offshore'
   },
   {
-    id: 'c21', assignedCounselorId: 's1', partnerId: 'p7',
+    id: 'c11', assignedCounselorId: 's1',
     client: {
-        id: 'u21', name: 'Hassan Mahmoud', avatar: 'https://picsum.photos/seed/hassan/200/200',
-        email: 'hassan.m@example.com', phone: '+61 488 222 333', location: 'Adelaide, SA',
-        visaStatus: 'Subclass 482', visaExpiry: '2026-09-12', qualificationTarget: 'Cert IV in Kitchen Mgmt',
-        experienceYears: 7, educationHistory: []
+      id: 'u11', name: 'Rajesh G.', avatar: 'https://ui-avatars.com/api/?name=Rajesh+G&background=random',
+      email: 'rajesh@example.com', phone: '+61 499 555 444', location: 'Darwin, NT',
+      visaStatus: 'Student 500', visaExpiry: '2024-10-30', qualificationTarget: 'TR Subclass 485',
+      experienceYears: 0, educationHistory: []
     },
-    source: 'direct', superAgentStatus: 'not_started', unreadCount: 0, status: 'active', priority: 'low', currentStage: 'lead', lastActive: new Date(), progressStage: 5, currentStep: 'Intake Enquiry', paymentTotal: 3100, paymentPaid: 0,
-    sentiment: 'neutral', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
-  },
-  {
-    id: 'c26', assignedCounselorId: 's1', partnerId: 'p8',
-    client: {
-        id: 'u26', name: 'Carlos Santos', avatar: 'https://picsum.photos/seed/carlos/200/200',
-        email: 'carlos.s@example.com', phone: '+61 433 111 222', location: 'Sydney, NSW',
-        visaStatus: 'Student 500', visaExpiry: '2025-01-10', qualificationTarget: 'Cert III in Tiling',
-        experienceYears: 10, educationHistory: []
-    },
-    source: 'sub_agent', subAgentName: 'TradeLink', unreadCount: 0, status: 'active', priority: 'high', currentStage: 'evidence_collection', lastActive: new Date(), progressStage: 22, currentStep: 'Evidence Collection', paymentTotal: 4200, paymentPaid: 1000,
+    source: 'direct', superAgentStatus: 'not_started', unreadCount: 0, status: 'active', priority: 'high', currentStage: 'lead', lastActive: new Date(), progressStage: 15, currentStep: 'TR Checklist', paymentTotal: 1800, paymentPaid: 1800,
     sentiment: 'anxious', visaRiskLevel: 'medium', activities: [], documents: [], messages: [],
-    superAgentStatus: 'not_started'
+    journey: [{ id: 'j14', serviceType: 'visa', title: 'TR 485 Onshore', status: 'active', startDate: new Date() }],
+    isB2BSettled: true, onshoreStatus: 'landed'
   },
   {
-    id: 'c27', assignedCounselorId: 's1', partnerId: 'p8',
+    id: 'c12', assignedCounselorId: 's2',
     client: {
-        id: 'u27', name: 'Sven Lindholm', avatar: 'https://picsum.photos/seed/sven/200/200',
-        email: 'sven.l@example.com', phone: '+61 422 333 444', location: 'Gold Coast, QLD',
-        visaStatus: 'Subclass 417', visaExpiry: '2024-12-05', qualificationTarget: 'Cert III in Bricklaying',
-        experienceYears: 4, educationHistory: []
+      id: 'u12', name: 'Mustafizur R.', avatar: 'https://ui-avatars.com/api/?name=Mustafizur+R&background=random',
+      email: 'mustafiz@example.com', phone: '+61 411 777 000', location: 'Hobart, TAS',
+      visaStatus: 'Student 500', visaExpiry: '2025-05-01', qualificationTarget: 'Cert IV in Plumbing',
+      experienceYears: 12, educationHistory: []
     },
-    source: 'direct', unreadCount: 0, status: 'lead', priority: 'low', currentStage: 'lead', lastActive: new Date(), progressStage: 5, currentStep: 'Initial Lead', paymentTotal: 3800, paymentPaid: 0,
-    sentiment: 'neutral', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
-    superAgentStatus: 'not_started'
-  },
-
-  // --- ADMISSIONS CATEGORY (12 FILES) ---
-  {
-    id: 'c4', assignedCounselorId: 's2', partnerId: 'p3',
-    client: {
-        id: 'u4', name: 'Elena Rodriguez', avatar: 'https://picsum.photos/seed/elena/200/200',
-        email: 'elena.r@example.com', phone: '+61 455 666 777', location: 'Adelaide, SA',
-        visaStatus: 'Visitor 600', visaExpiry: '2024-12-01', qualificationTarget: 'Master of Public Health',
-        experienceYears: 2, educationHistory: [{ id: 'e4', level: 'Bachelor', institution: 'Madrid Uni', startYear: 2018, endYear: 2022 }]
-    },
-    source: 'sub_agent', subAgentName: 'VisaFast', superAgentStatus: 'processing', unreadCount: 0, status: 'active', priority: 'high', currentStage: 'app_lodged', lastActive: new Date(Date.now() - 3600000), progressStage: 40, currentStep: 'App Lodged', paymentTotal: 38000, paymentPaid: 5000,
-    sentiment: 'anxious', visaRiskLevel: 'medium', activities: [], documents: [], messages: [],
-  },
-  {
-    id: 'c6', assignedCounselorId: 's2', partnerId: 'p3',
-    client: {
-        id: 'u6', name: 'Priya Sharma', avatar: 'https://picsum.photos/seed/priya/200/200',
-        email: 'priya.s@example.com', phone: '+61 433 222 111', location: 'Darwin, NT',
-        visaStatus: 'Student 500', visaExpiry: '2027-02-15', qualificationTarget: 'Bachelor of Nursing',
-        experienceYears: 1, educationHistory: [{ id: 'e6', level: 'Year 12', institution: 'DPS India', startYear: 2021, endYear: 2023 }]
-    },
-    source: 'sub_agent', subAgentName: 'Global Ed', superAgentStatus: 'accepted', unreadCount: 0, status: 'completed', priority: 'low', currentStage: 'coe_issued', lastActive: new Date(Date.now() - 172800000), progressStage: 100, currentStep: 'CoE Issued', paymentTotal: 45000, paymentPaid: 45000,
+    source: 'sub_agent', subAgentName: 'Global Ed Bangladesh', superAgentStatus: 'accepted', unreadCount: 0, status: 'completed', priority: 'low', currentStage: 'certified', lastActive: new Date(Date.now() - 172800000), progressStage: 100, currentStep: 'File Completed', paymentTotal: 5500, paymentPaid: 5500,
     sentiment: 'positive', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
-  },
-  {
-    id: 'c11', assignedCounselorId: 's2', partnerId: 'p3',
-    client: {
-        id: 'u11', name: 'Yuki Tanaka', avatar: 'https://picsum.photos/seed/yuki/200/200',
-        email: 'yuki.t@example.com', phone: '+61 422 999 000', location: 'Sydney, NSW',
-        visaStatus: 'Student 500', visaExpiry: '2025-05-10', qualificationTarget: 'Master of Data Science',
-        experienceYears: 3, educationHistory: []
-    },
-    source: 'direct', superAgentStatus: 'not_started', unreadCount: 0, status: 'active', priority: 'high', currentStage: 'conditional_offer', lastActive: new Date(), progressStage: 60, currentStep: 'Conditional Offer', paymentTotal: 42000, paymentPaid: 10000,
-    sentiment: 'neutral', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
-  },
-  {
-    id: 'c12', assignedCounselorId: 's2', partnerId: 'p3',
-    client: {
-        id: 'u12', name: 'Kevin O\'Connor', avatar: 'https://picsum.photos/seed/kevin/200/200',
-        email: 'kevin.o@example.com', phone: '+61 411 777 888', location: 'Melbourne, VIC',
-        visaStatus: 'Student 500', visaExpiry: '2026-03-20', qualificationTarget: 'Master of Nursing (GE)',
-        experienceYears: 2, educationHistory: []
-    },
-    source: 'sub_agent', subAgentName: 'Global Ed', superAgentStatus: 'processing', unreadCount: 0, status: 'active', priority: 'medium', currentStage: 'gte_assessment', lastActive: new Date(), progressStage: 75, currentStep: 'GTE / GS Check', paymentTotal: 48000, paymentPaid: 15000,
-    sentiment: 'anxious', visaRiskLevel: 'medium', activities: [], documents: [], messages: [],
-  },
-  {
-    id: 'c13', assignedCounselorId: 's2', partnerId: 'p3',
-    client: {
-        id: 'u13', name: 'Linda Ng', avatar: 'https://picsum.photos/seed/linda/200/200',
-        email: 'linda.n@example.com', phone: '+61 400 555 666', location: 'Brisbane, QLD',
-        visaStatus: 'Subclass 485', visaExpiry: '2025-12-10', qualificationTarget: 'MBA (Executive)',
-        experienceYears: 10, educationHistory: []
-    },
-    source: 'direct', superAgentStatus: 'not_started', unreadCount: 0, status: 'active', priority: 'low', currentStage: 'lead', lastActive: new Date(), progressStage: 5, currentStep: 'Uni Enquiry', paymentTotal: 55000, paymentPaid: 0,
-    sentiment: 'neutral', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
-  },
-  {
-    id: 'c14', assignedCounselorId: 's2', partnerId: 'p3',
-    client: {
-        id: 'u14', name: 'Arjun Singh', avatar: 'https://picsum.photos/seed/arjun/200/200',
-        email: 'arjun.s@example.com', phone: '+61 499 123 321', location: 'Melbourne, VIC',
-        visaStatus: 'Student 500', visaExpiry: '2027-01-15', qualificationTarget: 'Master of Accounting',
-        experienceYears: 1, educationHistory: []
-    },
-    source: 'sub_agent', subAgentName: 'VisaFast', superAgentStatus: 'not_started', unreadCount: 0, status: 'active', priority: 'high', currentStage: 'app_lodged', lastActive: new Date(), progressStage: 45, currentStep: 'App Lodged', paymentTotal: 32000, paymentPaid: 5000,
-    sentiment: 'urgent', visaRiskLevel: 'high', activities: [], documents: [], messages: [],
-  },
-  {
-    id: 'c15', assignedCounselorId: 's2', partnerId: 'p3',
-    client: {
-        id: 'u15', name: 'Chloe Dubois', avatar: 'https://picsum.photos/seed/chloe/200/200',
-        email: 'chloe.d@example.com', phone: '+61 477 666 555', location: 'Hobart, TAS',
-        visaStatus: 'Visitor 600', visaExpiry: '2024-11-20', qualificationTarget: 'PhD in Education',
-        experienceYears: 5, educationHistory: []
-    },
-    source: 'direct', superAgentStatus: 'not_started', unreadCount: 0, status: 'active', priority: 'medium', currentStage: 'conditional_offer', lastActive: new Date(), progressStage: 65, currentStep: 'Offer Received', paymentTotal: 60000, paymentPaid: 20000,
-    sentiment: 'positive', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
-  },
-  {
-    id: 'c22', assignedCounselorId: 's2', partnerId: 'p3',
-    client: {
-        id: 'u22', name: 'James Kim', avatar: 'https://picsum.photos/seed/james/200/200',
-        email: 'james.k@example.com', phone: '+61 466 333 444', location: 'Melbourne, VIC',
-        visaStatus: 'Student 500', visaExpiry: '2025-02-14', qualificationTarget: 'Bachelor of IT',
-        experienceYears: 0, educationHistory: []
-    },
-    source: 'direct', superAgentStatus: 'not_started', unreadCount: 0, status: 'active', priority: 'high', currentStage: 'app_lodged', lastActive: new Date(), progressStage: 40, currentStep: 'App Lodged', paymentTotal: 35000, paymentPaid: 5000,
-    sentiment: 'anxious', visaRiskLevel: 'medium', activities: [], documents: [], messages: [],
-  },
-  {
-    id: 'c23', assignedCounselorId: 's2', partnerId: 'p3',
-    client: {
-        id: 'u23', name: 'Sophie Martin', avatar: 'https://picsum.photos/seed/sophie/200/200',
-        email: 'sophie.m@example.com', phone: '+61 455 222 111', location: 'Sydney, NSW',
-        visaStatus: 'Visitor 600', visaExpiry: '2024-10-10', qualificationTarget: 'Master of Law (LLM)',
-        experienceYears: 4, educationHistory: []
-    },
-    source: 'sub_agent', subAgentName: 'Elite', superAgentStatus: 'processing', unreadCount: 1, status: 'active', priority: 'high', currentStage: 'conditional_offer', lastActive: new Date(), progressStage: 60, currentStep: 'Conditional Offer', paymentTotal: 52000, paymentPaid: 15000,
-    sentiment: 'urgent', visaRiskLevel: 'critical', activities: [], documents: [], messages: [{ id: 'sophie_m1', sender: SenderType.CLIENT, type: MessageType.TEXT, content: "Can I accept my offer today?", timestamp: new Date(), read: false, thread: 'source' }],
-  },
-  {
-    id: 'c24', assignedCounselorId: 's2', partnerId: 'p3',
-    client: {
-        id: 'u24', name: 'Ali Rezai', avatar: 'https://picsum.photos/seed/ali/200/200',
-        email: 'ali.r@example.com', phone: '+61 444 888 999', location: 'Perth, WA',
-        visaStatus: 'Student 500', visaExpiry: '2026-08-20', qualificationTarget: 'Bachelor of Engineering',
-        experienceYears: 2, educationHistory: []
-    },
-    source: 'direct', superAgentStatus: 'not_started', unreadCount: 0, status: 'active', priority: 'low', currentStage: 'gte_assessment', lastActive: new Date(), progressStage: 70, currentStep: 'GTE Assessment', paymentTotal: 41000, paymentPaid: 10000,
-    sentiment: 'neutral', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
-  },
-  {
-    id: 'c25', assignedCounselorId: 's2', partnerId: 'p3',
-    client: {
-        id: 'u25', name: 'Fatima Al-Sayed', avatar: 'https://picsum.photos/seed/fatima2/200/200',
-        email: 'fatima.s@example.com', phone: '+61 477 999 888', location: 'Brisbane, QLD',
-        visaStatus: 'Student 500', visaExpiry: '2025-11-30', qualificationTarget: 'Master of Social Work',
-        experienceYears: 3, educationHistory: []
-    },
-    source: 'sub_agent', subAgentName: 'Global Ed', superAgentStatus: 'processing', unreadCount: 0, status: 'active', priority: 'medium', currentStage: 'app_lodged', lastActive: new Date(), progressStage: 45, currentStep: 'App Lodged', paymentTotal: 38000, paymentPaid: 5000,
-    sentiment: 'positive', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
-  },
-  {
-    id: 'c28', assignedCounselorId: 's2', partnerId: 'p3',
-    client: {
-        id: 'u28', name: 'Lucas Meyer', avatar: 'https://picsum.photos/seed/lucas/200/200',
-        email: 'lucas.m@example.com', phone: '+61 411 222 333', location: 'Perth, WA',
-        visaStatus: 'Student 500', visaExpiry: '2026-06-20', qualificationTarget: 'Bachelor of Cyber Security',
-        experienceYears: 0, educationHistory: []
-    },
-    source: 'direct', superAgentStatus: 'not_started', unreadCount: 0, status: 'active', priority: 'medium', currentStage: 'app_lodged', lastActive: new Date(), progressStage: 40, currentStep: 'App Lodged', paymentTotal: 33000, paymentPaid: 5000,
-    sentiment: 'neutral', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
+    journey: [
+        { id: 'j15', serviceType: 'admission', title: 'Offshore Visa BD', status: 'completed', startDate: new Date(2022, 0, 1) },
+        { id: 'j16', serviceType: 'rpl', title: 'Plumbing RPL Onshore', status: 'completed', startDate: new Date(), endDate: new Date() }
+    ],
+    isB2BSettled: true, onshoreStatus: 'landed'
   }
 ];
 
-export const PROGRESS_STEPS = ['Intake', 'Doc Check', 'Mediator Verified', 'Super Agent', 'Complete'];
-
 export const MOCK_COMMISSIONS: CommissionRecord[] = [
-    { id: 'tx1', clientId: 'u1', clientName: 'Sarah Jenkins', description: 'Commission from StudyPath RTO', amount: 800, type: 'incoming', status: 'pending', dueDate: new Date('2024-06-01'), relatedEntityName: 'StudyPath RTO' },
+  {
+    id: 'tx1',
+    clientId: 'u1',
+    clientName: 'Sarah Jenkins',
+    description: 'RPL Service Fee',
+    amount: 4500,
+    type: 'incoming',
+    status: 'paid',
+    dueDate: new Date(2024, 5, 15),
+    relatedEntityName: 'StudyPath RTO'
+  },
+  {
+    id: 'tx2',
+    clientId: 'u1',
+    clientName: 'Sarah Jenkins',
+    description: 'Sub-Agent Commission',
+    amount: 1125,
+    type: 'outgoing_sub_agent',
+    status: 'pending',
+    dueDate: new Date(2024, 5, 30),
+    relatedEntityName: 'Global Ed Bangladesh'
+  }
 ];

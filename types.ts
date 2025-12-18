@@ -19,7 +19,7 @@ export type MessageThread = 'source' | 'upstream';
 
 export type ViewState = 'dashboard' | 'pipeline' | 'inbox' | 'partners' | 'finance' | 'team';
 
-export type ApplicationType = 'rpl' | 'admission';
+export type ApplicationType = 'rpl' | 'admission' | 'visa' | 'onshore_transfer';
 
 export type ApplicationStage = 
   | 'lead' 
@@ -30,7 +30,19 @@ export type ApplicationStage =
   | 'app_lodged'
   | 'conditional_offer'
   | 'gte_assessment'
-  | 'coe_issued';
+  | 'coe_issued'
+  | 'visa_granted'
+  | 'onshore_arrival';
+
+export interface JourneyMilestone {
+    id: string;
+    serviceType: ApplicationType;
+    title: string;
+    status: 'completed' | 'active' | 'upcoming';
+    startDate: Date;
+    endDate?: Date;
+    outcome?: string;
+}
 
 export interface ApplicationCard {
   id: string;
@@ -45,7 +57,6 @@ export interface ApplicationCard {
   daysInStage: number;
   missingDocs: number;
   counselorId: string;
-  // Added partnerId to fix the property access error in Kanban.tsx
   partnerId?: string;
 }
 
@@ -100,10 +111,13 @@ export interface Conversation {
   paymentTotal: number;
   paymentPaid: number;
   activities: ActivityLog[];
+  // Lifecycle Journey
+  journey: JourneyMilestone[];
+  isB2BSettled?: boolean; // For Bangladesh Offshore B2B
+  onshoreStatus?: 'offshore' | 'landed' | 'resident';
   // AI Intelligent Fields
   sentiment?: 'positive' | 'neutral' | 'anxious' | 'urgent';
   visaRiskLevel?: 'low' | 'medium' | 'high' | 'critical';
-  // Custom Categorization
   customCategory?: string;
 }
 
@@ -162,8 +176,8 @@ export interface Partner {
   logo: string;
 }
 
+// Added missing TransactionType export to resolve build errors
 export type TransactionType = 'incoming' | 'outgoing_sub_agent' | 'outgoing_staff';
-export type TransactionStatus = 'pending' | 'paid' | 'overdue';
 
 export interface CommissionRecord {
     id: string;
@@ -172,7 +186,7 @@ export interface CommissionRecord {
     description: string;
     amount: number;
     type: TransactionType;
-    status: TransactionStatus;
+    status: 'pending' | 'paid' | 'overdue';
     dueDate: Date;
     relatedEntityName: string;
 }
