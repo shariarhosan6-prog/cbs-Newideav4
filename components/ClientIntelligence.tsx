@@ -1,9 +1,9 @@
 
 import React, { useState } from 'react';
-import { Conversation, DocumentStatus, EducationEntry, ActivityLog } from '../types';
+import { Conversation, DocumentStatus, EducationEntry, ActivityLog, ApplicationStage } from '../types';
 import { 
-    User, FileText, ShoppingCart, Eye, Download, AlertCircle, Plus, GraduationCap, AlertTriangle, X, CheckCircle, Clock, 
-    History, MapPin, ExternalLink, ShieldCheck, Mail, Zap, FileBarChart, MoreHorizontal, Globe
+    User, FileText, GraduationCap, History, CheckCircle, Clock, 
+    ShieldCheck, Zap, MoreHorizontal, ChevronDown, Rocket
 } from 'lucide-react';
 
 interface Props {
@@ -11,24 +11,55 @@ interface Props {
   isOpen: boolean;
   onAddDocument: (name: string) => void;
   onAddEducation: (edu: EducationEntry) => void;
+  onUpdateStatus: (status: ApplicationStage) => void;
 }
 
-const ClientIntelligence: React.FC<Props> = ({ conversation, isOpen, onAddDocument, onAddEducation }) => {
+const ClientIntelligence: React.FC<Props> = ({ conversation, isOpen, onAddDocument, onAddEducation, onUpdateStatus }) => {
     const [activeSection, setActiveSection] = useState<'profile' | 'docs' | 'activity'>('profile');
+    const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
     
     const verifiedCount = conversation.documents.filter(d => d.status === 'verified').length;
     const progressPercent = Math.round((verifiedCount / conversation.documents.length) * 100) || 0;
 
+    const RPL_STAGES: ApplicationStage[] = ['lead', 'evidence_collection', 'mediator_review', 'rto_submission', 'certified'];
+    const ADM_STAGES: ApplicationStage[] = ['lead', 'app_lodged', 'conditional_offer', 'gte_assessment', 'coe_issued'];
+    const availableStages = conversation.client.qualificationTarget.toLowerCase().includes('cert') || conversation.client.qualificationTarget.toLowerCase().includes('dip') 
+        ? RPL_STAGES : ADM_STAGES;
+
     return (
-        <div className="h-full bg-slate-50 flex flex-col overflow-hidden">
-            {/* 1. Header & Profile Card (Simplified for better focus) */}
-            <div className="p-6 bg-white border-b border-slate-100 z-10">
+        <div className="h-full bg-slate-50 flex flex-col overflow-hidden border-l border-slate-100">
+            {/* 1. Header & Profile Card */}
+            <div className="p-6 bg-white border-b border-slate-100 z-20">
                 <div className="flex items-center gap-4 mb-6">
-                    <img src={conversation.client.avatar} alt="" className="w-14 h-14 rounded-2xl object-cover border ring-4 ring-slate-50" />
-                    <div>
+                    <img src={conversation.client.avatar} alt="" className="w-14 h-14 rounded-2xl object-cover border ring-4 ring-slate-50 shadow-sm" />
+                    <div className="flex-1">
                         <h2 className="text-lg font-bold text-slate-900 leading-tight">{conversation.client.name}</h2>
-                        <div className="flex items-center gap-1.5 mt-0.5 text-[11px] text-slate-500 font-bold uppercase tracking-wide">
-                            <span className="bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded uppercase">{conversation.client.visaStatus}</span>
+                        <div className="flex items-center gap-2 mt-1">
+                             <div className="relative">
+                                <button 
+                                    onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
+                                    className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 text-[10px] font-black uppercase tracking-widest border border-indigo-100 hover:bg-indigo-100 transition-colors"
+                                >
+                                    {conversation.currentStep}
+                                    <ChevronDown className="w-3 h-3" />
+                                </button>
+
+                                {isStatusDropdownOpen && (
+                                    <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-xl shadow-2xl border border-slate-100 p-2 z-50 animate-in zoom-in-95">
+                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest p-2">Update Progression</p>
+                                        {availableStages.map(stage => (
+                                            <button 
+                                                key={stage}
+                                                onClick={() => { onUpdateStatus(stage); setIsStatusDropdownOpen(false); }}
+                                                className={`w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-between group ${conversation.currentStage === stage ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-slate-50 text-slate-600'}`}
+                                            >
+                                                {stage.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                                                {(stage === 'rto_submission' || stage === 'app_lodged') && <Rocket className="w-3 h-3 text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity" />}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                             </div>
                         </div>
                     </div>
                 </div>
@@ -42,7 +73,7 @@ const ClientIntelligence: React.FC<Props> = ({ conversation, isOpen, onAddDocume
                         <button 
                             key={tab.id}
                             onClick={() => setActiveSection(tab.id as any)}
-                            className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold transition-all ${activeSection === tab.id ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500'}`}
+                            className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold transition-all ${activeSection === tab.id ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                         >
                             <tab.icon className="w-3.5 h-3.5" />
                             {tab.label}
@@ -52,34 +83,51 @@ const ClientIntelligence: React.FC<Props> = ({ conversation, isOpen, onAddDocume
             </div>
 
             {/* Content Body */}
-            <div className="flex-1 overflow-y-auto p-5 space-y-6 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto p-5 space-y-6 custom-scrollbar bg-slate-50/50">
                 
                 {activeSection === 'profile' && (
                     <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
                         {/* Financials Summary */}
-                        <div className="bg-slate-900 text-white rounded-2xl p-4 shadow-xl shadow-slate-200">
-                            <div className="flex justify-between items-center mb-4">
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Financial Status</p>
-                                <span className="text-[10px] font-bold bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">Good Standing</span>
+                        <div className="bg-slate-900 text-white rounded-3xl p-6 shadow-xl shadow-slate-200 group relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/20 rounded-full blur-3xl -mr-16 -mt-16"></div>
+                            <div className="relative z-10">
+                                <div className="flex justify-between items-center mb-4">
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Financial Status</p>
+                                    <span className="text-[10px] font-black bg-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded-full border border-emerald-500/20">VERIFIED</span>
+                                </div>
+                                <h3 className="text-3xl font-black mb-1 tracking-tight">${(conversation.paymentTotal - conversation.paymentPaid).toLocaleString()}</h3>
+                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-6 opacity-70">Outstanding Balance</p>
+                                <button className="w-full bg-white text-slate-900 hover:bg-indigo-50 transition-all text-[11px] font-black uppercase tracking-widest py-3 rounded-2xl flex items-center justify-center gap-2 shadow-lg active:scale-95">
+                                    <Zap className="w-4 h-4 text-indigo-600 fill-current" /> Send Payment Link
+                                </button>
                             </div>
-                            <h3 className="text-2xl font-bold mb-1">${(conversation.paymentTotal - conversation.paymentPaid).toLocaleString()}</h3>
-                            <p className="text-[10px] text-slate-400 font-medium mb-4">Current Outstanding Balance</p>
-                            <button className="w-full bg-white/10 hover:bg-white/20 transition-all text-white text-xs font-bold py-2 rounded-lg flex items-center justify-center gap-2">
-                                <Zap className="w-3.5 h-3.5" /> Issue Payment Link
-                            </button>
+                        </div>
+
+                        {/* Profile Info */}
+                        <div className="bg-white rounded-3xl border border-slate-200 p-5 space-y-4 shadow-sm">
+                             <div className="flex items-center gap-3">
+                                 <div className="p-2 bg-slate-50 rounded-xl text-slate-400"><History className="w-4 h-4" /></div>
+                                 <div>
+                                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Experience</p>
+                                     <p className="text-xs font-bold text-slate-800">{conversation.client.experienceYears} Years Professional</p>
+                                 </div>
+                             </div>
                         </div>
 
                         {/* Education History Card */}
-                        <div className="bg-white rounded-2xl border border-slate-200 p-4">
-                            <h4 className="text-xs font-bold text-slate-800 mb-4 flex items-center gap-2">
-                                <GraduationCap className="w-4 h-4 text-indigo-500" /> Education Snapshot
+                        <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+                            <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-widest mb-6 flex items-center gap-2">
+                                <GraduationCap className="w-5 h-5 text-indigo-500" /> Academic Timeline
                             </h4>
-                            <div className="space-y-4">
+                            <div className="space-y-6">
                                 {conversation.client.educationHistory.map((edu) => (
-                                    <div key={edu.id} className="relative pl-6 border-l-2 border-indigo-100 pb-2 group last:pb-0">
-                                        <div className="absolute -left-[5px] top-0 w-2 h-2 rounded-full bg-indigo-500 group-last:bg-emerald-500"></div>
-                                        <p className="text-xs font-bold text-slate-800 leading-none">{edu.level}</p>
-                                        <p className="text-[10px] text-slate-500 mt-1">{edu.institution}</p>
+                                    <div key={edu.id} className="relative pl-7 border-l-2 border-slate-100 pb-2 group last:pb-0">
+                                        <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-white border-2 border-slate-200 flex items-center justify-center">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div>
+                                        </div>
+                                        <p className="text-xs font-black text-slate-800 leading-none">{edu.level}</p>
+                                        <p className="text-[11px] font-bold text-slate-400 mt-1.5 uppercase tracking-tight">{edu.institution}</p>
+                                        <p className="text-[10px] text-slate-400 mt-1 font-medium">{edu.startYear} — {edu.endYear}</p>
                                     </div>
                                 ))}
                             </div>
@@ -89,44 +137,58 @@ const ClientIntelligence: React.FC<Props> = ({ conversation, isOpen, onAddDocume
 
                 {activeSection === 'docs' && (
                     <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
-                        <div className="flex items-center justify-between mb-2">
-                             <h4 className="text-xs font-bold text-slate-800">Checklist Progress</h4>
-                             <span className="text-xs font-bold text-blue-600">{progressPercent}%</span>
+                        <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
+                            <div className="flex items-center justify-between mb-4">
+                                <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-widest">Submission Integrity</h4>
+                                <span className="text-xs font-black text-indigo-600 bg-indigo-50 px-2 py-1 rounded-lg">{progressPercent}%</span>
+                            </div>
+                            <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-50">
+                                <div style={{width: `${progressPercent}%`}} className="h-full bg-gradient-to-r from-indigo-500 to-blue-500 transition-all duration-1000"></div>
+                            </div>
                         </div>
-                        <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                            <div style={{width: `${progressPercent}%`}} className="h-full bg-blue-500 transition-all duration-1000"></div>
-                        </div>
-                        <div className="grid gap-2">
+
+                        <div className="grid gap-3">
                             {conversation.documents.map(doc => (
-                                <div key={doc.id} className="bg-white p-3 rounded-xl border border-slate-100 flex items-center justify-between hover:border-blue-100 transition-all">
-                                    <div className="flex items-center gap-3">
-                                        {doc.status === 'verified' ? <CheckCircle className="w-4 h-4 text-emerald-500" /> : <Clock className="w-4 h-4 text-amber-500" />}
-                                        <span className="text-xs font-bold text-slate-700">{doc.name}</span>
+                                <div key={doc.id} className="bg-white p-4 rounded-2xl border border-slate-100 flex items-center justify-between hover:border-indigo-200 hover:shadow-md transition-all group">
+                                    <div className="flex items-center gap-4">
+                                        {doc.status === 'verified' ? (
+                                            <div className="p-2 bg-emerald-50 text-emerald-500 rounded-xl"><CheckCircle className="w-4 h-4" /></div>
+                                        ) : (
+                                            <div className="p-2 bg-amber-50 text-amber-500 rounded-xl animate-pulse"><Clock className="w-4 h-4" /></div>
+                                        )}
+                                        <div>
+                                            <span className="text-xs font-bold text-slate-800 block">{doc.name}</span>
+                                            {doc.uploadDate && <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Uploaded {new Date(doc.uploadDate).toLocaleDateString()}</span>}
+                                        </div>
                                     </div>
-                                    <button className="text-slate-400 hover:text-slate-600"><MoreHorizontal className="w-4 h-4" /></button>
+                                    <button className="text-slate-300 hover:text-slate-600 transition-colors"><MoreHorizontal className="w-4 h-4" /></button>
                                 </div>
                             ))}
+                            <button className="w-full py-4 rounded-2xl border-2 border-dashed border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:bg-white hover:text-indigo-600 hover:border-indigo-200 transition-all">
+                                Request Additional Evidence
+                            </button>
                         </div>
                     </div>
                 )}
 
                 {activeSection === 'activity' && (
                     <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
-                        <h4 className="text-xs font-bold text-slate-800 flex items-center gap-2 mb-4">
-                            <ShieldCheck className="w-4 h-4 text-blue-500" /> Audit Trail (Staff Activity)
+                        <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-widest flex items-center gap-2 mb-6">
+                            <ShieldCheck className="w-5 h-5 text-indigo-500" /> Operational Protocol Log
                         </h4>
-                        <div className="space-y-6">
+                        <div className="space-y-8 relative">
+                            <div className="absolute left-4 top-2 bottom-2 w-0.5 bg-slate-100"></div>
                             {conversation.activities.map((log) => (
-                                <div key={log.id} className="flex gap-4 relative">
-                                    <div className="shrink-0 w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-[10px] text-slate-500">
+                                <div key={log.id} className="flex gap-4 relative z-10">
+                                    <div className="shrink-0 w-8 h-8 rounded-xl bg-white border border-slate-100 shadow-sm flex items-center justify-center font-black text-[10px] text-indigo-600 uppercase">
                                         {log.staffName.charAt(0)}
                                     </div>
-                                    <div className="flex-1">
-                                        <div className="flex justify-between items-baseline">
-                                            <p className="text-xs font-bold text-slate-800">{log.staffName}</p>
-                                            <span className="text-[10px] text-slate-400">{new Date(log.timestamp).toLocaleDateString()}</span>
+                                    <div className="flex-1 bg-white p-3 rounded-2xl border border-slate-100 shadow-sm">
+                                        <div className="flex justify-between items-baseline mb-1">
+                                            <p className="text-[11px] font-black text-slate-900 uppercase tracking-tight">{log.staffName}</p>
+                                            <span className="text-[9px] font-bold text-slate-400">{new Date(log.timestamp).toLocaleDateString()}</span>
                                         </div>
-                                        <p className="text-xs text-slate-600 mt-1">{log.action}</p>
+                                        <p className="text-xs text-slate-600 font-medium">{log.action}</p>
                                     </div>
                                 </div>
                             ))}

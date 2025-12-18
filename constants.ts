@@ -28,10 +28,16 @@ export const MOCK_COUNSELORS: Counselor[] = [
     },
 ];
 
+export const MOCK_PARTNERS: Partner[] = [
+  { id: 'p1', name: 'StudyPath RTO', type: 'RTO', contactPerson: 'David Ross', email: 'admissions@studypath.edu.au', activeStudents: 12, commissionRate: '25%', status: 'active', logo: 'https://ui-avatars.com/api/?name=Study+Path&background=6366f1&color=fff' },
+  { id: 'p2', name: 'Global Ed Consultancy', type: 'Sub-Agent', contactPerson: 'Priya Kapoor', email: 'priya@globaled.com', activeStudents: 8, commissionRate: '15%', status: 'active', logo: 'https://ui-avatars.com/api/?name=Global+Ed&background=f59e0b&color=fff' },
+];
+
 export const MOCK_CONVERSATIONS: Conversation[] = [
   {
     id: 'c1',
     assignedCounselorId: 's1',
+    partnerId: 'p1',
     client: {
       id: 'u1',
       name: 'Sarah Jenkins',
@@ -54,6 +60,7 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     unreadCount: 1,
     status: 'active',
     priority: 'high',
+    currentStage: 'mediator_review',
     lastActive: new Date(),
     progressStage: 60,
     currentStep: 'Mediator Review',
@@ -77,6 +84,7 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
   {
     id: 'c2',
     assignedCounselorId: 's2',
+    partnerId: 'p1',
     client: {
       id: 'u2',
       name: 'Michael Chen',
@@ -96,6 +104,7 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     unreadCount: 0,
     status: 'lead',
     priority: 'medium',
+    currentStage: 'lead',
     lastActive: new Date(Date.now() - 86400000),
     progressStage: 10,
     currentStep: 'Initial Assessment',
@@ -110,11 +119,6 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
 ];
 
 export const PROGRESS_STEPS = ['Intake', 'Doc Check', 'Mediator Verified', 'Super Agent', 'Complete'];
-
-export const MOCK_PARTNERS: Partner[] = [
-    { id: 'p1', name: 'StudyPath RTO', type: 'RTO', contactPerson: 'David Ross', email: 'admissions@studypath.edu.au', activeStudents: 12, commissionRate: '25%', status: 'active', logo: 'https://ui-avatars.com/api/?name=Study+Path&background=6366f1&color=fff' },
-    { id: 'p2', name: 'Global Ed Consultancy', type: 'Sub-Agent', contactPerson: 'Priya Kapoor', email: 'priya@globaled.com', activeStudents: 8, commissionRate: '15%', status: 'active', logo: 'https://ui-avatars.com/api/?name=Global+Ed&background=f59e0b&color=fff' },
-];
 
 export const MOCK_COMMISSIONS: CommissionRecord[] = [
     { id: 'tx1', clientId: 'u1', clientName: 'Sarah Jenkins', description: 'Commission from StudyPath RTO', amount: 800, type: 'incoming', status: 'pending', dueDate: new Date('2024-06-01'), relatedEntityName: 'StudyPath RTO' },

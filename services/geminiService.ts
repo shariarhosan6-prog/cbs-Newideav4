@@ -1,9 +1,8 @@
 
 import { GoogleGenAI } from "@google/genai";
-import { Message, SenderType } from "../types";
+import { Message, SenderType, ClientProfile, Partner, DocumentStatus } from "../types";
 
 // Initialize the Google GenAI client
-// Always use the named parameter and process.env.API_KEY directly as per guidelines.
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const getSmartSuggestions = async (
@@ -34,7 +33,6 @@ export const getSmartSuggestions = async (
       Return ONLY the suggestions as a JSON array of strings.
     `;
 
-    // Use gemini-3-flash-preview for text tasks as per guidelines.
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: prompt,
@@ -55,7 +53,6 @@ export const getSmartSuggestions = async (
 };
 
 export const analyzeDocumentMock = async (fileName: string): Promise<{ type: string; confidence: number; summary: string }> => {
-  // Simulating document analysis using Gemini
   if (!process.env.API_KEY) {
     return {
        type: "Unknown",
@@ -71,7 +68,6 @@ export const analyzeDocumentMock = async (fileName: string): Promise<{ type: str
       Return JSON: { "type": string, "confidence": number (0-100), "summary": string }
     `;
 
-    // Use gemini-3-flash-preview for text tasks as per guidelines.
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: prompt,
@@ -87,5 +83,61 @@ export const analyzeDocumentMock = async (fileName: string): Promise<{ type: str
     return { type: "General File", confidence: 50, summary: "Could not analyze file." };
   } catch (e) {
     return { type: "Error", confidence: 0, summary: "Analysis failed." };
+  }
+};
+
+/**
+ * Generates a professional email draft for a partner (RTO/University)
+ * when a student's file is ready for submission.
+ */
+export const generatePartnerEmail = async (
+  client: ClientProfile,
+  partner: Partner,
+  verifiedDocs: DocumentStatus[]
+): Promise<{ subject: string; body: string }> => {
+  if (!process.env.API_KEY) {
+    return {
+      subject: `New Application Submission: ${client.name}`,
+      body: `Hi ${partner.contactPerson},\n\nPlease find attached the documents for ${client.name} for the ${client.qualificationTarget}.`
+    };
+  }
+
+  try {
+    const docList = verifiedDocs.map(d => d.name).join(', ');
+    const prompt = `
+      You are an AI specialized in the education and migration industry. 
+      Generate a professional email to a partner (${partner.type}) regarding a student application submission.
+      
+      Details:
+      - Client Name: ${client.name}
+      - Qualification Target: ${client.qualificationTarget}
+      - Partner Name: ${partner.name}
+      - Partner Contact: ${partner.contactPerson}
+      - Documents being sent: ${docList}
+      - Current Visa: ${client.visaStatus}
+      
+      The email should be professional, polite, and clear. 
+      Return JSON: { "subject": string, "body": string }
+    `;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: prompt,
+      config: {
+        responseMimeType: 'application/json'
+      }
+    });
+
+    const text = response.text;
+    if (text) {
+      return JSON.parse(text);
+    }
+    throw new Error("No response from AI");
+  } catch (e) {
+    console.error("Gemini email generation error:", e);
+    return {
+      subject: `Application Lodgment: ${client.name} - ${client.qualificationTarget}`,
+      body: `Dear ${partner.contactPerson},\n\nWe are pleased to submit the application for ${client.name}. Attached are the verified documents for your review.\n\nBest regards,\nStitch OS Team`
+    };
   }
 };

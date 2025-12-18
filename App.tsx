@@ -9,28 +9,87 @@ import ClientIntelligence from './components/ClientIntelligence';
 import Partners from './components/Partners';
 import Finance from './components/Finance';
 import TeamManagement from './components/TeamManagement';
-import { MOCK_CONVERSATIONS, MOCK_COUNSELORS } from './constants';
-import { Conversation, MessageType, SenderType, MessageThread, ViewState, EducationEntry } from './types';
-import { Menu, X } from 'lucide-react';
-import { analyzeDocumentMock } from './services/geminiService';
+import { MOCK_CONVERSATIONS, MOCK_COUNSELORS, MOCK_PARTNERS } from './constants';
+import { Conversation, MessageType, SenderType, MessageThread, ViewState, ApplicationStage } from './types';
+import { analyzeDocumentMock, generatePartnerEmail } from './services/geminiService';
 
 function App() {
   const [currentView, setCurrentView] = useState<ViewState>('dashboard');
   const [conversations, setConversations] = useState<Conversation[]>(MOCK_CONVERSATIONS);
   const [selectedId, setSelectedId] = useState<string>(MOCK_CONVERSATIONS[0].id);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [rightPanelOpen, setRightPanelOpen] = useState(true);
   const [jumpHighlight, setJumpHighlight] = useState(false);
 
   const selectedConversation = conversations.find(c => c.id === selectedId) || conversations[0];
   const unreadCount = conversations.reduce((acc, curr) => acc + curr.unreadCount, 0);
 
-  // Deep link with high-fidelity transition
   const handleSelectFromPipeline = (id: string) => {
     setSelectedId(id);
     setCurrentView('inbox');
     setJumpHighlight(true);
-    setTimeout(() => setJumpHighlight(false), 3000); // Visual feedback for the "jump"
+    setTimeout(() => setJumpHighlight(false), 3000);
+  };
+
+  const handleUpdateStatus = async (id: string, newStage: ApplicationStage) => {
+    const conv = conversations.find(c => c.id === id);
+    if (!conv) return;
+
+    // 1. Update the conversation state
+    setConversations(prev => prev.map(c => {
+      if (c.id === id) {
+        return { 
+          ...c, 
+          currentStage: newStage,
+          currentStep: newStage.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+          activities: [
+            { id: `act_${Date.now()}`, staffId: 'admin', staffName: 'AI Automator', action: `Status changed to ${newStage}`, timestamp: new Date() },
+            ...c.activities
+          ]
+        };
+      }
+      return c;
+    }));
+
+    // 2. Automated Partner Email Trigger
+    // Check if we are moving to a submission stage
+    const isSubmission = newStage === 'rto_submission' || newStage === 'app_lodged';
+    
+    if (isSubmission) {
+      const partner = MOCK_PARTNERS.find(p => p.id === (conv.partnerId || 'p1'));
+      if (partner) {
+        // AI Generate the email content
+        const emailContent = await generatePartnerEmail(
+          conv.client,
+          partner,
+          conv.documents.filter(d => d.status === 'verified')
+        );
+
+        // Add System Message to Chat
+        const systemMsg = {
+          id: `sys_email_${Date.now()}`,
+          sender: SenderType.SYSTEM,
+          type: MessageType.SYSTEM,
+          content: `📧 AI AUTOMATION: Professional email sent to ${partner.name} (${partner.contactPerson}). Subject: "${emailContent.subject}". Attached ${conv.documents.filter(d => d.status === 'verified').length} verified documents.`,
+          timestamp: new Date(),
+          thread: 'source' as MessageThread
+        };
+
+        // Add a secondary system message to the Upstream thread
+        const upstreamMsg = {
+          id: `sys_up_${Date.now()}`,
+          sender: SenderType.SUPER_AGENT,
+          type: MessageType.TEXT,
+          content: `AUTO-LODGMENT: We've officially submitted ${conv.client.name}'s file to ${partner.name}. Awaiting initial feedback.`,
+          timestamp: new Date(),
+          thread: 'upstream' as MessageThread
+        };
+
+        setConversations(prev => prev.map(c => {
+          if (c.id === id) return { ...c, messages: [...c.messages, systemMsg, upstreamMsg] };
+          return c;
+        }));
+      }
+    }
   };
 
   const handleSendMessage = async (text: string, type: MessageType = MessageType.TEXT, fileData?: { name: string, size: string }, thread: MessageThread = 'source') => {
@@ -51,23 +110,34 @@ function App() {
       return c;
     }));
 
-    // AI Automation Simulation
+    // NLP Trigger for "Send this to RTO" style commands
+    if (text.toLowerCase().includes("send this to") || text.toLowerCase().includes("submit to")) {
+        // AI extracts target and triggers submission
+        setTimeout(() => {
+            handleUpdateStatus(selectedId, selectedConversation.currentStage.includes('app') ? 'app_lodged' : 'rto_submission');
+        }, 1000);
+    }
+
+    // AI Automation Simulation for Document analysis
     setTimeout(async () => {
-       if (thread === 'source') {
-           if (type === MessageType.DOCUMENT && fileData) {
-                const analysis = await analyzeDocumentMock(fileData.name);
-                const systemMsg = { id: (Date.now() + 1).toString(), sender: SenderType.SYSTEM, type: MessageType.SYSTEM, content: `AI Verified: ${analysis.type} (${analysis.confidence}%). Document summary: ${analysis.summary}`, timestamp: new Date(), thread: 'source' as MessageThread };
-                setConversations(prev => prev.map(c => {
-                    if(c.id === selectedId) return { ...c, messages: [...c.messages, systemMsg], documents: c.documents.map(d => d.status === 'missing' && analysis.type.toLowerCase().includes(d.name.toLowerCase().split(' ')[0]) ? { ...d, status: 'verified', confidence: analysis.confidence } : d) };
-                    return c;
-                }));
-           } else {
-                const replyMsg = { id: (Date.now() + 1).toString(), sender: SenderType.CLIENT, type: MessageType.TEXT, content: "Perfect, I'll get those files sent over by the end of the day.", timestamp: new Date(), read: true, thread: 'source' as MessageThread };
-                setConversations(prev => prev.map(c => {
-                    if (c.id === selectedId) return { ...c, messages: [...c.messages, replyMsg] };
-                    return c;
-                }));
-           }
+       if (thread === 'source' && type === MessageType.DOCUMENT && fileData) {
+            const analysis = await analyzeDocumentMock(fileData.name);
+            const systemMsg = { 
+              id: (Date.now() + 1).toString(), 
+              sender: SenderType.SYSTEM, 
+              type: MessageType.SYSTEM, 
+              content: `AI Verified: ${analysis.type} (${analysis.confidence}%). Document summary: ${analysis.summary}`, 
+              timestamp: new Date(), 
+              thread: 'source' as MessageThread 
+            };
+            setConversations(prev => prev.map(c => {
+                if(c.id === selectedId) return { 
+                  ...c, 
+                  messages: [...c.messages, systemMsg], 
+                  documents: c.documents.map(d => d.status === 'missing' && analysis.type.toLowerCase().includes(d.name.toLowerCase().split(' ')[0]) ? { ...d, status: 'verified', confidence: analysis.confidence, uploadDate: new Date() } : d) 
+                };
+                return c;
+            }));
        }
     }, 2000);
   };
@@ -85,9 +155,7 @@ function App() {
       };
 
       setConversations(prev => prev.map(c => {
-          if (c.id === selectedId) {
-              return { ...c, assignedCounselorId: counselorId, activities: [newLog, ...(c.activities || [])] };
-          }
+          if (c.id === selectedId) return { ...c, assignedCounselorId: counselorId, activities: [newLog, ...(c.activities || [])] };
           return c;
       }));
   };
@@ -119,6 +187,7 @@ function App() {
                     isOpen={true} 
                     onAddDocument={() => {}} 
                     onAddEducation={() => {}} 
+                    onUpdateStatus={(status) => handleUpdateStatus(selectedId, status)}
                 />
             </div>
           </div>

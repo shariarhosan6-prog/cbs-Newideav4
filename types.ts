@@ -85,11 +85,13 @@ export interface Conversation {
   source: LeadSource;
   subAgentName?: string;
   assignedCounselorId: string;
+  partnerId?: string; // ID of the RTO or University partner
   superAgentStatus: 'not_started' | 'processing' | 'submitted' | 'accepted';
   messages: Message[];
   unreadCount: number;
   status: 'active' | 'lead' | 'review' | 'completed';
   priority: 'high' | 'medium' | 'low';
+  currentStage: ApplicationStage; // Synced with ApplicationCard stage
   lastActive: Date;
   progressStage: number;
   currentStep: string;
