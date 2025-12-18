@@ -2,10 +2,30 @@
 import { Conversation, MessageType, SenderType, Partner, CommissionRecord, Counselor, ActivityLog } from './types';
 
 export const MOCK_COUNSELORS: Counselor[] = [
-    { id: 's1', name: 'Jessica Wu', avatar: 'https://ui-avatars.com/api/?name=Jessica+Wu&background=ffb6c1&color=fff', role: 'Senior Counselor', totalSales: 45000, commissionEarned: 4500, activeDeals: 12, lastActive: new Date(), status: 'online' },
-    { id: 's2', name: 'Tom Hardy', avatar: 'https://ui-avatars.com/api/?name=Tom+Hardy&background=add8e6&color=fff', role: 'Junior Counselor', totalSales: 32000, commissionEarned: 3200, activeDeals: 8, lastActive: new Date(Date.now() - 3600000), status: 'busy' },
-    { id: 's3', name: 'Amanda Lee', avatar: 'https://ui-avatars.com/api/?name=Amanda+Lee&background=90ee90&color=fff', role: 'Migration Agent', totalSales: 58000, commissionEarned: 5800, activeDeals: 15, lastActive: new Date(), status: 'online' },
-    { id: 's4', name: 'David Kim', avatar: 'https://ui-avatars.com/api/?name=David+Kim&background=f0e68c&color=fff', role: 'Junior Counselor', totalSales: 21000, commissionEarned: 2100, activeDeals: 5, lastActive: new Date(Date.now() - 86400000), status: 'offline' },
+    { 
+        id: 's1', name: 'Jessica Wu', avatar: 'https://ui-avatars.com/api/?name=Jessica+Wu&background=ffb6c1&color=fff', 
+        role: 'Senior Counselor', department: 'RPL', totalSales: 45000, commissionEarned: 4500, activeDeals: 12, 
+        lastActive: new Date(), status: 'online',
+        tasks: [{ id: 't1', title: 'Verify Sarah USI', priority: 'high', dueDate: new Date(), status: 'pending' }]
+    },
+    { 
+        id: 's2', name: 'Tom Hardy', avatar: 'https://ui-avatars.com/api/?name=Tom+Hardy&background=add8e6&color=fff', 
+        role: 'Junior Counselor', department: 'Admissions', totalSales: 32000, commissionEarned: 3200, activeDeals: 18, 
+        lastActive: new Date(Date.now() - 3600000), status: 'busy',
+        tasks: []
+    },
+    { 
+        id: 's3', name: 'Amanda Lee', avatar: 'https://ui-avatars.com/api/?name=Amanda+Lee&background=90ee90&color=fff', 
+        role: 'Migration Agent', department: 'Legal', totalSales: 58000, commissionEarned: 5800, activeDeals: 8, 
+        lastActive: new Date(), status: 'online',
+        tasks: []
+    },
+    { 
+        id: 's4', name: 'David Kim', avatar: 'https://ui-avatars.com/api/?name=David+Kim&background=f0e68c&color=fff', 
+        role: 'Junior Counselor', department: 'RPL', totalSales: 21000, commissionEarned: 2100, activeDeals: 5, 
+        lastActive: new Date(Date.now() - 86400000), status: 'offline',
+        tasks: []
+    },
 ];
 
 export const MOCK_CONVERSATIONS: Conversation[] = [
@@ -41,15 +61,13 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     paymentPaid: 1250,
     activities: [
         { id: 'a1', staffId: 'admin', staffName: 'Alex (Admin)', action: 'Assigned file to Jessica Wu', timestamp: new Date(Date.now() - 86400000 * 3) },
-        { id: 'a2', staffId: 's1', staffName: 'Jessica Wu', action: 'Requested missing USI Transcript', timestamp: new Date(Date.now() - 86400000) },
-        { id: 'a3', staffId: 'ai', staffName: 'AI Engine', action: 'Verified Sarah_CV.pdf', timestamp: new Date(Date.now() - 3600000) }
+        { id: 'a2', staffId: 's1', staffName: 'Jessica Wu', action: 'Requested missing USI Transcript', timestamp: new Date(Date.now() - 86400000) }
     ],
     documents: [
       { id: 'd1', name: 'Resume / CV', status: 'verified', uploadDate: new Date('2024-05-10'), confidence: 98 },
       { id: 'd2', name: 'Employment Reference 1', status: 'verified', uploadDate: new Date('2024-05-12'), confidence: 95 },
       { id: 'd4', name: 'Photo ID', status: 'verified', uploadDate: new Date('2024-05-01'), confidence: 99 },
-      { id: 'd5', name: 'USI Transcript', status: 'missing' },
-      { id: 'd_gap', name: 'Gap Explanation (2019-2022)', status: 'missing' }
+      { id: 'd5', name: 'USI Transcript', status: 'missing' }
     ],
     messages: [
       { id: 'm1', sender: SenderType.AGENT, type: MessageType.TEXT, content: "Hi Sarah! I'm reviewing your file before sending it to the main processing team.", timestamp: new Date(Date.now() - 86400000 * 2), read: true, thread: 'source' },

@@ -45,7 +45,7 @@ export interface ApplicationCard {
   lastUpdate?: Date;
   daysInStage: number;
   missingDocs: number;
-  counselorId: string; // Changed to ID for lookup
+  counselorId: string;
 }
 
 export interface ActivityLog {
@@ -57,16 +57,26 @@ export interface ActivityLog {
     details?: string;
 }
 
+export interface TeamTask {
+    id: string;
+    title: string;
+    priority: 'high' | 'medium' | 'low';
+    dueDate: Date;
+    status: 'pending' | 'completed';
+}
+
 export interface Counselor {
     id: string;
     name: string;
     avatar: string;
     role: 'Junior Counselor' | 'Senior Counselor' | 'Migration Agent';
+    department: 'RPL' | 'Admissions' | 'Legal';
     totalSales: number;
     commissionEarned: number;
     activeDeals: number;
     lastActive: Date;
     status: 'online' | 'offline' | 'busy';
+    tasks: TeamTask[];
 }
 
 export interface Conversation {
@@ -74,7 +84,7 @@ export interface Conversation {
   client: ClientProfile;
   source: LeadSource;
   subAgentName?: string;
-  assignedCounselorId: string; // The staff member handling this file
+  assignedCounselorId: string;
   superAgentStatus: 'not_started' | 'processing' | 'submitted' | 'accepted';
   messages: Message[];
   unreadCount: number;
@@ -86,10 +96,9 @@ export interface Conversation {
   documents: DocumentStatus[];
   paymentTotal: number;
   paymentPaid: number;
-  activities: ActivityLog[]; // Audit trail for this file
+  activities: ActivityLog[];
 }
 
-// ... other types remain same ...
 export interface Message {
   id: string;
   sender: SenderType;
