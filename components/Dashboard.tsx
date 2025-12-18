@@ -1,10 +1,15 @@
+
 import React from 'react';
 import { 
     TrendingUp, Users, AlertCircle, CheckCircle2, DollarSign, Briefcase, ArrowRight, 
     Activity, Building2, Wallet, ArrowUpRight, ArrowDownLeft, Calendar, BarChart3, MoreHorizontal 
 } from 'lucide-react';
 
-const Dashboard: React.FC = () => {
+interface Props {
+  onOpenNewLead: () => void;
+}
+
+const Dashboard: React.FC<Props> = ({ onOpenNewLead }) => {
   return (
     <div className="flex-1 bg-slate-50 h-full overflow-y-auto">
       {/* Super Admin Header */}
@@ -30,8 +35,11 @@ const Dashboard: React.FC = () => {
                  <button className="p-2 bg-slate-50 border border-slate-200 rounded-lg hover:bg-slate-100 transition-colors text-slate-500">
                     <Calendar className="w-4 h-4" />
                  </button>
-                 <button className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-bold shadow-lg shadow-slate-200 hover:bg-slate-800 transition-all">
-                    <Activity className="w-4 h-4" /> Generate Report
+                 <button 
+                    onClick={onOpenNewLead}
+                    className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-bold shadow-lg shadow-slate-200 hover:bg-slate-800 transition-all active:scale-95"
+                 >
+                    <Users className="w-4 h-4" /> New Lead
                  </button>
             </div>
         </div>

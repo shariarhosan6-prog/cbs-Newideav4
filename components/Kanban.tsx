@@ -10,9 +10,10 @@ interface Props {
   onSelectCard?: (id: string) => void;
   filterPartnerId?: string | null;
   onClearFilter?: () => void;
+  onAddLead?: () => void;
 }
 
-const Kanban: React.FC<Props> = ({ conversations, onSelectCard, filterPartnerId, onClearFilter }) => {
+const Kanban: React.FC<Props> = ({ conversations, onSelectCard, filterPartnerId, onClearFilter, onAddLead }) => {
   const [activePipeline, setActivePipeline] = useState<ApplicationType>('rpl');
 
   const RPL_STAGES: { id: ApplicationStage; label: string; color: string }[] = [
@@ -98,7 +99,10 @@ const Kanban: React.FC<Props> = ({ conversations, onSelectCard, filterPartnerId,
                   </div>
                 )}
             </div>
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-blue-700 transition-colors flex items-center gap-2">
+            <button 
+                onClick={onAddLead}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-blue-700 transition-colors flex items-center gap-2 active:scale-95 shadow-lg shadow-blue-100"
+            >
                 <Plus className="w-4 h-4" /> New Lead
             </button>
         </div>
@@ -124,7 +128,7 @@ const Kanban: React.FC<Props> = ({ conversations, onSelectCard, filterPartnerId,
                                 <div 
                                     key={card.id} 
                                     onClick={() => onSelectCard?.(card.id)}
-                                    className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md cursor-pointer transition-all group"
+                                    className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md cursor-pointer transition-all group animate-in fade-in slide-in-from-bottom-2"
                                 >
                                     <div className="flex justify-between items-start mb-2">
                                         <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full uppercase">
@@ -154,7 +158,10 @@ const Kanban: React.FC<Props> = ({ conversations, onSelectCard, filterPartnerId,
                                    No applications found for this partner in this stage.
                                </div>
                             )}
-                            <button className="w-full py-3 text-xs text-slate-400 font-bold hover:text-blue-600 border-2 border-dashed border-slate-200 rounded-xl hover:bg-white hover:border-blue-200 transition-all flex items-center justify-center gap-2">
+                            <button 
+                                onClick={onAddLead}
+                                className="w-full py-3 text-xs text-slate-400 font-bold hover:text-blue-600 border-2 border-dashed border-slate-200 rounded-xl hover:bg-white hover:border-blue-200 transition-all flex items-center justify-center gap-2"
+                            >
                                 <Plus className="w-4 h-4" /> Add File
                             </button>
                         </div>

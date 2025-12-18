@@ -9,8 +9,9 @@ import ClientIntelligence from './components/ClientIntelligence';
 import Partners from './components/Partners';
 import Finance from './components/Finance';
 import TeamManagement from './components/TeamManagement';
+import NewLeadModal from './components/NewLeadModal';
 import { MOCK_CONVERSATIONS, MOCK_COUNSELORS, MOCK_PARTNERS } from './constants';
-import { Conversation, MessageType, SenderType, MessageThread, ViewState, ApplicationStage, Counselor, TeamTask, Partner } from './types';
+import { Conversation, MessageType, SenderType, MessageThread, ViewState, ApplicationStage, Counselor, TeamTask, Partner, ClientProfile } from './types';
 import { analyzeDocumentMock, generatePartnerEmail } from './services/geminiService';
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
   const [rightPanelOpen, setRightPanelOpen] = useState(true);
   const [jumpHighlight, setJumpHighlight] = useState(false);
   const [categories, setCategories] = useState<string[]>(['Urgent Follow-ups', 'Prospects', 'Onboarding', 'Waiting on RTO']);
+  const [isNewLeadModalOpen, setIsNewLeadModalOpen] = useState(false);
   
   // Filtering state
   const [pipelinePartnerFilter, setPipelinePartnerFilter] = useState<string | null>(null);
@@ -222,15 +224,69 @@ function App() {
     setCurrentView('pipeline');
   };
 
+  const handleCreateLead = (leadData: Partial<ClientProfile>) => {
+    const newId = `c_new_${Date.now()}`;
+    const newConversation: Conversation = {
+      id: newId,
+      assignedCounselorId: counselors[0].id, // Default to first counselor for now
+      client: {
+        id: `u_new_${Date.now()}`,
+        name: leadData.name || 'New Lead',
+        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(leadData.name || 'N L')}&background=random`,
+        email: leadData.email || '',
+        phone: leadData.phone || '',
+        location: leadData.location || 'Unknown',
+        visaStatus: leadData.visaStatus || 'TBA',
+        visaExpiry: leadData.visaExpiry || '',
+        qualificationTarget: leadData.qualificationTarget || 'General Enquiry',
+        experienceYears: 0,
+        educationHistory: []
+      },
+      source: 'direct',
+      superAgentStatus: 'not_started',
+      unreadCount: 1,
+      status: 'lead',
+      priority: 'medium',
+      currentStage: 'lead',
+      lastActive: new Date(),
+      progressStage: 5,
+      currentStep: 'Initial Assessment',
+      paymentTotal: 0,
+      paymentPaid: 0,
+      activities: [{
+        id: `act_init_${Date.now()}`,
+        staffId: 'ai',
+        staffName: 'AI System',
+        action: 'New lead created via dashboard',
+        timestamp: new Date()
+      }],
+      documents: [],
+      messages: [{
+        id: `msg_init_${Date.now()}`,
+        sender: SenderType.SYSTEM,
+        type: MessageType.SYSTEM,
+        content: `New lead created for ${leadData.name}. Qualification target: ${leadData.qualificationTarget}`,
+        timestamp: new Date(),
+        thread: 'source'
+      }]
+    };
+
+    setConversations(prev => [newConversation, ...prev]);
+    setSelectedId(newId);
+    setCurrentView('inbox');
+    setIsNewLeadModalOpen(false);
+  };
+
   const renderContent = () => {
     switch (currentView) {
-      case 'dashboard': return <Dashboard />;
+      case 'dashboard': return <Dashboard onOpenNewLead={() => setIsNewLeadModalOpen(true)} />;
       case 'pipeline': return (
         <Kanban 
           conversations={conversations} 
           onSelectCard={handleSelectFromPipeline} 
           filterPartnerId={pipelinePartnerFilter}
           onClearFilter={() => setPipelinePartnerFilter(null)}
+          onAddLead={() => setIsNewLeadModalOpen(true)}
         />
       );
       case 'team': return (
@@ -285,7 +341,7 @@ function App() {
         />
       );
       case 'finance': return <Finance />;
-      default: return <Dashboard />;
+      default: return <Dashboard onOpenNewLead={() => setIsNewLeadModalOpen(true)} />;
     }
   };
 
@@ -297,6 +353,13 @@ function App() {
       <main className="flex-1 h-full relative overflow-hidden flex flex-col">
          {renderContent()}
       </main>
+
+      {/* New Lead Modal */}
+      <NewLeadModal 
+        isOpen={isNewLeadModalOpen} 
+        onClose={() => setIsNewLeadModalOpen(false)} 
+        onSubmit={handleCreateLead} 
+      />
     </div>
   );
 }
