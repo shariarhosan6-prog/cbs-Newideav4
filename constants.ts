@@ -41,41 +41,45 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     ],
     messages: [{ id: 'm1', sender: SenderType.CLIENT, type: MessageType.TEXT, content: "I am now in Sydney, can we start my RPL?", timestamp: new Date(), read: false, thread: 'source' }],
     journey: [
-        { id: 'j1', serviceType: 'admission', title: 'Subclass 500 BD-Offshore', status: 'completed', startDate: new Date(2023, 5, 1) },
-        { id: 'j2', serviceType: 'rpl', title: 'Dip. Project Mgmt Onshore', status: 'active', startDate: new Date() }
+        { id: 'j1', serviceType: 'admission', title: 'Offshore Enrollment (BD)', status: 'completed', startDate: new Date(2023, 5, 1) },
+        { id: 'j2', serviceType: 'visa', title: 'Visa Grant (S500)', status: 'completed', startDate: new Date(2023, 9, 15) },
+        { id: 'j3', serviceType: 'rpl', title: 'Diploma of PM (Onshore)', status: 'active', startDate: new Date() }
     ],
     isB2BSettled: true, onshoreStatus: 'landed'
   },
   {
-    id: 'c2', assignedCounselorId: 's1', partnerId: 'p3',
+    id: 'c2', assignedCounselorId: 's1',
     client: {
       id: 'u2', name: 'Rafiqul Islam', avatar: 'https://ui-avatars.com/api/?name=Rafiqul+Islam&background=random',
       email: 'rafiq.bd@example.com', phone: '+880 1711 223344', location: 'Dhaka, Bangladesh',
       visaStatus: 'Applying', visaExpiry: '', qualificationTarget: 'Master of IT',
       experienceYears: 2, 
-      educationHistory: [
-          { id: 'e3', level: 'Bachelor', institution: 'Dhaka University', startYear: 2018, endYear: 2022 }
-      ]
+      educationHistory: [{ id: 'e3', level: 'Bachelor', institution: 'Dhaka University', startYear: 2018, endYear: 2022 }]
     },
-    source: 'sub_agent', subAgentName: 'Elite Careers BD', superAgentStatus: 'not_started', unreadCount: 0, status: 'lead', priority: 'medium', currentStage: 'lead', lastActive: new Date(), progressStage: 10, currentStep: 'Offshore Intake', paymentTotal: 22000, paymentPaid: 0,
+    source: 'sub_agent', subAgentName: 'Elite Careers BD', superAgentStatus: 'not_started', unreadCount: 0, status: 'lead', priority: 'medium', currentStage: 'gte_assessment', lastActive: new Date(), progressStage: 10, currentStep: 'Offshore Intake', paymentTotal: 22000, paymentPaid: 0,
     sentiment: 'neutral', visaRiskLevel: 'medium', activities: [], documents: [], messages: [],
-    journey: [{ id: 'j3', serviceType: 'admission', title: 'Masters Admission (BD)', status: 'active', startDate: new Date() }],
+    journey: [
+        { id: 'j4', serviceType: 'admission', title: 'GTE Assessment Phase', status: 'active', startDate: new Date() },
+        { id: 'j5', serviceType: 'visa', title: 'Subclass 500 Lodgement', status: 'upcoming', startDate: new Date() }
+    ],
     isB2BSettled: false, onshoreStatus: 'offshore'
   },
   {
-    id: 'c3', assignedCounselorId: 's2', partnerId: 'p1',
+    id: 'c3', assignedCounselorId: 's2',
     client: {
       id: 'u3', name: 'Michael Chen', avatar: 'https://ui-avatars.com/api/?name=Michael+Chen&background=random',
       email: 'm.chen@example.com', phone: '+61 411 222 333', location: 'Brisbane, QLD',
       visaStatus: 'Student 500', visaExpiry: '2025-12-01', qualificationTarget: 'Cert IV Commercial Cookery',
       experienceYears: 4, 
-      educationHistory: [
-          { id: 'e4', level: 'Year 12', institution: 'Shanghai High', startYear: 2014, endYear: 2017 }
-      ]
+      educationHistory: [{ id: 'e4', level: 'Year 12', institution: 'Shanghai High', startYear: 2014, endYear: 2017 }]
     },
     source: 'direct', superAgentStatus: 'processing', unreadCount: 0, status: 'active', priority: 'low', currentStage: 'evidence_collection', lastActive: new Date(), progressStage: 40, currentStep: 'Evidence Phase', paymentTotal: 3500, paymentPaid: 1000,
     sentiment: 'positive', visaRiskLevel: 'low', activities: [], documents: [{ id: 'd_m1', name: 'Passport', status: 'verified', uploadDate: new Date() }], messages: [],
-    journey: [{ id: 'j4', serviceType: 'rpl', title: 'Chef RPL Onshore', status: 'active', startDate: new Date() }],
+    journey: [
+        { id: 'j6', serviceType: 'admission', title: 'Offshore Enrollment', status: 'completed', startDate: new Date(2022, 1, 1) },
+        { id: 'j7', serviceType: 'visa', title: 'Visa Granted', status: 'completed', startDate: new Date(2022, 5, 1) },
+        { id: 'j8', serviceType: 'rpl', title: 'Chef RPL (Onshore)', status: 'active', startDate: new Date() }
+    ],
     isB2BSettled: true, onshoreStatus: 'landed'
   },
   {
@@ -88,7 +92,11 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     },
     source: 'sub_agent', subAgentName: 'Global Ed Bangladesh', superAgentStatus: 'not_started', unreadCount: 0, status: 'active', priority: 'high', currentStage: 'lead', lastActive: new Date(), progressStage: 5, currentStep: 'Migration Plan', paymentTotal: 1500, paymentPaid: 1500,
     sentiment: 'urgent', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
-    journey: [{ id: 'j5', serviceType: 'visa', title: 'PR Pathway Onshore', status: 'active', startDate: new Date() }],
+    journey: [
+        { id: 'j9', serviceType: 'admission', title: 'Masters (Completed)', status: 'completed', startDate: new Date(2021, 1, 1) },
+        { id: 'j10', serviceType: 'visa', title: 'Subclass 485 Granted', status: 'completed', startDate: new Date(2023, 7, 10) },
+        { id: 'j11', serviceType: 'visa', title: 'PR Strategy (Onshore)', status: 'active', startDate: new Date() }
+    ],
     isB2BSettled: true, onshoreStatus: 'landed'
   },
   {
@@ -101,7 +109,10 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     },
     source: 'sub_agent', subAgentName: 'BD Scholars', superAgentStatus: 'processing', unreadCount: 3, status: 'review', priority: 'medium', currentStage: 'app_lodged', lastActive: new Date(), progressStage: 50, currentStep: 'Visa Lodged', paymentTotal: 28000, paymentPaid: 2000,
     sentiment: 'anxious', visaRiskLevel: 'medium', activities: [], documents: [], messages: [],
-    journey: [{ id: 'j7', serviceType: 'admission', title: 'Nursing Offshore BD', status: 'active', startDate: new Date() }],
+    journey: [
+        { id: 'j12', serviceType: 'admission', title: 'CoE Issued (Nursing)', status: 'completed', startDate: new Date(2023, 11, 1) },
+        { id: 'j13', serviceType: 'visa', title: 'Visa Decision Pending', status: 'active', startDate: new Date() }
+    ],
     isB2BSettled: false, onshoreStatus: 'offshore'
   },
   {
@@ -114,7 +125,10 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     },
     source: 'direct', superAgentStatus: 'not_started', unreadCount: 0, status: 'active', priority: 'medium', currentStage: 'lead', lastActive: new Date(), progressStage: 20, currentStep: 'Release Letter', paymentTotal: 500, paymentPaid: 0,
     sentiment: 'neutral', visaRiskLevel: 'medium', activities: [], documents: [], messages: [],
-    journey: [{ id: 'j8', serviceType: 'onshore_transfer', title: 'Automotive Switch', status: 'active', startDate: new Date() }],
+    journey: [
+        { id: 'j14', serviceType: 'admission', title: 'Original Course', status: 'completed', startDate: new Date(2022, 1, 1) },
+        { id: 'j15', serviceType: 'onshore_transfer', title: 'Automotive Switch', status: 'active', startDate: new Date() }
+    ],
     isB2BSettled: true, onshoreStatus: 'landed'
   },
   {
@@ -127,7 +141,11 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     },
     source: 'sub_agent', subAgentName: 'Global Ed Bangladesh', superAgentStatus: 'submitted', unreadCount: 0, status: 'active', priority: 'low', currentStage: 'rto_submission', lastActive: new Date(), progressStage: 90, currentStep: 'RTO Pending', paymentTotal: 4200, paymentPaid: 4200,
     sentiment: 'positive', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
-    journey: [{ id: 'j10', serviceType: 'rpl', title: 'Tiling RPL Onshore', status: 'active', startDate: new Date() }],
+    journey: [
+        { id: 'j16', serviceType: 'admission', title: 'Offshore Admission', status: 'completed', startDate: new Date(2021, 5, 1) },
+        { id: 'j17', serviceType: 'visa', title: 'Visa S500 Granted', status: 'completed', startDate: new Date(2021, 9, 10) },
+        { id: 'j18', serviceType: 'rpl', title: 'Tiling RPL (Onshore)', status: 'active', startDate: new Date() }
+    ],
     isB2BSettled: true, onshoreStatus: 'landed'
   },
   {
@@ -140,7 +158,9 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     },
     source: 'sub_agent', subAgentName: 'Elite Careers BD', superAgentStatus: 'not_started', unreadCount: 0, status: 'lead', priority: 'medium', currentStage: 'gte_assessment', lastActive: new Date(), progressStage: 35, currentStep: 'GTE Assessment', paymentTotal: 32000, paymentPaid: 0,
     sentiment: 'neutral', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
-    journey: [{ id: 'j11', serviceType: 'admission', title: 'MPA Offshore BD', status: 'active', startDate: new Date() }],
+    journey: [
+        { id: 'j19', serviceType: 'admission', title: 'GTE Documentation', status: 'active', startDate: new Date() }
+    ],
     isB2BSettled: false, onshoreStatus: 'offshore'
   },
   {
@@ -153,7 +173,10 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     },
     source: 'sub_agent', subAgentName: 'BD Scholars', superAgentStatus: 'not_started', unreadCount: 0, status: 'active', priority: 'high', currentStage: 'evidence_collection', lastActive: new Date(), progressStage: 30, currentStep: 'Evidence Phase', paymentTotal: 3800, paymentPaid: 500,
     sentiment: 'urgent', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
-    journey: [{ id: 'j12', serviceType: 'rpl', title: 'Painting RPL Onshore', status: 'active', startDate: new Date() }],
+    journey: [
+        { id: 'j20', serviceType: 'visa', title: 'Graduate Visa (485)', status: 'completed', startDate: new Date(2023, 3, 15) },
+        { id: 'j21', serviceType: 'rpl', title: 'Painting RPL (Onshore)', status: 'active', startDate: new Date() }
+    ],
     isB2BSettled: true, onshoreStatus: 'landed'
   },
   {
@@ -166,7 +189,9 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     },
     source: 'sub_agent', subAgentName: 'Sylhet Global', superAgentStatus: 'not_started', unreadCount: 0, status: 'lead', priority: 'low', currentStage: 'lead', lastActive: new Date(), progressStage: 5, currentStep: 'Document Prep', paymentTotal: 12000, paymentPaid: 0,
     sentiment: 'neutral', visaRiskLevel: 'medium', activities: [], documents: [], messages: [],
-    journey: [{ id: 'j13', serviceType: 'admission', title: 'Childcare Offshore BD', status: 'active', startDate: new Date() }],
+    journey: [
+        { id: 'j22', serviceType: 'admission', title: 'Application Started', status: 'active', startDate: new Date() }
+    ],
     isB2BSettled: false, onshoreStatus: 'offshore'
   }
 ];
