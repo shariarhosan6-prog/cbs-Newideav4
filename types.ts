@@ -38,6 +38,13 @@ export type ApplicationStage =
   | 'b2b_settlement'      
   | 'certified';
 
+export interface SearchFilters {
+  query: string;
+  stages: ApplicationStage[];
+  priorities: ('high' | 'medium' | 'low')[];
+  sources: LeadSource[];
+}
+
 export interface JourneyMilestone {
     id: string;
     serviceType: ApplicationType;
