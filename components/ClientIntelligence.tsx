@@ -9,7 +9,8 @@ import {
     CreditCard, Wallet, BadgePercent, Target, Receipt, Eye, 
     Activity, DollarSign, CheckCircle2, Crown, Briefcase, Handshake,
     Stethoscope, Fingerprint, Calculator, FileSearch, ClipboardList, CheckSquare,
-    Bell, Plus, ChevronLeft, ArrowRight, ShieldAlert, History as HistoryIcon
+    Bell, Plus, ChevronLeft, ArrowRight, ShieldAlert, History as HistoryIcon,
+    AlertTriangle, CheckSquare as CheckSquareIcon, ListChecks, TrendingDown
 } from 'lucide-react';
 
 interface Props {
@@ -37,6 +38,24 @@ const ClientIntelligence: React.FC<Props> = ({ conversation, onUpdateStatus }) =
         setNewRequest({ type: 'identity', name: '', deadline: '', reminder: true });
     };
 
+    // --- Risk Assessment Logic ---
+    const gsScore = conversation.gsScore || 75;
+    const riskLevel = conversation.visaRiskLevel || 'medium';
+    
+    const getScoreColor = (score: number) => {
+        if (score >= 85) return 'text-emerald-500';
+        if (score >= 70) return 'text-blue-500';
+        if (score >= 50) return 'text-orange-500';
+        return 'text-red-500';
+    };
+
+    const getScoreBg = (score: number) => {
+        if (score >= 85) return 'bg-emerald-500';
+        if (score >= 70) return 'bg-blue-500';
+        if (score >= 50) return 'bg-orange-500';
+        return 'bg-red-500';
+    };
+
     return (
         <div className="h-full bg-slate-50 flex flex-col overflow-hidden border-l border-slate-200">
             {/* COUNSELOR STATUS HEADER */}
@@ -54,7 +73,7 @@ const ClientIntelligence: React.FC<Props> = ({ conversation, onUpdateStatus }) =
                     <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10 mt-6">
                         {[
                             { id: 'checklist', label: 'Worklist', icon: CheckSquare },
-                            { id: 'gte', label: 'GTE Audit', icon: ShieldCheck },
+                            { id: 'gte', label: 'Risk Audit', icon: ShieldCheck },
                             { id: 'local', label: 'BD Events', icon: MapPin }
                         ].map(t => (
                             <button 
@@ -277,16 +296,191 @@ const ClientIntelligence: React.FC<Props> = ({ conversation, onUpdateStatus }) =
                     </div>
                 )}
 
-                {/* GTE AUDIT & LOCAL EVENTS remain unchanged from previous state for brevity */}
+                {/* 2. RISK ASSESSMENT PANEL (GTE AUDIT) */}
                 {activeSection === 'gte' && (
-                    <div className="animate-in fade-in slide-in-from-right-4 space-y-8">
-                         <div className="bg-slate-900 rounded-[32px] p-8 text-white relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:scale-125 transition-transform duration-700"><ShieldCheck className="w-20 h-20" /></div>
-                            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400 mb-8 flex items-center gap-2">
-                                <Sparkles className="w-4 h-4 animate-pulse" /> AI GTE Integrity Check
+                    <div className="space-y-8 animate-in fade-in slide-in-from-right-4 pb-10">
+                        
+                        {/* A. GS SCORE GAUGE */}
+                        <div className="bg-white rounded-[32px] p-8 border border-slate-200 shadow-sm text-center relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 p-4 opacity-5 rotate-12 group-hover:scale-125 transition-transform"><Target className="w-16 h-16 text-slate-900" /></div>
+                            
+                            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6 flex items-center justify-center gap-2">
+                                <Sparkles className="w-3.5 h-3.5" /> Genuine Student Integrity
                             </h4>
-                            {/* ... Content from previous version ... */}
-                            <div className="text-sm font-bold opacity-70">GTE Module Active. Analysis in progress...</div>
+
+                            <div className="relative inline-flex items-center justify-center mb-6">
+                                {/* SVG Circular Gauge */}
+                                <svg className="w-32 h-32 transform -rotate-90">
+                                    <circle
+                                        cx="64"
+                                        cy="64"
+                                        r="58"
+                                        stroke="currentColor"
+                                        strokeWidth="8"
+                                        fill="transparent"
+                                        className="text-slate-100"
+                                    />
+                                    <circle
+                                        cx="64"
+                                        cy="64"
+                                        r="58"
+                                        stroke="currentColor"
+                                        strokeWidth="8"
+                                        fill="transparent"
+                                        strokeDasharray={364}
+                                        strokeDashoffset={364 - (364 * gsScore) / 100}
+                                        strokeLinecap="round"
+                                        className={`${getScoreColor(gsScore)} transition-all duration-1000 ease-out`}
+                                    />
+                                </svg>
+                                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                    <span className={`text-3xl font-black ${getScoreColor(gsScore)} tracking-tighter`}>{gsScore}%</span>
+                                    <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Score</span>
+                                </div>
+                            </div>
+
+                            <div className={`px-4 py-2 rounded-2xl ${getScoreBg(gsScore)}/10 border ${getScoreBg(gsScore)}/20 inline-block`}>
+                                <p className={`text-[10px] font-black uppercase tracking-widest ${getScoreColor(gsScore)}`}>
+                                    Status: {riskLevel.toUpperCase()} RISK PROFILE
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* B. RISK FACTORS BREAKDOWN */}
+                        <div className="space-y-4">
+                            <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-2">High Impact Risk Factors</h4>
+                            <div className="grid grid-cols-1 gap-3">
+                                {[
+                                    { label: "Financial Capability", impact: "Critical", score: 85, icon: DollarSign, color: "emerald" },
+                                    { label: "Study Gap Evidence", impact: "High", score: 40, icon: Clock, color: "red" },
+                                    { label: "Academic Progression", impact: "Medium", score: 65, icon: GraduationCap, color: "orange" },
+                                    { label: "Sub-Agent Reliability", impact: "Low", score: 92, icon: Handshake, color: "emerald" }
+                                ].map((factor, i) => (
+                                    <div key={i} className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between group hover:border-slate-300 transition-all">
+                                        <div className="flex items-center gap-3">
+                                            <div className={`p-2 rounded-xl bg-${factor.color}-50 text-${factor.color}-600`}>
+                                                <factor.icon className="w-4 h-4" />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs font-black text-slate-800">{factor.label}</p>
+                                                <p className="text-[9px] font-bold text-slate-400 uppercase">Impact: {factor.impact}</p>
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <span className={`text-xs font-black text-${factor.color}-600`}>{factor.score}%</span>
+                                            <div className="w-16 h-1 bg-slate-100 rounded-full mt-1 overflow-hidden">
+                                                <div className={`h-full bg-${factor.color}-500`} style={{width: `${factor.score}%`}}></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* C. RED FLAGS HIGHLIGHT */}
+                        <div className="bg-red-50 rounded-[32px] p-6 border border-red-100 relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-4 opacity-5"><ShieldAlert className="w-12 h-12 text-red-600" /></div>
+                            <h4 className="text-[10px] font-black text-red-600 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                <AlertTriangle className="w-3.5 h-3.5" /> AI Detected Red Flags
+                            </h4>
+                            <div className="space-y-3">
+                                {[
+                                    "2-year unexplained gap post Bachelor completion.",
+                                    "Passport expiring in less than 6 months.",
+                                    "Inconsistent financial source of funds from sub-agent."
+                                ].map((flag, i) => (
+                                    <div key={i} className="flex gap-3">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-red-400 mt-1.5 shrink-0"></div>
+                                        <p className="text-[10px] font-bold text-red-700 leading-relaxed">{flag}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* D. STRATEGIC RECOMMENDATIONS */}
+                        <div className="bg-slate-900 rounded-[32px] p-8 text-white relative overflow-hidden group">
+                            <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-indigo-600/20 rounded-full blur-3xl"></div>
+                            <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+                                <Zap className="w-3.5 h-3.5 fill-current" /> AI Strategic Recommendations
+                            </h4>
+                            <div className="space-y-4">
+                                <div className="p-4 bg-white/5 rounded-2xl border border-white/10 group-hover:bg-white/10 transition-colors">
+                                    <p className="text-[10px] font-black text-blue-400 uppercase mb-1 tracking-widest">Primary Action</p>
+                                    <p className="text-xs font-bold leading-relaxed opacity-90">Request Employment Letter or Professional Year certificate to explain the 2021-2023 gap.</p>
+                                </div>
+                                <div className="p-4 bg-white/5 rounded-2xl border border-white/10 group-hover:bg-white/10 transition-colors">
+                                    <p className="text-[10px] font-black text-emerald-400 uppercase mb-1 tracking-widest">Secondary Action</p>
+                                    <p className="text-xs font-bold leading-relaxed opacity-90">Schedule a mock GTE interview to assess oral communication skills for visa interview readiness.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* E. RISK MITIGATION CHECKLIST */}
+                        <div className="space-y-4">
+                            <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-2 flex items-center justify-between">
+                                Risk Mitigation Checklist
+                                <span className="text-[8px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded uppercase">2/5 Done</span>
+                            </h4>
+                            <div className="space-y-2">
+                                {[
+                                    { task: "Verify Financial Sponsor Bank Statements", done: true },
+                                    { task: "Cross-check Sub-Agent Verification Stamp", done: true },
+                                    { task: "Obtain Gap Explanation Affidavit", done: false },
+                                    { task: "Review 3rd Version of GTE SOP", done: false },
+                                    { task: "Confirm OSHC Activation Date", done: false }
+                                ].map((item, i) => (
+                                    <button key={i} className={`w-full flex items-center gap-3 p-4 rounded-2xl border text-left transition-all ${item.done ? 'bg-emerald-50/50 border-emerald-100 text-emerald-700' : 'bg-white border-slate-100 text-slate-600 hover:border-blue-200 shadow-sm'}`}>
+                                        <div className={`p-1 rounded-lg ${item.done ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-200' : 'bg-slate-100 text-slate-300'}`}>
+                                            {item.done ? <CheckCircle2 className="w-3.5 h-3.5" /> : <ListChecks className="w-3.5 h-3.5" />}
+                                        </div>
+                                        <span className={`text-[11px] font-bold ${item.done ? 'line-through opacity-60' : ''}`}>{item.task}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                    </div>
+                )}
+
+                {/* 3. LOCAL EVENTS (BD EVENTS) */}
+                {activeSection === 'local' && (
+                    <div className="space-y-8 animate-in fade-in slide-in-from-right-4">
+                         <div className="bg-white rounded-[32px] p-8 border border-slate-200 shadow-sm relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 p-6 opacity-5"><MapPin className="w-16 h-16 text-slate-900" /></div>
+                            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-8 flex items-center gap-2">
+                                <MapPin className="w-3.5 h-3.5" /> Bangladesh Processing Hub
+                            </h4>
+                            
+                            <div className="space-y-6">
+                                <div className="relative pl-8 border-l-2 border-dashed border-slate-100">
+                                    <div className="absolute -left-2.5 top-0 p-1 bg-white border-2 border-blue-500 rounded-full text-blue-500"><Stethoscope className="w-3 h-3" /></div>
+                                    <div>
+                                        <p className="text-[10px] font-black text-slate-900 uppercase">IOM Medical Examination</p>
+                                        <p className="text-xs font-bold text-slate-500 mt-1">Gulshan, Dhaka Branch</p>
+                                        <p className="text-[9px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded uppercase w-fit mt-2">Booked: June 15, 2024</p>
+                                    </div>
+                                </div>
+
+                                <div className="relative pl-8 border-l-2 border-dashed border-slate-100">
+                                    <div className="absolute -left-2.5 top-0 p-1 bg-white border-2 border-slate-200 rounded-full text-slate-300"><Fingerprint className="w-3 h-3" /></div>
+                                    <div>
+                                        <p className="text-[10px] font-black text-slate-400 uppercase">VFS Biometrics Collection</p>
+                                        <p className="text-xs font-bold text-slate-400 mt-1">Pending Submission of File</p>
+                                    </div>
+                                </div>
+                                
+                                <div className="pt-4 mt-6 border-t border-slate-50">
+                                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                        <div>
+                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Local Lead Source</p>
+                                            <p className="text-sm font-black text-slate-900">{conversation.subAgentName || 'Global Ed Bangladesh'}</p>
+                                        </div>
+                                        <button className="p-3 bg-white border border-slate-200 text-slate-400 hover:text-blue-600 rounded-xl transition-all shadow-sm">
+                                            <Handshake className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 )}
