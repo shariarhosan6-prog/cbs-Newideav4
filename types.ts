@@ -1,4 +1,5 @@
 
+
 export enum MessageType {
   TEXT = 'text',
   IMAGE = 'image',
@@ -15,24 +16,28 @@ export enum SenderType {
 }
 
 export type LeadSource = 'direct' | 'sub_agent';
-export type MessageThread = 'source' | 'upstream'; 
+export type MessageThread = 'source' | 'upstream' | 'internal'; 
 
 export type ViewState = 'dashboard' | 'pipeline' | 'inbox' | 'partners' | 'finance' | 'team';
 
-export type ApplicationType = 'rpl' | 'admission' | 'visa' | 'onshore_transfer';
+export type ApplicationType = 'rpl' | 'admission' | 'visa' | 'onshore_transfer' | 'professional_year';
 
 export type ApplicationStage = 
   | 'lead' 
-  | 'evidence_collection' 
-  | 'mediator_review' 
+  | 'gs_assessment'       // Genuine Student Check
+  | 'financial_audit'     // Bank Statement/Source of Funds Verification
+  | 'sop_drafting'        // Statement of Purpose iterations
   | 'rto_submission' 
-  | 'certified'
-  | 'app_lodged'
   | 'conditional_offer'
-  | 'gte_assessment'
+  | 'payment_confirmed'
   | 'coe_issued'
+  | 'visa_lodged'
+  | 'biometrics_booked'   // VFS Appointment
+  | 'medical_completed'   // IOM/Bupa Check
   | 'visa_granted'
-  | 'onshore_arrival';
+  | 'onshore_arrival'
+  | 'b2b_settlement'      // Sub-agent commission payout
+  | 'certified';
 
 export interface JourneyMilestone {
     id: string;
@@ -44,81 +49,31 @@ export interface JourneyMilestone {
     outcome?: string;
 }
 
-export interface ApplicationCard {
-  id: string;
-  type: ApplicationType;
-  clientName: string;
-  qualification: string;
-  stage: ApplicationStage;
-  tags: string[];
-  source?: string;
-  value: string;
-  lastUpdate?: Date;
-  daysInStage: number;
-  missingDocs: number;
-  counselorId: string;
-  partnerId?: string;
-}
-
-export interface ActivityLog {
-    id: string;
-    staffId: string;
-    staffName: string;
-    action: string;
-    timestamp: Date;
-    details?: string;
-}
-
-export interface TeamTask {
-    id: string;
-    title: string;
-    priority: 'high' | 'medium' | 'low';
-    dueDate: Date;
-    status: 'pending' | 'completed';
-}
-
-export interface Counselor {
-    id: string;
-    name: string;
-    avatar: string;
-    role: 'Junior Counselor' | 'Senior Counselor' | 'Migration Agent';
-    department: 'RPL' | 'Admissions' | 'Legal';
-    totalSales: number;
-    commissionEarned: number;
-    activeDeals: number;
-    lastActive: Date;
-    status: 'online' | 'offline' | 'busy';
-    tasks: TeamTask[];
-}
-
 export interface Conversation {
   id: string;
   client: ClientProfile;
   source: LeadSource;
   subAgentName?: string;
   assignedCounselorId: string;
-  partnerId?: string;
-  superAgentStatus: 'not_started' | 'processing' | 'submitted' | 'accepted';
-  messages: Message[];
   unreadCount: number;
   status: 'active' | 'lead' | 'review' | 'completed';
   priority: 'high' | 'medium' | 'low';
   currentStage: ApplicationStage;
   lastActive: Date;
-  progressStage: number;
-  currentStep: string;
   documents: DocumentStatus[];
   paymentTotal: number;
   paymentPaid: number;
-  activities: ActivityLog[];
-  // Lifecycle Journey
-  journey: JourneyMilestone[];
-  isB2BSettled?: boolean; // For Bangladesh Offshore B2B
+  isB2BSettled?: boolean;
   onshoreStatus?: 'offshore' | 'landed' | 'resident';
-  // AI Intelligent Fields
-  sentiment?: 'positive' | 'neutral' | 'anxious' | 'urgent';
   visaRiskLevel?: 'low' | 'medium' | 'high' | 'critical';
   customCategory?: string;
+  // Missing pieces added:
+  gsScore?: number; // 0-100 Genuine Student Score
+  medicalStatus?: 'pending' | 'booked' | 'completed';
+  biometricStatus?: 'pending' | 'booked' | 'completed';
+  sopStatus?: 'not_started' | 'drafting' | 'review_required' | 'finalized';
+  journey: JourneyMilestone[];
+  messages: Message[];
 }
 
 export interface Message {
@@ -127,9 +82,6 @@ export interface Message {
   type: MessageType;
   content: string;
   timestamp: Date;
-  fileName?: string;
-  fileSize?: string;
-  read?: boolean;
   thread: MessageThread;
 }
 
@@ -137,17 +89,16 @@ export interface DocumentStatus {
   id: string;
   name: string;
   status: 'verified' | 'pending' | 'missing' | 'rejected';
+  type: 'identity' | 'academic' | 'financial' | 'sop' | 'employment';
   uploadDate?: Date;
-  confidence?: number;
 }
 
 export interface EducationEntry {
   id: string;
-  level: 'Year 10' | 'Year 12' | 'Diploma' | 'Bachelor' | 'Masters' | 'PhD';
+  level: string;
   institution: string;
   startYear: number;
   endYear: number;
-  isGapFiller?: boolean;
 }
 
 export interface ClientProfile {
@@ -158,7 +109,6 @@ export interface ClientProfile {
   phone: string;
   location: string;
   visaStatus: string;
-  visaExpiry: string;
   qualificationTarget: string;
   experienceYears: number;
   educationHistory: EducationEntry[];
@@ -167,26 +117,52 @@ export interface ClientProfile {
 export interface Partner {
   id: string;
   name: string;
-  type: 'RTO' | 'Sub-Agent' | 'University';
+  type: 'RTO' | 'Sub-Agent' | 'University' | 'Insurance';
   contactPerson: string;
-  email: string;
+  email: string; // Added field for partner profile
   activeStudents: number;
   commissionRate: string;
   status: 'active' | 'inactive';
   logo: string;
 }
 
-// Added missing TransactionType export to resolve build errors
+/**
+ * Team Task structure for managing counselor workloads
+ */
+export interface TeamTask {
+  id: string;
+  title: string;
+  priority: 'high' | 'medium' | 'low';
+  dueDate: Date;
+  status: 'pending' | 'completed';
+}
+
+export interface Counselor {
+  id: string;
+  name: string;
+  avatar: string;
+  role: string;
+  department: string; // Added field for team filtering
+  activeDeals: number;
+  commissionEarned: number; // Added field for financial tracking
+  totalSales: number; // Added field for performance tracking
+  status: 'online' | 'offline' | 'busy';
+  tasks: TeamTask[];
+}
+
+/**
+ * Financial structures for the Commission Hub
+ */
 export type TransactionType = 'incoming' | 'outgoing_sub_agent' | 'outgoing_staff';
 
 export interface CommissionRecord {
-    id: string;
-    clientId: string;
-    clientName: string;
-    description: string;
-    amount: number;
-    type: TransactionType;
-    status: 'pending' | 'paid' | 'overdue';
-    dueDate: Date;
-    relatedEntityName: string;
+  id: string;
+  clientId: string;
+  clientName: string;
+  description: string;
+  amount: number;
+  type: TransactionType;
+  status: 'paid' | 'pending' | 'overdue';
+  dueDate: Date;
+  relatedEntityName: string;
 }

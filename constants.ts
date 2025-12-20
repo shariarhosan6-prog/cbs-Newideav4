@@ -1,201 +1,317 @@
 
-import { Conversation, MessageType, SenderType, Partner, CommissionRecord, Counselor } from './types';
+import { Conversation, MessageType, SenderType, Partner, Counselor, CommissionRecord } from './types';
 
 export const MOCK_COUNSELORS: Counselor[] = [
     { 
-        id: 's1', name: 'Jessica Wu', avatar: 'https://ui-avatars.com/api/?name=Jessica+Wu&background=6366f1&color=fff', 
-        role: 'Senior Counselor', department: 'RPL', totalSales: 45000, commissionEarned: 4500, activeDeals: 12, 
-        lastActive: new Date(), status: 'online', tasks: []
-    },
-    { 
-        id: 's2', name: 'Tom Hardy', avatar: 'https://ui-avatars.com/api/?name=Tom+Hardy&background=0f172a&color=fff', 
-        role: 'Junior Counselor', department: 'Admissions', totalSales: 32000, commissionEarned: 3200, activeDeals: 18, 
-        lastActive: new Date(), status: 'busy', tasks: []
-    },
+        id: 's1', 
+        name: 'Jessica Wu', 
+        avatar: 'https://ui-avatars.com/api/?name=Jessica+Wu&background=6366f1&color=fff', 
+        role: 'Senior Counselor', 
+        department: 'Admissions',
+        activeDeals: 12, 
+        commissionEarned: 2450, 
+        totalSales: 45000, 
+        status: 'online', 
+        tasks: []
+    }
 ];
 
 export const MOCK_PARTNERS: Partner[] = [
-  { id: 'p1', name: 'StudyPath RTO', type: 'RTO', contactPerson: 'David Ross', email: 'admissions@studypath.edu.au', activeStudents: 12, commissionRate: '25%', status: 'active', logo: 'https://ui-avatars.com/api/?name=Study+Path&background=6366f1&color=fff' },
-  { id: 'p3', name: 'Victoria University', type: 'University', contactPerson: 'Mark Sloan', email: 'international@vu.edu.au', activeStudents: 45, commissionRate: '15%', status: 'active', logo: 'https://ui-avatars.com/api/?name=Victoria+Uni&background=000&color=fff' },
-];
+  // --- UNIVERSITIES (Australia Focused) ---
+  { 
+    id: 'uni1', name: 'University of Melbourne', type: 'University', 
+    contactPerson: 'Sarah Thompson', email: 'admissions@unimelb.edu.au', 
+    activeStudents: 45, commissionRate: '10%', status: 'active', 
+    logo: 'https://ui-avatars.com/api/?name=UOM&background=002147&color=fff' 
+  },
+  { 
+    id: 'uni2', name: 'Monash University', type: 'University', 
+    contactPerson: 'David Miller', email: 'international@monash.edu', 
+    activeStudents: 38, commissionRate: '12%', status: 'active', 
+    logo: 'https://ui-avatars.com/api/?name=Monash&background=006dae&color=fff' 
+  },
+  { 
+    id: 'uni3', name: 'RMIT University', type: 'University', 
+    contactPerson: 'Emma Watson', email: 'apply@rmit.edu.au', 
+    activeStudents: 52, commissionRate: '15%', status: 'active', 
+    logo: 'https://ui-avatars.com/api/?name=RMIT&background=e61e2a&color=fff' 
+  },
+  { 
+    id: 'uni4', name: 'UNSW Sydney', type: 'University', 
+    contactPerson: 'James Bond', email: 'enquiry@unsw.edu.au', 
+    activeStudents: 29, commissionRate: '10%', status: 'active', 
+    logo: 'https://ui-avatars.com/api/?name=UNSW&background=ffcc00&color=000' 
+  },
+  { 
+    id: 'uni5', name: 'University of Sydney', type: 'University', 
+    contactPerson: 'Lucy Liu', email: 'global.office@sydney.edu.au', 
+    activeStudents: 33, commissionRate: '11%', status: 'active', 
+    logo: 'https://ui-avatars.com/api/?name=USYD&background=e64626&color=fff' 
+  },
+  { 
+    id: 'uni6', name: 'Curtin University', type: 'University', 
+    contactPerson: 'Mark Ruffalo', email: 'international@curtin.edu.au', 
+    activeStudents: 22, commissionRate: '15%', status: 'active', 
+    logo: 'https://ui-avatars.com/api/?name=Curtin&background=444&color=ffcc00' 
+  },
+  { 
+    id: 'uni7', name: 'QUT (Queensland Tech)', type: 'University', 
+    contactPerson: 'Steve Rogers', email: 'admissions@qut.edu.au', 
+    activeStudents: 18, commissionRate: '14%', status: 'active', 
+    logo: 'https://ui-avatars.com/api/?name=QUT&background=00407a&color=fff' 
+  },
+  { 
+    id: 'uni8', name: 'Griffith University', type: 'University', 
+    contactPerson: 'Natasha Romanoff', email: 'apply@griffith.edu.au', 
+    activeStudents: 15, commissionRate: '15%', status: 'active', 
+    logo: 'https://ui-avatars.com/api/?name=Griffith&background=cc0000&color=fff' 
+  },
+  { 
+    id: 'uni9', name: 'Victoria University', type: 'University', 
+    contactPerson: 'Peter Parker', email: 'vu.international@vu.edu.au', 
+    activeStudents: 64, commissionRate: '18%', status: 'active', 
+    logo: 'https://ui-avatars.com/api/?name=VU&background=005eb8&color=fff' 
+  },
+  { 
+    id: 'uni10', name: 'Western Sydney Uni', type: 'University', 
+    contactPerson: 'Wanda Maximoff', email: 'international@westernsydney.edu.au', 
+    activeStudents: 41, commissionRate: '16%', status: 'active', 
+    logo: 'https://ui-avatars.com/api/?name=WSU&background=990033&color=fff' 
+  },
 
-export const MOCK_CONVERSATIONS: Conversation[] = [
-  {
-    id: 'c1', assignedCounselorId: 's1', partnerId: 'p1',
-    client: {
-      id: 'u1', name: 'Sarah Jenkins', avatar: 'https://picsum.photos/seed/sarah/200/200',
-      email: 'sarah.j@example.com', phone: '+61 400 123 456', location: 'Melbourne, VIC',
-      visaStatus: 'Subclass 482', visaExpiry: '2024-11-15', qualificationTarget: 'Diploma of Project Management',
-      experienceYears: 5, 
-      educationHistory: [
-          { id: 'e1', level: 'Bachelor', institution: 'NSU Bangladesh', startYear: 2016, endYear: 2020 },
-          { id: 'e2', level: 'Diploma', institution: 'Sydney Institute of Business', startYear: 2021, endYear: 2022 }
-      ]
-    },
-    source: 'sub_agent', subAgentName: 'Global Ed Bangladesh', superAgentStatus: 'processing', unreadCount: 1, status: 'active', priority: 'high', currentStage: 'mediator_review', lastActive: new Date(), progressStage: 60, currentStep: 'Onshore Processing', paymentTotal: 4500, paymentPaid: 2500,
-    sentiment: 'anxious', visaRiskLevel: 'high', activities: [], 
-    documents: [
-        { id: 'd1', name: 'Passport Main Page', status: 'verified', uploadDate: new Date(2023, 11, 15) },
-        { id: 'd2', name: 'Updated CV 2024', status: 'verified', uploadDate: new Date(2024, 0, 5) },
-        { id: 'd3', name: 'Reference Letter - Google', status: 'pending', uploadDate: new Date(2024, 1, 10) }
-    ],
-    messages: [{ id: 'm1', sender: SenderType.CLIENT, type: MessageType.TEXT, content: "I am now in Sydney, can we start my RPL?", timestamp: new Date(), read: false, thread: 'source' }],
-    journey: [
-        { id: 'j1', serviceType: 'admission', title: 'Offshore Enrollment (BD)', status: 'completed', startDate: new Date(2023, 5, 1) },
-        { id: 'j2', serviceType: 'visa', title: 'Visa Grant (S500)', status: 'completed', startDate: new Date(2023, 9, 15) },
-        { id: 'j3', serviceType: 'rpl', title: 'Diploma of PM (Onshore)', status: 'active', startDate: new Date() }
-    ],
-    isB2BSettled: true, onshoreStatus: 'landed'
+  // --- SUB-AGENTS (Lead Generators) ---
+  { 
+    id: 'sub1', name: 'Global Ed Bangladesh', type: 'Sub-Agent', 
+    contactPerson: 'Masud Rana', email: 'dhaka@globaled.com', 
+    activeStudents: 85, commissionRate: '25%', status: 'active', 
+    logo: 'https://ui-avatars.com/api/?name=GE+BD&background=006a4e&color=fff' 
   },
-  {
-    id: 'c2', assignedCounselorId: 's1',
-    client: {
-      id: 'u2', name: 'Rafiqul Islam', avatar: 'https://ui-avatars.com/api/?name=Rafiqul+Islam&background=random',
-      email: 'rafiq.bd@example.com', phone: '+880 1711 223344', location: 'Dhaka, Bangladesh',
-      visaStatus: 'Applying', visaExpiry: '', qualificationTarget: 'Master of IT',
-      experienceYears: 2, 
-      educationHistory: [{ id: 'e3', level: 'Bachelor', institution: 'Dhaka University', startYear: 2018, endYear: 2022 }]
-    },
-    source: 'sub_agent', subAgentName: 'Elite Careers BD', superAgentStatus: 'not_started', unreadCount: 0, status: 'lead', priority: 'medium', currentStage: 'gte_assessment', lastActive: new Date(), progressStage: 10, currentStep: 'Offshore Intake', paymentTotal: 22000, paymentPaid: 0,
-    sentiment: 'neutral', visaRiskLevel: 'medium', activities: [], documents: [], messages: [],
-    journey: [
-        { id: 'j4', serviceType: 'admission', title: 'GTE Assessment Phase', status: 'active', startDate: new Date() },
-        { id: 'j5', serviceType: 'visa', title: 'Subclass 500 Lodgement', status: 'upcoming', startDate: new Date() }
-    ],
-    isB2BSettled: false, onshoreStatus: 'offshore'
+  { 
+    id: 'sub2', name: 'Dhaka Scholars', type: 'Sub-Agent', 
+    contactPerson: 'Fatima Zoya', email: 'admin@dhakascholars.bd', 
+    activeStudents: 42, commissionRate: '20%', status: 'active', 
+    logo: 'https://ui-avatars.com/api/?name=DS&background=f42a41&color=fff' 
   },
-  {
-    id: 'c3', assignedCounselorId: 's2',
-    client: {
-      id: 'u3', name: 'Michael Chen', avatar: 'https://ui-avatars.com/api/?name=Michael+Chen&background=random',
-      email: 'm.chen@example.com', phone: '+61 411 222 333', location: 'Brisbane, QLD',
-      visaStatus: 'Student 500', visaExpiry: '2025-12-01', qualificationTarget: 'Cert IV Commercial Cookery',
-      experienceYears: 4, 
-      educationHistory: [{ id: 'e4', level: 'Year 12', institution: 'Shanghai High', startYear: 2014, endYear: 2017 }]
-    },
-    source: 'direct', superAgentStatus: 'processing', unreadCount: 0, status: 'active', priority: 'low', currentStage: 'evidence_collection', lastActive: new Date(), progressStage: 40, currentStep: 'Evidence Phase', paymentTotal: 3500, paymentPaid: 1000,
-    sentiment: 'positive', visaRiskLevel: 'low', activities: [], documents: [{ id: 'd_m1', name: 'Passport', status: 'verified', uploadDate: new Date() }], messages: [],
-    journey: [
-        { id: 'j6', serviceType: 'admission', title: 'Offshore Enrollment', status: 'completed', startDate: new Date(2022, 1, 1) },
-        { id: 'j7', serviceType: 'visa', title: 'Visa Granted', status: 'completed', startDate: new Date(2022, 5, 1) },
-        { id: 'j8', serviceType: 'rpl', title: 'Chef RPL (Onshore)', status: 'active', startDate: new Date() }
-    ],
-    isB2BSettled: true, onshoreStatus: 'landed'
+  { 
+    id: 'sub3', name: 'Mumbai Education Hub', type: 'Sub-Agent', 
+    contactPerson: 'Amit Patel', email: 'contact@mumbaiedu.in', 
+    activeStudents: 31, commissionRate: '30%', status: 'active', 
+    logo: 'https://ui-avatars.com/api/?name=MEH&background=ff9933&color=fff' 
   },
-  {
-    id: 'c4', assignedCounselorId: 's1',
-    client: {
-      id: 'u4', name: 'Tanvir Ahmed', avatar: 'https://ui-avatars.com/api/?name=Tanvir+Ahmed&background=random',
-      email: 'tanvir@example.com', phone: '+61 455 666 777', location: 'Sydney, NSW',
-      visaStatus: 'Graduate 485', visaExpiry: '2026-06-15', qualificationTarget: 'Migration Strategy: 189/190',
-      experienceYears: 6, educationHistory: [{ id: 'e5', level: 'Masters', institution: 'Monash University', startYear: 2021, endYear: 2023 }]
-    },
-    source: 'sub_agent', subAgentName: 'Global Ed Bangladesh', superAgentStatus: 'not_started', unreadCount: 0, status: 'active', priority: 'high', currentStage: 'lead', lastActive: new Date(), progressStage: 5, currentStep: 'Migration Plan', paymentTotal: 1500, paymentPaid: 1500,
-    sentiment: 'urgent', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
-    journey: [
-        { id: 'j9', serviceType: 'admission', title: 'Masters (Completed)', status: 'completed', startDate: new Date(2021, 1, 1) },
-        { id: 'j10', serviceType: 'visa', title: 'Subclass 485 Granted', status: 'completed', startDate: new Date(2023, 7, 10) },
-        { id: 'j11', serviceType: 'visa', title: 'PR Strategy (Onshore)', status: 'active', startDate: new Date() }
-    ],
-    isB2BSettled: true, onshoreStatus: 'landed'
+  { 
+    id: 'sub4', name: 'Hanoi Gateway', type: 'Sub-Agent', 
+    contactPerson: 'Tran Minh', email: 'hanoi@gatewayedu.vn', 
+    activeStudents: 19, commissionRate: '25%', status: 'active', 
+    logo: 'https://ui-avatars.com/api/?name=Hanoi&background=da251d&color=ff0' 
   },
-  {
-    id: 'c5', assignedCounselorId: 's2',
-    client: {
-      id: 'u5', name: 'Anika Rahman', avatar: 'https://ui-avatars.com/api/?name=Anika+Rahman&background=random',
-      email: 'anika@example.com', phone: '+880 1819 000000', location: 'Chittagong, BD',
-      visaStatus: 'Applying', visaExpiry: '', qualificationTarget: 'Bachelor of Nursing',
-      experienceYears: 0, educationHistory: [{ id: 'e6', level: 'Year 12', institution: 'Cant Public College', startYear: 2019, endYear: 2021 }]
-    },
-    source: 'sub_agent', subAgentName: 'BD Scholars', superAgentStatus: 'processing', unreadCount: 3, status: 'review', priority: 'medium', currentStage: 'app_lodged', lastActive: new Date(), progressStage: 50, currentStep: 'Visa Lodged', paymentTotal: 28000, paymentPaid: 2000,
-    sentiment: 'anxious', visaRiskLevel: 'medium', activities: [], documents: [], messages: [],
-    journey: [
-        { id: 'j12', serviceType: 'admission', title: 'CoE Issued (Nursing)', status: 'completed', startDate: new Date(2023, 11, 1) },
-        { id: 'j13', serviceType: 'visa', title: 'Visa Decision Pending', status: 'active', startDate: new Date() }
-    ],
-    isB2BSettled: false, onshoreStatus: 'offshore'
+  { 
+    id: 'sub5', name: 'Lahore Consultancy', type: 'Sub-Agent', 
+    contactPerson: 'Zaid Khan', email: 'info@lahoreedu.pk', 
+    activeStudents: 24, commissionRate: '22%', status: 'active', 
+    logo: 'https://ui-avatars.com/api/?name=Lahore&background=01411c&color=fff' 
   },
-  {
-    id: 'c6', assignedCounselorId: 's1',
-    client: {
-      id: 'u6', name: 'Suresh Kumar', avatar: 'https://ui-avatars.com/api/?name=Suresh+Kumar&background=random',
-      email: 'suresh@example.com', phone: '+61 433 111 222', location: 'Perth, WA',
-      visaStatus: 'Student 500', visaExpiry: '2025-01-10', qualificationTarget: 'Course Transfer to Automotive',
-      experienceYears: 3, educationHistory: [{ id: 'e7', level: 'Diploma', institution: 'WA TAFE', startYear: 2022, endYear: 2023 }]
-    },
-    source: 'direct', superAgentStatus: 'not_started', unreadCount: 0, status: 'active', priority: 'medium', currentStage: 'lead', lastActive: new Date(), progressStage: 20, currentStep: 'Release Letter', paymentTotal: 500, paymentPaid: 0,
-    sentiment: 'neutral', visaRiskLevel: 'medium', activities: [], documents: [], messages: [],
-    journey: [
-        { id: 'j14', serviceType: 'admission', title: 'Original Course', status: 'completed', startDate: new Date(2022, 1, 1) },
-        { id: 'j15', serviceType: 'onshore_transfer', title: 'Automotive Switch', status: 'active', startDate: new Date() }
-    ],
-    isB2BSettled: true, onshoreStatus: 'landed'
+  { 
+    id: 'sub6', name: 'Persian Education', type: 'Sub-Agent', 
+    contactPerson: 'Nasser Ali', email: 'nasser@persianedu.ir', 
+    activeStudents: 12, commissionRate: '35%', status: 'active', 
+    logo: 'https://ui-avatars.com/api/?name=Persian&background=239f40&color=fff' 
   },
-  {
-    id: 'c7', assignedCounselorId: 's2',
-    client: {
-      id: 'u7', name: 'Mehedi Hasan', avatar: 'https://ui-avatars.com/api/?name=Mehedi+Hasan&background=random',
-      email: 'mehedi@example.com', phone: '+61 477 888 999', location: 'Adelaide, SA',
-      visaStatus: 'Student 500', visaExpiry: '2025-08-30', qualificationTarget: 'Cert III Wall & Floor Tiling',
-      experienceYears: 8, educationHistory: [{ id: 'e8', level: 'Bachelor', institution: 'RUET Bangladesh', startYear: 2012, endYear: 2016 }]
-    },
-    source: 'sub_agent', subAgentName: 'Global Ed Bangladesh', superAgentStatus: 'submitted', unreadCount: 0, status: 'active', priority: 'low', currentStage: 'rto_submission', lastActive: new Date(), progressStage: 90, currentStep: 'RTO Pending', paymentTotal: 4200, paymentPaid: 4200,
-    sentiment: 'positive', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
-    journey: [
-        { id: 'j16', serviceType: 'admission', title: 'Offshore Admission', status: 'completed', startDate: new Date(2021, 5, 1) },
-        { id: 'j17', serviceType: 'visa', title: 'Visa S500 Granted', status: 'completed', startDate: new Date(2021, 9, 10) },
-        { id: 'j18', serviceType: 'rpl', title: 'Tiling RPL (Onshore)', status: 'active', startDate: new Date() }
-    ],
-    isB2BSettled: true, onshoreStatus: 'landed'
+
+  // --- RTOs ---
+  { 
+    id: 'p1', name: 'StudyPath RTO', type: 'RTO', 
+    contactPerson: 'David Ross', email: 'admissions@studypath.edu.au',
+    activeStudents: 12, commissionRate: '25%', status: 'active', 
+    logo: 'https://ui-avatars.com/api/?name=Study+Path&background=6366f1&color=fff' 
   },
-  {
-    id: 'c8', assignedCounselorId: 's1',
-    client: {
-      id: 'u8', name: 'Zoya Khan', avatar: 'https://ui-avatars.com/api/?name=Zoya+Khan&background=random',
-      email: 'zoya@example.com', phone: '+880 1611 000111', location: 'Dhaka, BD',
-      visaStatus: 'Applying', visaExpiry: '', qualificationTarget: 'Master of Accounting',
-      experienceYears: 1, educationHistory: [{ id: 'e9', level: 'Bachelor', institution: 'NSU', startYear: 2018, endYear: 2022 }]
-    },
-    source: 'sub_agent', subAgentName: 'Elite Careers BD', superAgentStatus: 'not_started', unreadCount: 0, status: 'lead', priority: 'medium', currentStage: 'gte_assessment', lastActive: new Date(), progressStage: 35, currentStep: 'GTE Assessment', paymentTotal: 32000, paymentPaid: 0,
-    sentiment: 'neutral', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
-    journey: [
-        { id: 'j19', serviceType: 'admission', title: 'GTE Documentation', status: 'active', startDate: new Date() }
-    ],
-    isB2BSettled: false, onshoreStatus: 'offshore'
-  },
-  {
-    id: 'c9', assignedCounselorId: 's1',
-    client: {
-      id: 'u9', name: 'Liton Das', avatar: 'https://ui-avatars.com/api/?name=Liton+Das&background=random',
-      email: 'liton@example.com', phone: '+61 400 999 888', location: 'Melbourne, VIC',
-      visaStatus: 'Graduate 485', visaExpiry: '2025-03-20', qualificationTarget: 'Cert III Painting',
-      experienceYears: 10, educationHistory: [{ id: 'e10', level: 'Year 12', institution: 'Dhaka College', startYear: 2010, endYear: 2012 }]
-    },
-    source: 'sub_agent', subAgentName: 'BD Scholars', superAgentStatus: 'not_started', unreadCount: 0, status: 'active', priority: 'high', currentStage: 'evidence_collection', lastActive: new Date(), progressStage: 30, currentStep: 'Evidence Phase', paymentTotal: 3800, paymentPaid: 500,
-    sentiment: 'urgent', visaRiskLevel: 'low', activities: [], documents: [], messages: [],
-    journey: [
-        { id: 'j20', serviceType: 'visa', title: 'Graduate Visa (485)', status: 'completed', startDate: new Date(2023, 3, 15) },
-        { id: 'j21', serviceType: 'rpl', title: 'Painting RPL (Onshore)', status: 'active', startDate: new Date() }
-    ],
-    isB2BSettled: true, onshoreStatus: 'landed'
-  },
-  {
-    id: 'c10', assignedCounselorId: 's2',
-    client: {
-      id: 'u10', name: 'Fatima Zohra', avatar: 'https://ui-avatars.com/api/?name=Fatima+Zohra&background=random',
-      email: 'fatima@example.com', phone: '+880 1911 333444', location: 'Sylhet, BD',
-      visaStatus: 'Applying', visaExpiry: '', qualificationTarget: 'Dip of Early Childhood',
-      experienceYears: 0, educationHistory: [{ id: 'e11', level: 'Year 12', institution: 'Sylhet Board', startYear: 2021, endYear: 2023 }]
-    },
-    source: 'sub_agent', subAgentName: 'Sylhet Global', superAgentStatus: 'not_started', unreadCount: 0, status: 'lead', priority: 'low', currentStage: 'lead', lastActive: new Date(), progressStage: 5, currentStep: 'Document Prep', paymentTotal: 12000, paymentPaid: 0,
-    sentiment: 'neutral', visaRiskLevel: 'medium', activities: [], documents: [], messages: [],
-    journey: [
-        { id: 'j22', serviceType: 'admission', title: 'Application Started', status: 'active', startDate: new Date() }
-    ],
-    isB2BSettled: false, onshoreStatus: 'offshore'
+  { 
+    id: 'p2', name: 'Skills Australia', type: 'RTO', 
+    contactPerson: 'Brendan Smith', email: 'apply@skills.edu.au',
+    activeStudents: 56, commissionRate: '20%', status: 'active', 
+    logo: 'https://ui-avatars.com/api/?name=Skills+AU&background=ffcc00&color=000' 
   }
 ];
 
 export const MOCK_COMMISSIONS: CommissionRecord[] = [
-  { id: 'tx1', clientId: 'u1', clientName: 'Sarah Jenkins', description: 'RPL Service Fee', amount: 4500, type: 'incoming', status: 'paid', dueDate: new Date(2024, 5, 15), relatedEntityName: 'StudyPath RTO' }
+  {
+    id: 'tx1',
+    clientId: 'u1',
+    clientName: 'Sarah Jenkins',
+    description: 'RPL Fee Payment',
+    amount: 4500,
+    type: 'incoming',
+    status: 'paid',
+    dueDate: new Date(),
+    relatedEntityName: 'Sarah Jenkins'
+  }
+];
+
+export const MOCK_CONVERSATIONS: Conversation[] = [
+  {
+    id: 'c1', assignedCounselorId: 's1',
+    client: {
+      id: 'u1', name: 'Sarah Jenkins', avatar: 'https://i.pravatar.cc/150?u=sarah',
+      email: 'sarah.j@example.com', phone: '+61 400 123 456', location: 'Melbourne, VIC',
+      visaStatus: 'Subclass 482', qualificationTarget: 'Diploma of Project Management',
+      experienceYears: 5, 
+      educationHistory: [{ id: 'e1', level: 'Bachelor', institution: 'NSU Bangladesh', startYear: 2016, endYear: 2020 }]
+    },
+    source: 'sub_agent', subAgentName: 'Global Ed Bangladesh', unreadCount: 1, status: 'active', priority: 'high', 
+    currentStage: 'sop_drafting', lastActive: new Date(), paymentTotal: 4500, paymentPaid: 2500,
+    visaRiskLevel: 'high', gsScore: 82, medicalStatus: 'pending', biometricStatus: 'pending', sopStatus: 'review_required',
+    documents: [
+        { id: 'd1', name: 'Passport Main Page', status: 'verified', type: 'identity' },
+        { id: 'd2', name: 'Bank Stmt (3 Months)', status: 'pending', type: 'financial' },
+        { id: 'd3', name: 'SOP Draft V1', status: 'pending', type: 'sop' }
+    ],
+    messages: [
+        { id: 'm1', sender: SenderType.CLIENT, type: MessageType.TEXT, content: "Has my SOP been reviewed yet?", timestamp: new Date(), thread: 'source' },
+        { id: 'm2', sender: SenderType.AGENT, type: MessageType.TEXT, content: "Reviewing it now with the Head Counselor. Will update shortly.", timestamp: new Date(), thread: 'internal' }
+    ],
+    journey: [], onshoreStatus: 'landed'
+  },
+  {
+    id: 'c2', assignedCounselorId: 's1',
+    client: {
+      id: 'u2', name: 'Tanvir Ahmed', avatar: 'https://i.pravatar.cc/150?u=tanvir',
+      email: 'tanvir.a@example.com', phone: '+880 1711 222 333', location: 'Dhaka, BD',
+      visaStatus: 'Visitor 600', qualificationTarget: 'Cert IV in Kitchen Management',
+      experienceYears: 3, educationHistory: []
+    },
+    source: 'sub_agent', subAgentName: 'Dhaka Scholars', unreadCount: 0, status: 'active', priority: 'medium', 
+    currentStage: 'gs_assessment', lastActive: new Date(), paymentTotal: 3200, paymentPaid: 0,
+    visaRiskLevel: 'medium', gsScore: 65, medicalStatus: 'pending', biometricStatus: 'pending', sopStatus: 'not_started',
+    documents: [{ id: 'd4', name: 'Academic Transcripts', status: 'verified', type: 'academic' }],
+    messages: [], journey: [], onshoreStatus: 'offshore'
+  },
+  {
+    id: 'c3', assignedCounselorId: 's1',
+    client: {
+      id: 'u3', name: 'Priya Sharma', avatar: 'https://i.pravatar.cc/150?u=priya',
+      email: 'priya.s@example.com', phone: '+91 98765 43210', location: 'Delhi, India',
+      visaStatus: 'Offshore', qualificationTarget: 'Master of IT',
+      experienceYears: 2, educationHistory: []
+    },
+    source: 'direct', unreadCount: 2, status: 'active', priority: 'high', 
+    currentStage: 'visa_lodged', lastActive: new Date(), paymentTotal: 18500, paymentPaid: 18500,
+    visaRiskLevel: 'low', gsScore: 94, medicalStatus: 'completed', biometricStatus: 'booked', sopStatus: 'finalized',
+    documents: [], messages: [], journey: [], onshoreStatus: 'offshore'
+  },
+  {
+    id: 'c4', assignedCounselorId: 's1',
+    client: {
+      id: 'u4', name: 'Michael Chen', avatar: 'https://i.pravatar.cc/150?u=michael',
+      email: 'm.chen@example.com', phone: '+61 411 222 333', location: 'Sydney, NSW',
+      visaStatus: 'Student 500', qualificationTarget: 'Adv. Diploma of Civil Construction',
+      experienceYears: 8, educationHistory: []
+    },
+    source: 'direct', unreadCount: 0, status: 'active', priority: 'low', 
+    currentStage: 'rto_submission', lastActive: new Date(), paymentTotal: 5500, paymentPaid: 1500,
+    visaRiskLevel: 'low', gsScore: 98, medicalStatus: 'completed', biometricStatus: 'completed', sopStatus: 'finalized',
+    documents: [], messages: [], journey: [], onshoreStatus: 'landed'
+  },
+  {
+    id: 'c5', assignedCounselorId: 's1',
+    client: {
+      id: 'u5', name: 'Anjali Gupta', avatar: 'https://i.pravatar.cc/150?u=anjali',
+      email: 'anjali@example.com', phone: '+91 1122334455', location: 'Mumbai, IN',
+      visaStatus: 'Offshore', qualificationTarget: 'Bachelor of Nursing',
+      experienceYears: 0, educationHistory: []
+    },
+    source: 'sub_agent', subAgentName: 'Mumbai Edu Hub', unreadCount: 0, status: 'active', priority: 'medium', 
+    currentStage: 'financial_audit', lastActive: new Date(), paymentTotal: 22000, paymentPaid: 0,
+    visaRiskLevel: 'high', gsScore: 45, medicalStatus: 'pending', biometricStatus: 'pending', sopStatus: 'drafting',
+    documents: [], messages: [], journey: [], onshoreStatus: 'offshore'
+  },
+  {
+    id: 'c6', assignedCounselorId: 's1',
+    client: {
+      id: 'u6', name: 'David Wilson', avatar: 'https://i.pravatar.cc/150?u=david',
+      email: 'david.w@example.com', phone: '+44 7700 900000', location: 'London, UK',
+      visaStatus: 'Working Holiday', qualificationTarget: 'Diploma of Leadership',
+      experienceYears: 10, educationHistory: []
+    },
+    source: 'direct', unreadCount: 0, status: 'active', priority: 'low', 
+    currentStage: 'conditional_offer', lastActive: new Date(), paymentTotal: 4000, paymentPaid: 2000,
+    visaRiskLevel: 'low', gsScore: 100, medicalStatus: 'completed', biometricStatus: 'completed', sopStatus: 'finalized',
+    documents: [], messages: [], journey: [], onshoreStatus: 'landed'
+  },
+  {
+    id: 'c7', assignedCounselorId: 's1',
+    client: {
+      id: 'u7', name: 'Nguyen Van Minh', avatar: 'https://i.pravatar.cc/150?u=minh',
+      email: 'minh.v@example.com', phone: '+84 24 3823 0000', location: 'Hanoi, VN',
+      visaStatus: 'Offshore', qualificationTarget: 'Cert III in Carpentry',
+      experienceYears: 4, educationHistory: []
+    },
+    source: 'sub_agent', subAgentName: 'Hanoi Gateway', unreadCount: 5, status: 'active', priority: 'high', 
+    currentStage: 'lead', lastActive: new Date(), paymentTotal: 12000, paymentPaid: 0,
+    visaRiskLevel: 'medium', gsScore: 72, medicalStatus: 'pending', biometricStatus: 'pending', sopStatus: 'not_started',
+    documents: [], messages: [], journey: [], onshoreStatus: 'offshore'
+  },
+  {
+    id: 'c8', assignedCounselorId: 's1',
+    client: {
+      id: 'u8', name: 'Zahra Khan', avatar: 'https://i.pravatar.cc/150?u=zahra',
+      email: 'zahra.k@example.com', phone: '+92 300 1234567', location: 'Lahore, PK',
+      visaStatus: 'Offshore', qualificationTarget: 'Diploma of IT',
+      experienceYears: 1, educationHistory: []
+    },
+    source: 'sub_agent', subAgentName: 'Lahore Consultancy', unreadCount: 0, status: 'active', priority: 'medium', 
+    currentStage: 'coe_issued', lastActive: new Date(), paymentTotal: 14500, paymentPaid: 14500,
+    visaRiskLevel: 'high', gsScore: 58, medicalStatus: 'completed', biometricStatus: 'pending', sopStatus: 'finalized',
+    documents: [], messages: [], journey: [], onshoreStatus: 'offshore'
+  },
+  {
+    id: 'c9', assignedCounselorId: 's1',
+    client: {
+      id: 'u9', name: 'Robert Smith', avatar: 'https://i.pravatar.cc/150?u=robert',
+      email: 'robert.s@example.com', phone: '+61 433 444 555', location: 'Perth, WA',
+      visaStatus: 'Student 500', qualificationTarget: 'Graduate Diploma of Management',
+      experienceYears: 6, educationHistory: []
+    },
+    source: 'direct', unreadCount: 0, status: 'active', priority: 'low', 
+    currentStage: 'visa_granted', lastActive: new Date(), paymentTotal: 9000, paymentPaid: 9000,
+    visaRiskLevel: 'low', gsScore: 99, medicalStatus: 'completed', biometricStatus: 'completed', sopStatus: 'finalized',
+    documents: [], messages: [], journey: [], onshoreStatus: 'landed'
+  },
+  {
+    id: 'c10', assignedCounselorId: 's1',
+    client: {
+      id: 'u10', name: 'Maria Garcia', avatar: 'https://i.pravatar.cc/150?u=maria',
+      email: 'm.garcia@example.com', phone: '+34 91 123 45 67', location: 'Madrid, ES',
+      visaStatus: 'Offshore', qualificationTarget: 'Diploma of Hospitality',
+      experienceYears: 3, educationHistory: []
+    },
+    source: 'direct', unreadCount: 1, status: 'active', priority: 'medium', 
+    currentStage: 'rto_submission', lastActive: new Date(), paymentTotal: 6000, paymentPaid: 3000,
+    visaRiskLevel: 'low', gsScore: 95, medicalStatus: 'pending', biometricStatus: 'pending', sopStatus: 'finalized',
+    documents: [], messages: [], journey: [], onshoreStatus: 'offshore'
+  },
+  {
+    id: 'c11', assignedCounselorId: 's1',
+    client: {
+      id: 'u11', name: 'Ali Rezai', avatar: 'https://i.pravatar.cc/150?u=ali',
+      email: 'ali.r@example.com', phone: '+98 21 1234 5678', location: 'Tehran, IR',
+      visaStatus: 'Offshore', qualificationTarget: 'Master of Engineering',
+      experienceYears: 5, educationHistory: []
+    },
+    source: 'sub_agent', subAgentName: 'Persian Education', unreadCount: 0, status: 'active', priority: 'high', 
+    currentStage: 'gs_assessment', lastActive: new Date(), paymentTotal: 25000, paymentPaid: 0,
+    visaRiskLevel: 'critical', gsScore: 35, medicalStatus: 'pending', biometricStatus: 'pending', sopStatus: 'drafting',
+    documents: [], messages: [], journey: [], onshoreStatus: 'offshore'
+  },
+  {
+    id: 'c12', assignedCounselorId: 's1',
+    client: {
+      id: 'u12', name: 'Yuki Sato', avatar: 'https://i.pravatar.cc/150?u=yuki',
+      email: 'yuki.s@example.com', phone: '+81 3 1234 5678', location: 'Tokyo, JP',
+      visaStatus: 'Offshore', qualificationTarget: 'Diploma of Yoga',
+      experienceYears: 2, educationHistory: []
+    },
+    source: 'direct', unreadCount: 0, status: 'active', priority: 'low', 
+    currentStage: 'lead', lastActive: new Date(), paymentTotal: 5000, paymentPaid: 0,
+    visaRiskLevel: 'low', gsScore: 100, medicalStatus: 'pending', biometricStatus: 'pending', sopStatus: 'not_started',
+    documents: [], messages: [], journey: [], onshoreStatus: 'offshore'
+  }
 ];

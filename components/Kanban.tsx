@@ -1,163 +1,128 @@
 
 import React, { useState } from 'react';
-import { ApplicationStage, ApplicationCard, ApplicationType, Conversation } from '../types';
+import { ApplicationStage, ApplicationType, Conversation } from '../types';
 import { 
-    MoreHorizontal, Plus, CalendarClock, AlertCircle, Hammer, Landmark, BarChart2, Filter, X,
-    Globe, PlaneLanding
+    Plus, Globe, PlaneLanding, ShieldAlert, FileSearch, Stethoscope, 
+    Fingerprint, BadgePercent, ChevronRight, AlertCircle, FileText
 } from 'lucide-react';
 
 interface Props {
   conversations: Conversation[];
   onSelectCard?: (id: string) => void;
-  filterPartnerId?: string | null;
-  onClearFilter?: () => void;
   onAddLead?: () => void;
 }
 
-const Kanban: React.FC<Props> = ({ conversations, onSelectCard, filterPartnerId, onClearFilter, onAddLead }) => {
-  const [activePipeline, setActivePipeline] = useState<ApplicationType>('rpl');
-
-  const RPL_STAGES: { id: ApplicationStage; label: string; color: string }[] = [
-    { id: 'lead', label: 'New Leads', color: 'bg-slate-500' },
-    { id: 'evidence_collection', label: 'Documentation', color: 'bg-blue-500' },
-    { id: 'mediator_review', label: 'Reviewing', color: 'bg-indigo-500' },
-    { id: 'rto_submission', label: 'Submitted', color: 'bg-orange-500' },
-    { id: 'certified', label: 'Certified', color: 'bg-green-500' },
-  ];
+const Kanban: React.FC<Props> = ({ conversations, onSelectCard, onAddLead }) => {
+  const [activePipeline, setActivePipeline] = useState<ApplicationType>('admission');
 
   const ADMISSION_STAGES: { id: ApplicationStage; label: string; color: string }[] = [
-    { id: 'lead', label: 'Enquiries', color: 'bg-slate-500' },
-    { id: 'app_lodged', label: 'Lodged', color: 'bg-purple-500' },
-    { id: 'conditional_offer', label: 'Offer Sent', color: 'bg-pink-500' },
-    { id: 'gte_assessment', label: 'GTE Check', color: 'bg-cyan-500' },
-    { id: 'coe_issued', label: 'CoE Issued', color: 'bg-emerald-500' },
+    { id: 'lead', label: 'Intake/Lead', color: 'bg-slate-400' },
+    { id: 'gs_assessment', label: 'GS/GTE Audit', color: 'bg-indigo-500' },
+    { id: 'financial_audit', label: 'Finance Check', color: 'bg-blue-500' },
+    { id: 'sop_drafting', label: 'SOP Drafting', color: 'bg-purple-500' },
+    { id: 'rto_submission', label: 'Uni/RTO Sub', color: 'bg-orange-500' },
+    { id: 'visa_lodged', label: 'Visa Lodged', color: 'bg-messenger-blue' },
+    { id: 'visa_granted', label: 'Visa Granted', color: 'bg-emerald-500' },
   ];
 
-  const currentStages = activePipeline === 'rpl' ? RPL_STAGES : ADMISSION_STAGES;
+  const currentStages = ADMISSION_STAGES;
 
-  const mappedCards: any[] = conversations.map(c => {
-      const isRpl = c.client.qualificationTarget.toLowerCase().includes('cert') || 
-                    c.client.qualificationTarget.toLowerCase().includes('dip') ||
-                    c.client.qualificationTarget.toLowerCase().includes('rpl');
-      const type: ApplicationType = isRpl ? 'rpl' : 'admission';
-      
-      return {
-          id: c.id,
-          partnerId: c.partnerId,
-          type: type,
-          clientName: c.client.name,
-          qualification: c.client.qualificationTarget,
-          stage: c.currentStage,
-          tags: [c.source === 'sub_agent' ? (c.subAgentName || 'Sub-Agent') : 'Direct'],
-          value: `$${c.paymentTotal.toLocaleString()}`,
-          daysInStage: Math.floor((Date.now() - c.lastActive.getTime()) / (1000 * 60 * 60 * 24)) || 1,
-          missingDocs: c.documents.filter(d => d.status === 'missing').length,
-          counselorId: c.assignedCounselorId,
-          onshore: c.onshoreStatus === 'landed',
-          isB2B: c.source === 'sub_agent'
-      };
-  });
-
-  const filteredCards = mappedCards.filter(card => {
-      const matchesPipeline = card.type === activePipeline;
-      const matchesPartner = filterPartnerId ? card.partnerId === filterPartnerId : true;
-      return matchesPipeline && matchesPartner;
+  const filteredConversations = conversations.filter(c => {
+      // In a real app, we'd filter by activePipeline type. For now, showing relevant admission flow.
+      return true;
   });
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-slate-100 overflow-hidden">
+    <div className="flex-1 flex flex-col h-full bg-slate-50 overflow-hidden">
         {/* Header */}
-        <div className="h-16 shrink-0 bg-white border-b border-slate-200 flex items-center justify-between px-6 z-10 shadow-sm">
-            <div className="flex items-center gap-4">
-                <div className="bg-slate-100 p-1 rounded-2xl flex gap-1">
-                    <button 
-                        onClick={() => setActivePipeline('rpl')}
-                        className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activePipeline === 'rpl' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500'}`}
-                    >
-                        RPL Pipeline
-                    </button>
-                    <button 
-                        onClick={() => setActivePipeline('admission')}
-                        className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activePipeline === 'admission' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500'}`}
-                    >
-                        Academic Hub
-                    </button>
+        <div className="h-16 shrink-0 bg-white border-b border-slate-200 flex items-center justify-between px-8 z-10 shadow-sm">
+            <div className="flex items-center gap-6">
+                <h2 className="text-sm font-black uppercase tracking-widest text-slate-900">Agency Workflow</h2>
+                <div className="flex gap-1 bg-slate-100 p-1 rounded-xl">
+                    {['admission', 'rpl', 'visa'].map(type => (
+                        <button 
+                            key={type}
+                            onClick={() => setActivePipeline(type as any)}
+                            className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-tight transition-all ${activePipeline === type ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400'}`}
+                        >
+                            {type}
+                        </button>
+                    ))}
                 </div>
             </div>
-            <button 
-                onClick={onAddLead}
-                className="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 transition-all active:scale-95 shadow-lg shadow-slate-200"
-            >
-                <Plus className="w-4 h-4 mr-2 inline" /> Create File
+            <button onClick={onAddLead} className="bg-blue-600 text-white px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-900 transition-all shadow-lg shadow-blue-100">
+                <Plus className="w-4 h-4 mr-2 inline" /> New Enrollment
             </button>
         </div>
 
-        {/* Kanban Surface */}
-        <div className="flex-1 overflow-x-auto p-6 flex gap-6 h-full bg-slate-100">
+        {/* Kanban Board */}
+        <div className="flex-1 overflow-x-auto p-6 flex gap-6 h-full custom-scrollbar">
             {currentStages.map(stage => {
-                const stageCards = filteredCards.filter(c => c.stage === stage.id);
+                const stageCards = filteredConversations.filter(c => c.currentStage === stage.id);
                 return (
                     <div key={stage.id} className="w-80 shrink-0 flex flex-col h-full">
-                        {/* Column Title */}
-                        <div className="flex items-center justify-between mb-4 px-2">
-                            <div className="flex items-center gap-3">
+                        <div className="flex items-center justify-between mb-4 px-3">
+                            <div className="flex items-center gap-2">
+                                <div className={`w-2 h-2 rounded-full ${stage.color}`}></div>
                                 <h3 className="font-black text-slate-800 text-[10px] uppercase tracking-widest">{stage.label}</h3>
-                                <span className="bg-white border border-slate-200 text-slate-500 text-[9px] font-black px-2 py-0.5 rounded-full">{stageCards.length}</span>
                             </div>
+                            <span className="text-[10px] font-black text-slate-300 bg-white border border-slate-100 px-2 rounded-full">{stageCards.length}</span>
                         </div>
 
-                        {/* Cards container */}
-                        <div className="flex-1 overflow-y-auto custom-scrollbar space-y-4 pb-24 pr-1">
-                            {stageCards.map(card => (
+                        <div className="flex-1 overflow-y-auto space-y-4 pb-20 pr-1 custom-scrollbar">
+                            {stageCards.map(conv => (
                                 <div 
-                                    key={card.id} 
-                                    onClick={() => onSelectCard?.(card.id)}
-                                    className="bg-white p-5 rounded-[24px] border border-slate-200 shadow-sm hover:shadow-xl cursor-pointer transition-all group animate-in fade-in slide-in-from-bottom-2 duration-300 relative overflow-hidden"
+                                    key={conv.id}
+                                    onClick={() => onSelectCard?.(conv.id)}
+                                    className="bg-white p-5 rounded-[28px] border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer group relative overflow-hidden"
                                 >
-                                    {card.onshore && (
-                                        <div className="absolute top-0 right-0 w-8 h-8 bg-emerald-500 text-white flex items-center justify-center rounded-bl-2xl shadow-sm z-10">
-                                            <PlaneLanding className="w-4 h-4" />
-                                        </div>
-                                    )}
-
-                                    <div className="flex justify-between items-start mb-4">
-                                        <div className="flex items-center gap-2">
-                                            <span className={`text-[8px] font-black uppercase tracking-tighter px-2 py-0.5 rounded-full ${card.isB2B ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'}`}>
-                                                {card.tags[0]}
-                                            </span>
-                                            {!card.onshore && (
-                                                <span className="text-[8px] font-black text-slate-400 uppercase flex items-center gap-1">
-                                                    <Globe className="w-2.5 h-2.5" /> Offshore
-                                                </span>
+                                    {/* GS RISK INDICATOR */}
+                                    <div className={`absolute top-0 left-0 w-1.5 h-full ${conv.visaRiskLevel === 'low' ? 'bg-emerald-400' : conv.visaRiskLevel === 'high' ? 'bg-red-500' : 'bg-orange-400'}`}></div>
+                                    
+                                    <div className="flex justify-between items-start mb-3">
+                                        <div className="flex gap-1.5">
+                                            {conv.onshoreStatus === 'landed' ? (
+                                                <span className="p-1 bg-emerald-50 text-emerald-600 rounded-lg"><PlaneLanding className="w-3 h-3" /></span>
+                                            ) : (
+                                                <span className="p-1 bg-blue-50 text-blue-600 rounded-lg"><Globe className="w-3 h-3" /></span>
                                             )}
+                                            {conv.sopStatus === 'review_required' && (
+                                                <span className="p-1 bg-purple-50 text-purple-600 rounded-lg animate-pulse"><FileText className="w-3 h-3" /></span>
+                                            )}
+                                        </div>
+                                        <div className="flex -space-x-2">
+                                            <div className="w-5 h-5 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[8px] font-black text-slate-400">JW</div>
                                         </div>
                                     </div>
 
-                                    <h4 className="font-black text-slate-900 text-sm mb-1 leading-tight">{card.clientName}</h4>
-                                    <p className="text-[11px] font-bold text-slate-500 truncate mb-5">{card.qualification}</p>
+                                    <h4 className="font-black text-slate-900 text-sm mb-1 leading-tight">{conv.client.name}</h4>
+                                    <p className="text-[10px] font-bold text-slate-400 truncate mb-4">{conv.subAgentName || 'Direct Lead'}</p>
                                     
-                                    <div className="flex justify-between items-center pt-4 border-t border-slate-50">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-[10px] font-black text-slate-400 border border-slate-200 uppercase">{card.counselorId.charAt(0)}</div>
-                                            <div>
-                                                <span className="block text-[10px] font-black text-slate-900">{card.value}</span>
-                                                <span className="block text-[9px] font-bold text-slate-400">{card.daysInStage} Days</span>
-                                            </div>
+                                    {/* STATUS CHIPS FOR MISSING STEPS */}
+                                    <div className="flex flex-wrap gap-2 mb-4">
+                                        <div className={`flex items-center gap-1 text-[8px] font-black uppercase px-2 py-0.5 rounded-full border ${conv.medicalStatus === 'completed' ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-slate-50 border-slate-100 text-slate-400'}`}>
+                                            <Stethoscope className="w-2.5 h-2.5" /> Med
                                         </div>
-                                        {card.missingDocs > 0 && (
-                                            <div className="flex items-center gap-1 bg-red-50 text-red-500 px-2 py-1 rounded-lg">
-                                                <AlertCircle className="w-3.5 h-3.5" />
-                                                <span className="text-[10px] font-black">{card.missingDocs}</span>
+                                        <div className={`flex items-center gap-1 text-[8px] font-black uppercase px-2 py-0.5 rounded-full border ${conv.biometricStatus === 'booked' ? 'bg-blue-50 border-blue-100 text-blue-600' : 'bg-slate-50 border-slate-100 text-slate-400'}`}>
+                                            <Fingerprint className="w-2.5 h-2.5" /> Bio
+                                        </div>
+                                        {conv.gsScore && conv.gsScore < 70 && (
+                                            <div className="flex items-center gap-1 text-[8px] font-black uppercase px-2 py-0.5 rounded-full bg-red-50 border-red-100 text-red-600">
+                                                <ShieldAlert className="w-2.5 h-2.5" /> Low GS
                                             </div>
                                         )}
                                     </div>
+
+                                    <div className="flex items-center justify-between pt-4 border-t border-slate-50">
+                                        <span className="text-[10px] font-black text-slate-900">${conv.paymentTotal.toLocaleString()}</span>
+                                        <div className="flex items-center gap-1 text-[9px] font-bold text-slate-400 uppercase">
+                                            {Math.floor((Date.now() - conv.lastActive.getTime()) / (1000 * 60 * 60 * 24))}d in stage
+                                        </div>
+                                    </div>
                                 </div>
                             ))}
-                            <button 
-                                onClick={onAddLead}
-                                className="w-full py-4 text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] hover:text-indigo-600 border-2 border-dashed border-slate-200 rounded-[24px] hover:bg-white hover:border-indigo-200 transition-all flex items-center justify-center gap-2"
-                            >
-                                <Plus className="w-4 h-4" /> Create File
+                            <button onClick={onAddLead} className="w-full py-4 border-2 border-dashed border-slate-200 rounded-[28px] text-[10px] font-black text-slate-300 uppercase hover:border-blue-200 hover:text-blue-500 hover:bg-white transition-all">
+                                + Add Student
                             </button>
                         </div>
                     </div>

@@ -6,13 +6,13 @@ import { Message, SenderType, ClientProfile, Partner, DocumentStatus } from "../
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 /**
- * Fast AI responses using gemini-2.5-flash-lite
+ * Fast AI responses using gemini-flash-lite-latest
  */
 export const fastRewrite = async (text: string): Promise<string> => {
   if (!process.env.API_KEY) return text;
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-lite-latest',
+      model: 'gemini-flash-lite-latest',
       contents: `Rewrite this message to be more professional for an RPL agent: "${text}"`,
     });
     return response.text || text;
@@ -107,7 +107,7 @@ export const getSmartSuggestions = async (
       .join('\n');
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-lite-latest', // Fast lite for smart suggestions
+      model: 'gemini-flash-lite-latest', // Updated to guideline-compliant model name
       contents: `
         Client Name: ${clientName}
         Target Qualification: ${qualification}

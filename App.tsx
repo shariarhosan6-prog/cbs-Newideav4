@@ -13,6 +13,7 @@ import NewLeadModal from './components/NewLeadModal';
 import AIChatBot from './components/AIChatBot';
 import { MOCK_CONVERSATIONS, MOCK_COUNSELORS, MOCK_PARTNERS } from './constants';
 import { Conversation, MessageType, SenderType, MessageThread, ViewState, ApplicationStage, Counselor, TeamTask, Partner, ClientProfile, ApplicationType } from './types';
+import { Menu, ChevronRight } from 'lucide-react';
 
 function App() {
   const [currentView, setCurrentView] = useState<ViewState>('dashboard');
@@ -21,6 +22,7 @@ function App() {
   const [partners, setPartners] = useState<Partner[]>(MOCK_PARTNERS);
   const [selectedId, setSelectedId] = useState<string>(MOCK_CONVERSATIONS[0].id);
   const [rightPanelOpen, setRightPanelOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [categories, setCategories] = useState<string[]>(['Urgent Follow-ups', 'Prospects', 'Onboarding', 'Waiting on RTO']);
   const [isNewLeadModalOpen, setIsNewLeadModalOpen] = useState(false);
   
@@ -28,7 +30,7 @@ function App() {
   const unreadCount = conversations.reduce((acc, curr) => acc + curr.unreadCount, 0);
 
   const handleUpdateStatus = (id: string, newStage: ApplicationStage) => {
-    setConversations(prev => prev.map(c => c.id === id ? { ...c, currentStage: newStage, currentStep: newStage.replace(/_/g, ' ') } : c));
+    setConversations(prev => prev.map(c => c.id === id ? { ...c, currentStage: newStage } : c));
   };
 
   const handleSendMessage = (text: string, type: MessageType = MessageType.TEXT, fileData?: { name: string, size: string }, thread: MessageThread = 'source') => {
@@ -50,7 +52,7 @@ function App() {
                  <ChatWindow key={selectedConversation.id} conversation={selectedConversation} onSendMessage={handleSendMessage} onToggleInfo={() => setRightPanelOpen(!rightPanelOpen)} onAssignCounselor={() => {}} isInfoOpen={rightPanelOpen} />
             </div>
             <div className={`absolute lg:static inset-y-0 right-0 z-30 w-full sm:w-96 bg-white border-l border-slate-200 transition-all duration-300 transform ${rightPanelOpen ? 'translate-x-0' : 'translate-x-full lg:hidden'}`}>
-                <ClientIntelligence conversation={selectedConversation} isOpen={true} onAddDocument={() => {}} onAddEducation={() => {}} onUpdateStatus={(status) => handleUpdateStatus(selectedId, status)} onSpawnService={() => {}} />
+                <ClientIntelligence conversation={selectedConversation} isOpen={true} onUpdateStatus={(status) => handleUpdateStatus(selectedId, status)} />
             </div>
           </div>
         );
@@ -63,9 +65,26 @@ function App() {
 
   return (
     <div className="flex h-screen bg-slate-50 overflow-hidden font-sans">
-      <div className="hidden lg:block h-full shrink-0">
-        <Sidebar currentView={currentView} onChangeView={setCurrentView} unreadCount={unreadCount} />
+      {/* SIDEBAR WRAPPER WITH ANIMATION */}
+      <div className={`transition-all duration-300 ease-in-out shrink-0 h-full bg-slate-900 z-50 overflow-hidden ${isSidebarOpen ? 'w-64' : 'w-0'}`}>
+        <Sidebar 
+          currentView={currentView} 
+          onChangeView={setCurrentView} 
+          unreadCount={unreadCount} 
+          onToggleCollapse={() => setIsSidebarOpen(false)}
+        />
       </div>
+
+      {/* FLOATING SIDEBAR TRIGGER (When closed) */}
+      {!isSidebarOpen && (
+        <button 
+          onClick={() => setIsSidebarOpen(true)}
+          className="fixed top-6 left-6 z-[60] p-3 bg-slate-900 text-white rounded-2xl shadow-2xl hover:bg-blue-600 transition-all hover:scale-105 active:scale-95 animate-in fade-in slide-in-from-left-4"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+      )}
+
       <main className="flex-1 h-full relative overflow-hidden flex flex-col">
          {renderContent()}
       </main>
