@@ -45,7 +45,10 @@ export const MOCK_PARTNERS: Partner[] = [
     activeStudents: 42,
     commissionRate: '15%',
     status: 'active',
-    logo: 'https://ui-avatars.com/api/?name=GE&background=random'
+    logo: 'https://ui-avatars.com/api/?name=GE&background=random',
+    successRate: 92,
+    commissionPaid: 45000,
+    commissionPending: 12000
   },
   {
     id: 'p2',
@@ -56,7 +59,38 @@ export const MOCK_PARTNERS: Partner[] = [
     activeStudents: 28,
     commissionRate: '20%',
     status: 'active',
-    logo: 'https://ui-avatars.com/api/?name=SP&background=random'
+    logo: 'https://ui-avatars.com/api/?name=SP&background=random',
+    successRate: 96,
+    commissionPaid: 32000,
+    commissionPending: 5400
+  },
+  {
+    id: 'p3',
+    name: 'Monash University',
+    type: 'University',
+    contactPerson: 'David Jones',
+    email: 'monash@example.edu.au',
+    activeStudents: 85,
+    commissionRate: '10%',
+    status: 'active',
+    logo: 'https://ui-avatars.com/api/?name=MU&background=random',
+    successRate: 88,
+    commissionPaid: 120000,
+    commissionPending: 45000
+  },
+  {
+    id: 'p4',
+    name: 'Elite Careers BD',
+    type: 'Sub-Agent',
+    contactPerson: 'Tanvir Ahmed',
+    email: 'elite@example.com',
+    activeStudents: 15,
+    commissionRate: '18%',
+    status: 'active',
+    logo: 'https://ui-avatars.com/api/?name=EC&background=random',
+    successRate: 74,
+    commissionPaid: 15000,
+    commissionPending: 8200
   }
 ];
 

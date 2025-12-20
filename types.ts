@@ -163,6 +163,10 @@ export interface Partner {
   commissionRate: string;
   status: 'active' | 'inactive';
   logo: string;
+  // Performance Metrics
+  successRate?: number; // 0-100
+  commissionPaid?: number;
+  commissionPending?: number;
 }
 
 export interface TeamTask {
