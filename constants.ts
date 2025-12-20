@@ -106,6 +106,10 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     messages: [
         { id: 'm1', sender: SenderType.CLIENT, type: MessageType.TEXT, content: "Has my SOP been reviewed yet?", timestamp: new Date(), thread: 'source' }
     ],
+    notes: [
+      { id: 'n1', content: "Client requested fast-track for RPL as current visa subclass 482 is expiring soon. @Jessica confirm if trade assessment is needed.", authorName: "Alex", timestamp: new Date(Date.now() - 86400000), color: 'yellow', mentions: ['Jessica'] },
+      { id: 'n2', content: "GTE Risk: Bangladesh source of funds needs double verification. 3 months bank statements showing regular deposits are critical.", authorName: "Jessica", timestamp: new Date(Date.now() - 43200000), color: 'red' }
+    ],
     journey: [], onshoreStatus: 'landed'
   },
   {
@@ -119,7 +123,8 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     source: 'sub_agent', subAgentName: 'Elite Careers BD', unreadCount: 0, status: 'active', priority: 'medium', 
     currentStage: 'gs_assessment', lastActive: new Date(Date.now() - 3600000), paymentTotal: 12000, paymentPaid: 0,
     visaRiskLevel: 'low', gsScore: 94, medicalStatus: 'pending', biometricStatus: 'pending', sopStatus: 'not_started',
-    documents: [], messages: [], journey: [], onshoreStatus: 'offshore'
+    documents: [], messages: [], journey: [], onshoreStatus: 'offshore',
+    notes: []
   },
   {
     id: 'c3', assignedCounselorId: 's2',
@@ -136,7 +141,10 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     messages: [
         { id: 'm10', sender: SenderType.CLIENT, type: MessageType.TEXT, content: "I just sent the payment receipt. Please check.", timestamp: new Date(), thread: 'source' }
     ],
-    journey: [], onshoreStatus: 'landed'
+    journey: [], onshoreStatus: 'landed',
+    notes: [
+      { id: 'n3', content: "Confirmed $8500 tuition payment. Proceed to COE issuance immediately.", authorName: "Finance Team", timestamp: new Date(), color: 'green' }
+    ]
   },
   {
     id: 'c4', assignedCounselorId: 's2',
@@ -149,7 +157,8 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     source: 'direct', unreadCount: 0, status: 'active', priority: 'low', 
     currentStage: 'rto_submission', lastActive: new Date(Date.now() - 86400000), paymentTotal: 1200, paymentPaid: 600,
     visaRiskLevel: 'low', gsScore: 91, medicalStatus: 'completed', biometricStatus: 'completed', sopStatus: 'finalized',
-    documents: [], messages: [], journey: [], onshoreStatus: 'landed'
+    documents: [], messages: [], journey: [], onshoreStatus: 'landed',
+    notes: []
   },
   {
     id: 'c5', assignedCounselorId: 's1',
@@ -165,7 +174,8 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     documents: [], messages: [
         { id: 'm20', sender: SenderType.SYSTEM, type: MessageType.SYSTEM, content: "Visa Application Lodged Successfully.", timestamp: new Date(), thread: 'source' }
     ],
-    journey: [], onshoreStatus: 'offshore'
+    journey: [], onshoreStatus: 'offshore',
+    notes: []
   },
   {
     id: 'c6', assignedCounselorId: 's1',
@@ -178,7 +188,8 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     source: 'direct', unreadCount: 0, status: 'active', priority: 'medium', 
     currentStage: 'financial_audit', lastActive: new Date(Date.now() - 172800000), paymentTotal: 45000, paymentPaid: 5000,
     visaRiskLevel: 'low', gsScore: 98, medicalStatus: 'pending', biometricStatus: 'pending', sopStatus: 'drafting',
-    documents: [], messages: [], journey: [], onshoreStatus: 'offshore'
+    documents: [], messages: [], journey: [], onshoreStatus: 'offshore',
+    notes: []
   },
   {
     id: 'c7', assignedCounselorId: 's2',
@@ -194,7 +205,8 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     documents: [], messages: [
         { id: 'm30', sender: SenderType.CLIENT, type: MessageType.TEXT, content: "Can I pay the tuition in installments?", timestamp: new Date(), thread: 'source' }
     ],
-    journey: [], onshoreStatus: 'offshore'
+    journey: [], onshoreStatus: 'offshore',
+    notes: []
   },
   {
     id: 'c8', assignedCounselorId: 's1',
@@ -207,7 +219,8 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     source: 'direct', unreadCount: 0, status: 'active', priority: 'low', 
     currentStage: 'lead', lastActive: new Date(Date.now() - 604800000), paymentTotal: 9000, paymentPaid: 0,
     visaRiskLevel: 'low', gsScore: 95, medicalStatus: 'pending', biometricStatus: 'pending', sopStatus: 'not_started',
-    documents: [], messages: [], journey: [], onshoreStatus: 'landed'
+    documents: [], messages: [], journey: [], onshoreStatus: 'landed',
+    notes: []
   },
   {
     id: 'c9', assignedCounselorId: 's2',
@@ -220,7 +233,8 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     source: 'sub_agent', subAgentName: 'EuroEdu Russia', unreadCount: 0, status: 'active', priority: 'medium', 
     currentStage: 'visa_granted', lastActive: new Date(Date.now() - 259200000), paymentTotal: 32000, paymentPaid: 32000,
     visaRiskLevel: 'high', gsScore: 65, medicalStatus: 'completed', biometricStatus: 'completed', sopStatus: 'finalized',
-    documents: [], messages: [], journey: [], onshoreStatus: 'offshore'
+    documents: [], messages: [], journey: [], onshoreStatus: 'offshore',
+    notes: []
   },
   {
     id: 'c10', assignedCounselorId: 's1',
@@ -239,7 +253,8 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     messages: [
         { id: 'm40', sender: SenderType.CLIENT, type: MessageType.TEXT, content: "Why was my bank statement rejected?", timestamp: new Date(), thread: 'source' }
     ],
-    journey: [], onshoreStatus: 'offshore'
+    journey: [], onshoreStatus: 'offshore',
+    notes: []
   },
   {
     id: 'c11', assignedCounselorId: 's2',
@@ -252,6 +267,9 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     source: 'direct', unreadCount: 0, status: 'completed', priority: 'medium', 
     currentStage: 'certified', lastActive: new Date(Date.now() - 31536000000), paymentTotal: 4000, paymentPaid: 4000,
     visaRiskLevel: 'low', gsScore: 90, medicalStatus: 'completed', biometricStatus: 'completed', sopStatus: 'finalized',
-    documents: [], messages: [], journey: [], onshoreStatus: 'landed'
+    documents: [], messages: [], journey: [], onshoreStatus: 'landed',
+    notes: []
   }
 ];
+
+export const PROGRESS_STEPS = ['Intake', 'Doc Check', 'Mediator Verified', 'Super Agent', 'Complete'];

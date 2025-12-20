@@ -15,7 +15,7 @@ import AdvancedSearch from './components/AdvancedSearch';
 import CalendarTimeline from './components/CalendarTimeline';
 import BulkActionToolbar from './components/BulkActionToolbar';
 import { MOCK_CONVERSATIONS, MOCK_COUNSELORS, MOCK_PARTNERS } from './constants';
-import { Conversation, MessageType, SenderType, MessageThread, ViewState, ApplicationStage, Counselor, Partner, SearchFilters } from './types';
+import { Conversation, MessageType, SenderType, MessageThread, ViewState, ApplicationStage, Counselor, Partner, SearchFilters, InternalNote } from './types';
 import { Menu } from 'lucide-react';
 
 const INITIAL_FILTERS: SearchFilters = {
@@ -74,9 +74,41 @@ function App() {
     setConversations(prev => prev.map(c => c.id === id ? { ...c, currentStage: newStage } : c));
   };
 
+  const handleAddNote = (id: string, noteData: Omit<InternalNote, 'id' | 'timestamp'>) => {
+    const newNote: InternalNote = {
+      ...noteData,
+      id: `note-${Date.now()}`,
+      timestamp: new Date()
+    };
+    setConversations(prev => prev.map(c => c.id === id ? { ...c, notes: [newNote, ...c.notes] } : c));
+    
+    // Also post it as an internal message in the chat for the stream
+    const newMessage = { 
+      id: `msg-note-${Date.now()}`, 
+      sender: SenderType.AGENT, 
+      type: MessageType.TEXT, 
+      content: `[Internal Note]: ${noteData.content}`, 
+      timestamp: new Date(), 
+      thread: 'internal' as MessageThread 
+    };
+    setConversations(prev => prev.map(c => c.id === id ? { ...c, messages: [...c.messages, newMessage] } : c));
+  };
+
   const handleSendMessage = (text: string, type: MessageType = MessageType.TEXT, fileData?: { name: string, size: string }, thread: MessageThread = 'source') => {
     const newMessage = { id: Date.now().toString(), sender: SenderType.AGENT, type, content: text, timestamp: new Date(), thread };
     setConversations(prev => prev.map(c => c.id === selectedId ? { ...c, messages: [...c.messages, newMessage], lastActive: new Date() } : c));
+    
+    // If it's an internal note sent via chat, also add it to the notes history
+    if (thread === 'internal') {
+        const newNote: InternalNote = {
+            id: `note-chat-${Date.now()}`,
+            content: text,
+            authorName: "Alex (Admin)",
+            timestamp: new Date(),
+            color: 'blue'
+        };
+        setConversations(prev => prev.map(c => c.id === selectedId ? { ...c, notes: [newNote, ...c.notes] } : c));
+    }
   };
 
   // --- BULK ACTION HANDLERS ---
@@ -160,7 +192,12 @@ function App() {
                    <ChatWindow key={selectedConversation.id} conversation={selectedConversation} onSendMessage={handleSendMessage} onToggleInfo={() => setRightPanelOpen(!rightPanelOpen)} onAssignCounselor={() => {}} isInfoOpen={rightPanelOpen} />
               </div>
               <div className={`absolute lg:static inset-y-0 right-0 z-30 w-full sm:w-96 bg-white border-l border-slate-200 transition-all duration-300 transform ${rightPanelOpen ? 'translate-x-0' : 'translate-x-full lg:hidden'}`}>
-                  <ClientIntelligence conversation={selectedConversation} isOpen={true} onUpdateStatus={(status) => handleUpdateStatus(selectedId, status)} />
+                  <ClientIntelligence 
+                    conversation={selectedConversation} 
+                    isOpen={true} 
+                    onUpdateStatus={(status) => handleUpdateStatus(selectedId, status)} 
+                    onAddNote={(note) => handleAddNote(selectedId, note)}
+                  />
               </div>
             </div>
             {/* BULK ACTION BAR */}

@@ -57,6 +57,15 @@ export interface JourneyMilestone {
     studentId: string;
 }
 
+export interface InternalNote {
+  id: string;
+  content: string;
+  authorName: string;
+  timestamp: Date;
+  color: 'yellow' | 'blue' | 'red' | 'green' | 'purple';
+  mentions?: string[];
+}
+
 export interface Conversation {
   id: string;
   client: ClientProfile;
@@ -81,6 +90,7 @@ export interface Conversation {
   sopStatus?: 'not_started' | 'drafting' | 'review_required' | 'finalized';
   journey: JourneyMilestone[];
   messages: Message[];
+  notes: InternalNote[];
 }
 
 export interface Message {

@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Conversation, DocumentStatus, EducationEntry, ApplicationStage, ApplicationType } from '../types';
+import { Conversation, DocumentStatus, EducationEntry, ApplicationStage, ApplicationType, InternalNote } from '../types';
 import { 
     User, FileText, GraduationCap, CheckCircle, Clock, 
     ShieldCheck, Zap, MoreHorizontal, ChevronDown, Send, 
@@ -10,19 +10,45 @@ import {
     Activity, DollarSign, CheckCircle2, Crown, Briefcase, Handshake,
     Stethoscope, Fingerprint, Calculator, FileSearch, ClipboardList, CheckSquare,
     Bell, Plus, ChevronLeft, ArrowRight, ShieldAlert, History as HistoryIcon,
-    AlertTriangle, CheckSquare as CheckSquareIcon, ListChecks, TrendingDown
+    AlertTriangle, CheckSquare as CheckSquareIcon, ListChecks, TrendingDown,
+    StickyNote, AtSign, Tag as TagIcon, MessageSquare
 } from 'lucide-react';
 
 interface Props {
   conversation: Conversation;
   isOpen: boolean;
   onUpdateStatus: (status: ApplicationStage) => void;
+  onAddNote?: (note: Omit<InternalNote, 'id' | 'timestamp'>) => void;
 }
 
-const ClientIntelligence: React.FC<Props> = ({ conversation, onUpdateStatus }) => {
-    const [activeSection, setActiveSection] = useState<'checklist' | 'gte' | 'local'>('checklist');
+const ClientIntelligence: React.FC<Props> = ({ conversation, onUpdateStatus, onAddNote }) => {
+    const [activeSection, setActiveSection] = useState<'checklist' | 'gte' | 'notes' | 'local'>('checklist');
     const [isRequesting, setIsRequesting] = useState(false);
     const [comparingDoc, setComparingDoc] = useState<DocumentStatus | null>(null);
+    const [isAddingNote, setIsAddingNote] = useState(false);
+
+    // Note Form State
+    const [noteContent, setNoteContent] = useState('');
+    const [noteColor, setNoteColor] = useState<InternalNote['color']>('yellow');
+
+    const handleNoteSubmit = () => {
+        if (!noteContent.trim()) return;
+        
+        // Simple regex for @mentions detection
+        const mentions = noteContent.match(/@(\w+)/g)?.map(m => m.substring(1)) || [];
+        
+        if (onAddNote) {
+            onAddNote({
+                content: noteContent,
+                authorName: "Alex (Admin)",
+                color: noteColor,
+                mentions: mentions
+            });
+        }
+        
+        setNoteContent('');
+        setIsAddingNote(false);
+    };
 
     // Request Form State
     const [newRequest, setNewRequest] = useState({
@@ -33,7 +59,6 @@ const ClientIntelligence: React.FC<Props> = ({ conversation, onUpdateStatus }) =
     });
 
     const handleRequestSubmit = () => {
-        // Mock submission
         setIsRequesting(false);
         setNewRequest({ type: 'identity', name: '', deadline: '', reminder: true });
     };
@@ -56,10 +81,32 @@ const ClientIntelligence: React.FC<Props> = ({ conversation, onUpdateStatus }) =
         return 'bg-red-500';
     };
 
+    const getNoteColorClasses = (color: InternalNote['color']) => {
+        switch (color) {
+            case 'yellow': return 'bg-yellow-50 border-yellow-200 text-yellow-900';
+            case 'blue': return 'bg-blue-50 border-blue-200 text-blue-900';
+            case 'red': return 'bg-red-50 border-red-200 text-red-900';
+            case 'green': return 'bg-emerald-50 border-emerald-200 text-emerald-900';
+            case 'purple': return 'bg-purple-50 border-purple-200 text-purple-900';
+            default: return 'bg-slate-50 border-slate-200 text-slate-900';
+        }
+    };
+
+    const getNoteIconColor = (color: InternalNote['color']) => {
+        switch (color) {
+            case 'yellow': return 'text-yellow-500';
+            case 'blue': return 'text-blue-500';
+            case 'red': return 'text-red-500';
+            case 'green': return 'text-emerald-500';
+            case 'purple': return 'text-purple-500';
+            default: return 'text-slate-500';
+        }
+    };
+
     return (
         <div className="h-full bg-slate-50 flex flex-col overflow-hidden border-l border-slate-200">
             {/* COUNSELOR STATUS HEADER */}
-            <div className="p-6 bg-slate-900 text-white relative overflow-hidden">
+            <div className="p-6 bg-slate-900 text-white relative overflow-hidden shrink-0">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/20 rounded-full blur-3xl -mr-16 -mt-16"></div>
                 <div className="relative z-10">
                     <div className="flex items-center justify-between mb-6">
@@ -74,6 +121,7 @@ const ClientIntelligence: React.FC<Props> = ({ conversation, onUpdateStatus }) =
                         {[
                             { id: 'checklist', label: 'Worklist', icon: CheckSquare },
                             { id: 'gte', label: 'Risk Audit', icon: ShieldCheck },
+                            { id: 'notes', label: 'Notes', icon: StickyNote },
                             { id: 'local', label: 'BD Events', icon: MapPin }
                         ].map(t => (
                             <button 
@@ -442,7 +490,100 @@ const ClientIntelligence: React.FC<Props> = ({ conversation, onUpdateStatus }) =
                     </div>
                 )}
 
-                {/* 3. LOCAL EVENTS (BD EVENTS) */}
+                {/* 3. NOTES & INTERNAL COMMENTS PANEL */}
+                {activeSection === 'notes' && (
+                    <div className="space-y-8 animate-in fade-in slide-in-from-right-4 pb-10">
+                        {/* A. NEW NOTE TRIGGER */}
+                        {isAddingNote ? (
+                            <div className="bg-white rounded-[32px] p-6 border-2 border-indigo-200 shadow-2xl animate-in zoom-in-95 duration-200">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h4 className="text-[11px] font-black uppercase tracking-widest text-indigo-600">New Sticky Note</h4>
+                                    <div className="flex gap-2">
+                                        {(['yellow', 'blue', 'red', 'green', 'purple'] as const).map(c => (
+                                            <button 
+                                                key={c} 
+                                                onClick={() => setNoteColor(c)}
+                                                className={`w-4 h-4 rounded-full border-2 transition-all ${noteColor === c ? 'border-slate-900 scale-125' : 'border-transparent'} 
+                                                    ${c === 'yellow' ? 'bg-yellow-400' : c === 'blue' ? 'bg-blue-400' : c === 'red' ? 'bg-red-400' : c === 'green' ? 'bg-emerald-400' : 'bg-purple-400'}`}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                                <textarea 
+                                    autoFocus
+                                    value={noteContent}
+                                    onChange={(e) => setNoteContent(e.target.value)}
+                                    placeholder="Type your internal note... Use @name to mention team members."
+                                    className="w-full h-32 bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm font-medium text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/5 resize-none mb-4 transition-all"
+                                />
+                                <div className="flex gap-3">
+                                    <button 
+                                        onClick={() => setIsAddingNote(false)}
+                                        className="flex-1 py-3 bg-slate-100 text-slate-500 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-200 transition-all"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button 
+                                        onClick={handleNoteSubmit}
+                                        className="flex-[2] py-3 bg-indigo-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all active:scale-95"
+                                    >
+                                        Post Note
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <button 
+                                onClick={() => setIsAddingNote(true)}
+                                className="w-full py-4 border-2 border-dashed border-indigo-200 rounded-[28px] text-[10px] font-black text-indigo-400 uppercase tracking-widest hover:bg-indigo-50 hover:border-indigo-400 transition-all flex items-center justify-center gap-2"
+                            >
+                                <Plus className="w-4 h-4" /> Add Private Note
+                            </button>
+                        )}
+
+                        {/* B. STICKY NOTES FEED */}
+                        <div className="space-y-6">
+                            <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-2 flex justify-between items-center">
+                                Team Briefing History
+                                <span className="text-[8px] font-black text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded uppercase">Private Only</span>
+                            </h4>
+
+                            <div className="space-y-4">
+                                {conversation.notes.length === 0 ? (
+                                    <div className="text-center py-10 opacity-30">
+                                        <MessageSquare className="w-12 h-12 mx-auto mb-3" />
+                                        <p className="text-xs font-black uppercase tracking-widest">No internal records</p>
+                                    </div>
+                                ) : (
+                                    conversation.notes.map((note) => (
+                                        <div key={note.id} className={`p-6 rounded-[32px] border transition-all hover:shadow-lg ${getNoteColorClasses(note.color)}`}>
+                                            <div className="flex justify-between items-start mb-3">
+                                                <div className="flex items-center gap-2">
+                                                    <div className={`p-1.5 rounded-lg bg-white/50 ${getNoteIconColor(note.color)}`}>
+                                                        <TagIcon className="w-3.5 h-3.5" />
+                                                    </div>
+                                                    <span className="text-[10px] font-black uppercase tracking-widest opacity-60">@{note.authorName}</span>
+                                                </div>
+                                                <span className="text-[9px] font-bold opacity-40 uppercase">{new Date(note.timestamp).toLocaleDateString()}</span>
+                                            </div>
+                                            <p className="text-sm font-bold leading-relaxed">
+                                                {note.content.split(' ').map((word, i) => (
+                                                    word.startsWith('@') 
+                                                        ? <span key={i} className="text-indigo-600 bg-white/40 px-1 rounded-md mr-1">{word} </span>
+                                                        : word + ' '
+                                                ))}
+                                            </p>
+                                            <div className="flex justify-end mt-4 pt-3 border-t border-black/5 opacity-40 group">
+                                                <button className="p-1 hover:text-red-600 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* 4. LOCAL EVENTS (BD EVENTS) */}
                 {activeSection === 'local' && (
                     <div className="space-y-8 animate-in fade-in slide-in-from-right-4">
                          <div className="bg-white rounded-[32px] p-8 border border-slate-200 shadow-sm relative overflow-hidden group">
