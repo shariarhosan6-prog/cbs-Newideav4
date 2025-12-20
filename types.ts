@@ -4,6 +4,7 @@ export enum MessageType {
   IMAGE = 'image',
   DOCUMENT = 'document',
   SYSTEM = 'system',
+  EMAIL = 'email',
 }
 
 export enum SenderType {
@@ -15,7 +16,7 @@ export enum SenderType {
 }
 
 export type LeadSource = 'direct' | 'sub_agent';
-export type MessageThread = 'source' | 'upstream' | 'internal' | 'team_discussion'; 
+export type MessageThread = 'source' | 'upstream' | 'internal' | 'team_discussion' | 'email'; 
 
 export type ViewState = 'dashboard' | 'pipeline' | 'inbox' | 'partners' | 'finance' | 'team' | 'calendar' | 'workspace';
 
@@ -126,6 +127,13 @@ export interface Conversation {
   difficulty?: 'easy' | 'standard' | 'complex' | 'critical';
 }
 
+export interface Attachment {
+  id: string;
+  name: string;
+  size: string;
+  type: string;
+}
+
 export interface Message {
   id: string;
   sender: SenderType;
@@ -136,6 +144,9 @@ export interface Message {
   authorName?: string;
   authorId?: string; 
   linkedCaseId?: string; // Optional link to a client file
+  subject?: string;      // Email only
+  attachments?: Attachment[]; // Email/Chat attachments
+  scheduledAt?: Date;    // Scheduled sending
 }
 
 export interface TeamChannel {

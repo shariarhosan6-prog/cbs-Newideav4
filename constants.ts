@@ -1,6 +1,12 @@
 
 import { Conversation, MessageType, SenderType, Partner, Counselor, CommissionRecord } from './types';
 
+export const EMAIL_TEMPLATES = [
+  { id: 't1', name: 'Document Request', subject: 'Action Required: Documents for RPL Application', body: 'Dear {name},\n\nWe require the following documents to proceed with your {qualification} application:\n1. Updated Resume\n2. Employment References\n3. Proof of Identity\n\nPlease upload them via your dashboard.\n\nRegards,\nStitch CRM Team' },
+  { id: 't2', name: 'Conditional Offer Letter', subject: 'Congratulations: Conditional Offer Received', body: 'Hi {name},\n\nGreat news! You have received a conditional offer for {qualification}. To finalize your enrollment, please complete the pending payment of {balance}.\n\nBest regards,\nAdmissions Team' },
+  { id: 't3', name: 'Payment Reminder', subject: 'Friendly Reminder: Outstanding Balance', body: 'Dear {name},\n\nThis is a friendly reminder regarding the outstanding balance of {balance} for your application. Please settle this by the end of the week to avoid delays.\n\nThank you.' },
+];
+
 // Exported mock data for counselors
 export const MOCK_COUNSELORS: Counselor[] = [
   {
@@ -138,7 +144,8 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
         { id: 'd3', name: 'Experience Certificate', status: 'requested', type: 'employment', requestedDate: new Date(), deadline: new Date(Date.now() + 86400000 * 3), autoReminder: true }
     ],
     messages: [
-        { id: 'm1', sender: SenderType.CLIENT, type: MessageType.TEXT, content: "Has my SOP been reviewed yet?", timestamp: new Date(), thread: 'source' }
+        { id: 'm1', sender: SenderType.CLIENT, type: MessageType.TEXT, content: "Has my SOP been reviewed yet?", timestamp: new Date(), thread: 'source' },
+        { id: 'e1', sender: SenderType.AGENT, type: MessageType.EMAIL, subject: 'Follow-up: Experience Documentation', content: "Hi Sarah, checking in on the experience certificates.", timestamp: new Date(Date.now() - 3600000), thread: 'email' }
     ],
     notes: [
       { id: 'n1', content: "Client requested fast-track for RPL as current visa subclass 482 is expiring soon. @Jessica confirm if trade assessment is needed.", authorName: "Alex", timestamp: new Date(Date.now() - 86400000), color: 'yellow', mentions: ['Jessica'] },
@@ -151,7 +158,6 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
       { id: 'a4', type: 'assignment_changed', content: 'File reassigned from Alex to Jessica Wu', actorName: 'Admin', timestamp: new Date(Date.now() - 172800000) }
     ],
     journey: [], onshoreStatus: 'landed',
-    // Added missing tasks property
     tasks: []
   },
   {
@@ -167,7 +173,6 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     visaRiskLevel: 'low', gsScore: 94, medicalStatus: 'pending', biometricStatus: 'pending', sopStatus: 'not_started',
     documents: [], messages: [], journey: [], onshoreStatus: 'offshore',
     notes: [], activities: [],
-    // Added missing tasks property
     tasks: []
   },
   {
@@ -190,7 +195,6 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
       { id: 'n3', content: "Confirmed $8500 tuition payment. Proceed to COE issuance immediately.", authorName: "Finance Team", timestamp: new Date(), color: 'green' }
     ],
     activities: [],
-    // Added missing tasks property
     tasks: []
   },
   {
@@ -206,7 +210,6 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     visaRiskLevel: 'low', gsScore: 91, medicalStatus: 'completed', biometricStatus: 'completed', sopStatus: 'finalized',
     documents: [], messages: [], journey: [], onshoreStatus: 'landed',
     notes: [], activities: [],
-    // Added missing tasks property
     tasks: []
   },
   {
@@ -225,7 +228,6 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     ],
     journey: [], onshoreStatus: 'offshore',
     notes: [], activities: [],
-    // Added missing tasks property
     tasks: []
   },
   {
@@ -241,7 +243,6 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     visaRiskLevel: 'low', gsScore: 98, medicalStatus: 'pending', biometricStatus: 'pending', sopStatus: 'drafting',
     documents: [], messages: [], journey: [], onshoreStatus: 'offshore',
     notes: [], activities: [],
-    // Added missing tasks property
     tasks: []
   },
   {
@@ -260,7 +261,6 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     ],
     journey: [], onshoreStatus: 'offshore',
     notes: [], activities: [],
-    // Added missing tasks property
     tasks: []
   },
   {
@@ -276,7 +276,6 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     visaRiskLevel: 'low', gsScore: 95, medicalStatus: 'pending', biometricStatus: 'pending', sopStatus: 'not_started',
     documents: [], messages: [], journey: [], onshoreStatus: 'landed',
     notes: [], activities: [],
-    // Added missing tasks property
     tasks: []
   },
   {
@@ -292,7 +291,6 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     visaRiskLevel: 'high', gsScore: 65, medicalStatus: 'completed', biometricStatus: 'completed', sopStatus: 'finalized',
     documents: [], messages: [], journey: [], onshoreStatus: 'offshore',
     notes: [], activities: [],
-    // Added missing tasks property
     tasks: []
   },
   {
@@ -314,7 +312,6 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     ],
     journey: [], onshoreStatus: 'offshore',
     notes: [], activities: [],
-    // Added missing tasks property
     tasks: []
   },
   {
@@ -330,7 +327,6 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     visaRiskLevel: 'low', gsScore: 90, medicalStatus: 'completed', biometricStatus: 'completed', sopStatus: 'finalized',
     documents: [], messages: [], journey: [], onshoreStatus: 'landed',
     notes: [], activities: [],
-    // Added missing tasks property
     tasks: []
   }
 ];

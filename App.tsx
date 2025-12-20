@@ -16,7 +16,7 @@ import AdvancedSearch from './components/AdvancedSearch';
 import CalendarTimeline from './components/CalendarTimeline';
 import BulkActionToolbar from './components/BulkActionToolbar';
 import { MOCK_CONVERSATIONS, MOCK_COUNSELORS, MOCK_PARTNERS } from './constants';
-import { Conversation, MessageType, SenderType, MessageThread, ViewState, ApplicationStage, Counselor, Partner, SearchFilters, InternalNote, ActivityLog, FileTask } from './types';
+import { Conversation, MessageType, SenderType, MessageThread, ViewState, ApplicationStage, Counselor, Partner, SearchFilters, InternalNote, ActivityLog, FileTask, Message } from './types';
 import { Menu } from 'lucide-react';
 
 const INITIAL_FILTERS: SearchFilters = {
@@ -190,23 +190,35 @@ function App() {
     setConversations(prev => prev.map(c => c.id === id ? { ...c, messages: [...c.messages, newMessage] } : c));
   };
 
-  const handleSendMessage = (text: string, type: MessageType = MessageType.TEXT, fileData?: { name: string, size: string }, thread: MessageThread = 'source') => {
+  const handleSendMessage = (text: string, type: MessageType = MessageType.TEXT, attachments: any[] = [], thread: MessageThread = 'source', extra: any = {}) => {
     const timestamp = new Date();
-    const newMessage = { 
+    const newMessage: Message = { 
         id: Date.now().toString(), 
-        sender: thread === 'team_discussion' ? SenderType.AGENT : SenderType.AGENT, 
+        sender: SenderType.AGENT, 
         type, 
         content: text, 
         timestamp, 
         thread,
         authorName: 'Alex (Admin)',
-        authorId: 'admin'
+        authorId: 'admin',
+        attachments,
+        ...extra
     };
     
     setConversations(prev => prev.map(c => {
         if (c.id === selectedId) {
             let updatedActivities = [...c.activities];
-            if (thread === 'internal' || thread === 'team_discussion') {
+            
+            // Log interaction
+            if (type === MessageType.EMAIL) {
+                updatedActivities = [{
+                    id: `act-email-${Date.now()}`,
+                    type: 'system',
+                    content: `Sent Email: "${extra.subject || 'No Subject'}"`,
+                    actorName: 'Alex (Admin)',
+                    timestamp
+                }, ...updatedActivities];
+            } else if (thread === 'internal' || thread === 'team_discussion') {
                 updatedActivities = [{
                     id: `act-collaboration-${Date.now()}`,
                     type: 'note_added',
@@ -215,7 +227,13 @@ function App() {
                     timestamp
                 }, ...updatedActivities];
             }
-            return { ...c, messages: [...c.messages, newMessage], lastActive: timestamp, activities: updatedActivities };
+
+            return { 
+                ...c, 
+                messages: [...c.messages, newMessage], 
+                lastActive: timestamp, 
+                activities: updatedActivities 
+            };
         }
         return c;
     }));
