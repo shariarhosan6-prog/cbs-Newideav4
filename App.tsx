@@ -12,6 +12,7 @@ import TeamManagement from './components/TeamManagement';
 import NewLeadModal from './components/NewLeadModal';
 import AIChatBot from './components/AIChatBot';
 import AdvancedSearch from './components/AdvancedSearch';
+import CalendarTimeline from './components/CalendarTimeline';
 import { MOCK_CONVERSATIONS, MOCK_COUNSELORS, MOCK_PARTNERS } from './constants';
 import { Conversation, MessageType, SenderType, MessageThread, ViewState, ApplicationStage, Counselor, TeamTask, Partner, ClientProfile, ApplicationType, SearchFilters } from './types';
 import { Menu, ChevronRight } from 'lucide-react';
@@ -103,6 +104,8 @@ function App() {
             </div>
           </div>
         );
+      case 'calendar':
+        return <CalendarTimeline conversations={conversations} onSelectStudent={(id) => { setSelectedId(id); setCurrentView('inbox'); }} />;
       case 'partners': return <Partners partners={partners} onUpdatePartner={() => {}} onAddPartner={() => {}} onViewApplications={() => {}} />;
       case 'finance': return <Finance />;
       case 'team': return <TeamManagement staff={counselors} onAddTask={() => {}} onToggleTaskStatus={() => {}} onDeleteTask={() => {}} />;

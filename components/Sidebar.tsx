@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { ViewState } from '../types';
-import { LayoutDashboard, MessageSquare, Kanban, Users, CreditCard, Settings, LogOut, Hexagon, UserCircle, ChevronLeft } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, Kanban, Users, CreditCard, Settings, LogOut, Hexagon, UserCircle, ChevronLeft, Calendar } from 'lucide-react';
 
 interface Props {
   currentView: ViewState;
@@ -15,6 +15,7 @@ const Sidebar: React.FC<Props> = ({ currentView, onChangeView, unreadCount, onTo
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'pipeline', label: 'Pipeline', icon: Kanban },
     { id: 'inbox', label: 'Inbox', icon: MessageSquare, badge: unreadCount },
+    { id: 'calendar', label: 'Schedule', icon: Calendar },
     { id: 'partners', label: 'Partners & RTOs', icon: Users },
     { id: 'finance', label: 'Commissions', icon: CreditCard },
     { id: 'team', label: 'Team Management', icon: UserCircle },

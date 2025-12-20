@@ -17,7 +17,7 @@ export enum SenderType {
 export type LeadSource = 'direct' | 'sub_agent';
 export type MessageThread = 'source' | 'upstream' | 'internal'; 
 
-export type ViewState = 'dashboard' | 'pipeline' | 'inbox' | 'partners' | 'finance' | 'team';
+export type ViewState = 'dashboard' | 'pipeline' | 'inbox' | 'partners' | 'finance' | 'team' | 'calendar';
 
 export type ApplicationType = 'rpl' | 'admission' | 'visa' | 'onshore_transfer' | 'professional_year';
 
@@ -49,10 +49,12 @@ export interface JourneyMilestone {
     id: string;
     serviceType: ApplicationType;
     title: string;
+    description?: string;
     status: 'completed' | 'active' | 'upcoming';
-    startDate: Date;
-    endDate?: Date;
-    outcome?: string;
+    date: Date; // Primary date for calendar/timeline
+    type: 'deadline' | 'appointment' | 'payment' | 'milestone';
+    studentName: string;
+    studentId: string;
 }
 
 export interface Conversation {
