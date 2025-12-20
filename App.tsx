@@ -9,6 +9,7 @@ import ClientIntelligence from './components/ClientIntelligence';
 import Partners from './components/Partners';
 import Finance from './components/Finance';
 import TeamManagement from './components/TeamManagement';
+import TeamWorkspace from './components/TeamWorkspace';
 import NewLeadModal from './components/NewLeadModal';
 import AIChatBot from './components/AIChatBot';
 import AdvancedSearch from './components/AdvancedSearch';
@@ -32,7 +33,7 @@ function App() {
   const [partners] = useState<Partner[]>(MOCK_PARTNERS);
   const [selectedId, setSelectedId] = useState<string>(MOCK_CONVERSATIONS[0].id);
   const [rightPanelOpen, setRightPanelOpen] = useState(true);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [categories, setCategories] = useState<string[]>(['Urgent Follow-ups', 'Prospects', 'Onboarding', 'Waiting on RTO']);
   const [isNewLeadModalOpen, setIsNewLeadModalOpen] = useState(false);
   
@@ -338,6 +339,8 @@ function App() {
             />
           </div>
         );
+      case 'workspace': 
+        return <TeamWorkspace staff={counselors} conversations={conversations} onSendMessage={() => {}} />;
       case 'calendar': return <CalendarTimeline conversations={conversations} onSelectStudent={(id) => { setSelectedId(id); setCurrentView('inbox'); }} />;
       case 'partners': return <Partners partners={partners} onUpdatePartner={() => {}} onAddPartner={() => {}} onViewApplications={() => {}} />;
       case 'finance': return <Finance />;
@@ -348,15 +351,16 @@ function App() {
 
   return (
     <div className="flex h-screen bg-slate-50 overflow-hidden font-sans">
-      <div className={`transition-all duration-300 ease-in-out shrink-0 h-full bg-slate-900 z-50 overflow-hidden ${isSidebarOpen ? 'w-64' : 'w-0'}`}>
-        <Sidebar currentView={currentView} onChangeView={setCurrentView} unreadCount={unreadCount} onToggleCollapse={() => setIsSidebarOpen(false)} />
+      <div className={`transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] shrink-0 h-full bg-slate-900 z-50 overflow-hidden ${isSidebarCollapsed ? 'w-20' : 'w-72'}`}>
+        <Sidebar 
+          currentView={currentView} 
+          onChangeView={setCurrentView} 
+          unreadCount={unreadCount} 
+          onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)} 
+          isCollapsed={isSidebarCollapsed}
+        />
       </div>
-      {!isSidebarOpen && (
-        <button onClick={() => setIsSidebarOpen(true)} className="fixed top-6 left-6 z-[60] p-3 bg-slate-900 text-white rounded-2xl shadow-2xl hover:bg-blue-600 transition-all">
-          <Menu className="w-5 h-5" />
-        </button>
-      )}
-      <main className="flex-1 h-full relative overflow-hidden flex flex-col">
+      <main className="flex-1 h-full relative overflow-hidden flex flex-col transition-all duration-500">
          {renderContent()}
       </main>
       <NewLeadModal isOpen={isNewLeadModalOpen} onClose={() => setIsNewLeadModalOpen(false)} onSubmit={() => {}} />

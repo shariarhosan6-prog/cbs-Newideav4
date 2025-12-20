@@ -17,7 +17,7 @@ export enum SenderType {
 export type LeadSource = 'direct' | 'sub_agent';
 export type MessageThread = 'source' | 'upstream' | 'internal' | 'team_discussion'; 
 
-export type ViewState = 'dashboard' | 'pipeline' | 'inbox' | 'partners' | 'finance' | 'team' | 'calendar';
+export type ViewState = 'dashboard' | 'pipeline' | 'inbox' | 'partners' | 'finance' | 'team' | 'calendar' | 'workspace';
 
 export type ApplicationType = 'rpl' | 'admission' | 'visa' | 'onshore_transfer' | 'professional_year';
 
@@ -132,9 +132,19 @@ export interface Message {
   type: MessageType;
   content: string;
   timestamp: Date;
-  thread: MessageThread;
+  thread: MessageThread | string; // Extended for workspace channels
   authorName?: string;
-  authorId?: string; // For resolving avatar and role
+  authorId?: string; 
+  linkedCaseId?: string; // Optional link to a client file
+}
+
+export interface TeamChannel {
+  id: string;
+  name: string;
+  type: 'public' | 'private' | 'dm';
+  description?: string;
+  unreadCount: number;
+  members: string[]; // Counselor IDs
 }
 
 export interface DocumentStatus {
@@ -202,7 +212,7 @@ export interface Counselor {
   activeDeals: number;
   commissionEarned: number; 
   totalSales: number; 
-  status: 'online' | 'offline' | 'busy';
+  status: 'online' | 'offline' | 'busy' | 'away' | 'meeting';
   tasks: TeamTask[];
 }
 
