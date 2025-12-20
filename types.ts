@@ -15,7 +15,7 @@ export enum SenderType {
 }
 
 export type LeadSource = 'direct' | 'sub_agent';
-export type MessageThread = 'source' | 'upstream' | 'internal'; 
+export type MessageThread = 'source' | 'upstream' | 'internal' | 'team_discussion'; 
 
 export type ViewState = 'dashboard' | 'pipeline' | 'inbox' | 'partners' | 'finance' | 'team' | 'calendar';
 
@@ -45,7 +45,9 @@ export type ActivityType =
   | 'payment_received' 
   | 'assignment_changed' 
   | 'note_added' 
-  | 'system';
+  | 'system'
+  | 'task_assigned'
+  | 'task_completed';
 
 export interface ActivityLog {
   id: string;
@@ -82,6 +84,16 @@ export interface InternalNote {
   timestamp: Date;
   color: 'yellow' | 'blue' | 'red' | 'green' | 'purple';
   mentions?: string[];
+  isPinned?: boolean;
+}
+
+export interface FileTask {
+  id: string;
+  title: string;
+  assignedToId: string;
+  assignedToName: string;
+  status: 'pending' | 'completed';
+  priority: 'high' | 'medium' | 'low';
 }
 
 export interface Conversation {
@@ -110,6 +122,8 @@ export interface Conversation {
   messages: Message[];
   notes: InternalNote[];
   activities: ActivityLog[];
+  tasks: FileTask[];
+  difficulty?: 'easy' | 'standard' | 'complex' | 'critical';
 }
 
 export interface Message {
@@ -119,6 +133,7 @@ export interface Message {
   content: string;
   timestamp: Date;
   thread: MessageThread;
+  authorName?: string;
 }
 
 export interface DocumentStatus {

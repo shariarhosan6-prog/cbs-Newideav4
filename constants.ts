@@ -150,7 +150,9 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
       { id: 'a3', type: 'doc_verified', content: 'Passport Main Page verified against AU Home Affairs standard', actorName: 'System (AI)', timestamp: new Date(Date.now() - 43200000) },
       { id: 'a4', type: 'assignment_changed', content: 'File reassigned from Alex to Jessica Wu', actorName: 'Admin', timestamp: new Date(Date.now() - 172800000) }
     ],
-    journey: [], onshoreStatus: 'landed'
+    journey: [], onshoreStatus: 'landed',
+    // Added missing tasks property
+    tasks: []
   },
   {
     id: 'c2', assignedCounselorId: 's1',
@@ -164,7 +166,9 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     currentStage: 'gs_assessment', lastActive: new Date(Date.now() - 3600000), paymentTotal: 12000, paymentPaid: 0,
     visaRiskLevel: 'low', gsScore: 94, medicalStatus: 'pending', biometricStatus: 'pending', sopStatus: 'not_started',
     documents: [], messages: [], journey: [], onshoreStatus: 'offshore',
-    notes: [], activities: []
+    notes: [], activities: [],
+    // Added missing tasks property
+    tasks: []
   },
   {
     id: 'c3', assignedCounselorId: 's2',
@@ -185,7 +189,9 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     notes: [
       { id: 'n3', content: "Confirmed $8500 tuition payment. Proceed to COE issuance immediately.", authorName: "Finance Team", timestamp: new Date(), color: 'green' }
     ],
-    activities: []
+    activities: [],
+    // Added missing tasks property
+    tasks: []
   },
   {
     id: 'c4', assignedCounselorId: 's2',
@@ -199,7 +205,9 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     currentStage: 'rto_submission', lastActive: new Date(Date.now() - 86400000), paymentTotal: 1200, paymentPaid: 600,
     visaRiskLevel: 'low', gsScore: 91, medicalStatus: 'completed', biometricStatus: 'completed', sopStatus: 'finalized',
     documents: [], messages: [], journey: [], onshoreStatus: 'landed',
-    notes: [], activities: []
+    notes: [], activities: [],
+    // Added missing tasks property
+    tasks: []
   },
   {
     id: 'c5', assignedCounselorId: 's1',
@@ -216,7 +224,9 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
         { id: 'm20', sender: SenderType.SYSTEM, type: MessageType.SYSTEM, content: "Visa Application Lodged Successfully.", timestamp: new Date(), thread: 'source' }
     ],
     journey: [], onshoreStatus: 'offshore',
-    notes: [], activities: []
+    notes: [], activities: [],
+    // Added missing tasks property
+    tasks: []
   },
   {
     id: 'c6', assignedCounselorId: 's1',
@@ -230,7 +240,9 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     currentStage: 'financial_audit', lastActive: new Date(Date.now() - 172800000), paymentTotal: 45000, paymentPaid: 5000,
     visaRiskLevel: 'low', gsScore: 98, medicalStatus: 'pending', biometricStatus: 'pending', sopStatus: 'drafting',
     documents: [], messages: [], journey: [], onshoreStatus: 'offshore',
-    notes: [], activities: []
+    notes: [], activities: [],
+    // Added missing tasks property
+    tasks: []
   },
   {
     id: 'c7', assignedCounselorId: 's2',
@@ -247,7 +259,9 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
         { id: 'm30', sender: SenderType.CLIENT, type: MessageType.TEXT, content: "Can I pay the tuition in installments?", timestamp: new Date(), thread: 'source' }
     ],
     journey: [], onshoreStatus: 'offshore',
-    notes: [], activities: []
+    notes: [], activities: [],
+    // Added missing tasks property
+    tasks: []
   },
   {
     id: 'c8', assignedCounselorId: 's1',
@@ -261,7 +275,9 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     currentStage: 'lead', lastActive: new Date(Date.now() - 604800000), paymentTotal: 9000, paymentPaid: 0,
     visaRiskLevel: 'low', gsScore: 95, medicalStatus: 'pending', biometricStatus: 'pending', sopStatus: 'not_started',
     documents: [], messages: [], journey: [], onshoreStatus: 'landed',
-    notes: [], activities: []
+    notes: [], activities: [],
+    // Added missing tasks property
+    tasks: []
   },
   {
     id: 'c9', assignedCounselorId: 's2',
@@ -275,7 +291,9 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     currentStage: 'visa_granted', lastActive: new Date(Date.now() - 259200000), paymentTotal: 32000, paymentPaid: 32000,
     visaRiskLevel: 'high', gsScore: 65, medicalStatus: 'completed', biometricStatus: 'completed', sopStatus: 'finalized',
     documents: [], messages: [], journey: [], onshoreStatus: 'offshore',
-    notes: [], activities: []
+    notes: [], activities: [],
+    // Added missing tasks property
+    tasks: []
   },
   {
     id: 'c10', assignedCounselorId: 's1',
@@ -295,7 +313,9 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
         { id: 'm40', sender: SenderType.CLIENT, type: MessageType.TEXT, content: "Why was my bank statement rejected?", timestamp: new Date(), thread: 'source' }
     ],
     journey: [], onshoreStatus: 'offshore',
-    notes: [], activities: []
+    notes: [], activities: [],
+    // Added missing tasks property
+    tasks: []
   },
   {
     id: 'c11', assignedCounselorId: 's2',
@@ -309,7 +329,9 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     currentStage: 'certified', lastActive: new Date(Date.now() - 31536000000), paymentTotal: 4000, paymentPaid: 4000,
     visaRiskLevel: 'low', gsScore: 90, medicalStatus: 'completed', biometricStatus: 'completed', sopStatus: 'finalized',
     documents: [], messages: [], journey: [], onshoreStatus: 'landed',
-    notes: [], activities: []
+    notes: [], activities: [],
+    // Added missing tasks property
+    tasks: []
   }
 ];
 

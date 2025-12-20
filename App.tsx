@@ -15,7 +15,7 @@ import AdvancedSearch from './components/AdvancedSearch';
 import CalendarTimeline from './components/CalendarTimeline';
 import BulkActionToolbar from './components/BulkActionToolbar';
 import { MOCK_CONVERSATIONS, MOCK_COUNSELORS, MOCK_PARTNERS } from './constants';
-import { Conversation, MessageType, SenderType, MessageThread, ViewState, ApplicationStage, Counselor, Partner, SearchFilters, InternalNote, ActivityLog } from './types';
+import { Conversation, MessageType, SenderType, MessageThread, ViewState, ApplicationStage, Counselor, Partner, SearchFilters, InternalNote, ActivityLog, FileTask } from './types';
 import { Menu } from 'lucide-react';
 
 const INITIAL_FILTERS: SearchFilters = {
@@ -108,11 +108,44 @@ function App() {
       }
       return c;
     }));
-    // If selected was archived, select another
     if (selectedId === id) {
       const next = conversations.find(c => c.id !== id && c.status !== 'archived');
       if (next) setSelectedId(next.id);
     }
+  };
+
+  const handleAddTask = (convId: string, taskData: Omit<FileTask, 'id' | 'status'>) => {
+    const timestamp = new Date();
+    const newTask: FileTask = { ...taskData, id: `task-${Date.now()}`, status: 'pending' };
+    const activity: ActivityLog = {
+        id: `act-task-${Date.now()}`,
+        type: 'task_assigned',
+        content: `Case task assigned to ${taskData.assignedToName}: "${taskData.title}"`,
+        actorName: 'Alex (Admin)',
+        timestamp
+    };
+    setConversations(prev => prev.map(c => c.id === convId ? { 
+        ...c, 
+        tasks: [...(c.tasks || []), newTask],
+        activities: [activity, ...c.activities]
+    } : c));
+  };
+
+  const handleToggleTask = (taskId: string) => {
+    const timestamp = new Date();
+    setConversations(prev => prev.map(c => {
+        if (c.id === selectedId) {
+            const updatedTasks = (c.tasks || []).map(t => {
+                if (t.id === taskId) {
+                    const newStatus = t.status === 'pending' ? 'completed' : 'pending';
+                    return { ...t, status: newStatus as any };
+                }
+                return t;
+            });
+            return { ...c, tasks: updatedTasks };
+        }
+        return c;
+    }));
   };
 
   const handleAddNote = (id: string, noteData: Omit<InternalNote, 'id' | 'timestamp'>) => {
@@ -121,7 +154,7 @@ function App() {
     const activity: ActivityLog = {
         id: `act-note-${Date.now()}`,
         type: 'note_added',
-        content: `Added internal note: "${noteData.content.substring(0, 30)}..."`,
+        content: `Added shared case note: "${noteData.content.substring(0, 30)}..."`,
         actorName: noteData.authorName,
         timestamp
     };
@@ -132,29 +165,39 @@ function App() {
         activities: [activity, ...c.activities]
     } : c));
     
+    // Auto-echo internal notes to team discussion if standard internal note
     const newMessage = { 
       id: `msg-note-${Date.now()}`, 
       sender: SenderType.AGENT, 
       type: MessageType.TEXT, 
-      content: `[Internal Note]: ${noteData.content}`, 
+      content: `[Case Insight]: ${noteData.content}`, 
       timestamp, 
-      thread: 'internal' as MessageThread 
+      thread: 'team_discussion' as MessageThread,
+      authorName: noteData.authorName
     };
     setConversations(prev => prev.map(c => c.id === id ? { ...c, messages: [...c.messages, newMessage] } : c));
   };
 
   const handleSendMessage = (text: string, type: MessageType = MessageType.TEXT, fileData?: { name: string, size: string }, thread: MessageThread = 'source') => {
     const timestamp = new Date();
-    const newMessage = { id: Date.now().toString(), sender: SenderType.AGENT, type, content: text, timestamp, thread };
+    const newMessage = { 
+        id: Date.now().toString(), 
+        sender: SenderType.AGENT, 
+        type, 
+        content: text, 
+        timestamp, 
+        thread,
+        authorName: 'Alex (Admin)'
+    };
     
     setConversations(prev => prev.map(c => {
         if (c.id === selectedId) {
             let updatedActivities = [...c.activities];
-            if (thread === 'internal') {
+            if (thread === 'internal' || thread === 'team_discussion') {
                 updatedActivities = [{
-                    id: `act-chat-note-${Date.now()}`,
+                    id: `act-collaboration-${Date.now()}`,
                     type: 'note_added',
-                    content: 'Added internal note via chat',
+                    content: `Added ${thread.replace('_', ' ')} update`,
                     actorName: 'Alex (Admin)',
                     timestamp
                 }, ...updatedActivities];
@@ -258,7 +301,7 @@ function App() {
                   />
               </div>
               <div className="flex-1 flex flex-col h-full bg-white">
-                   <ChatWindow key={selectedId} conversation={selectedConversation} onSendMessage={handleSendMessage} onToggleInfo={() => setRightPanelOpen(!rightPanelOpen)} onAssignCounselor={() => {}} isInfoOpen={rightPanelOpen} />
+                   <ChatWindow key={selectedId} conversation={selectedConversation} onSendMessage={handleSendMessage} onToggleInfo={() => setRightPanelOpen(!rightPanelOpen)} onAssignCounselor={(cid) => handleAssignCounselor(selectedId, cid)} isInfoOpen={rightPanelOpen} />
               </div>
               <div className={`absolute lg:static inset-y-0 right-0 z-30 w-full sm:w-96 bg-white border-l border-slate-200 transition-all duration-300 transform ${rightPanelOpen ? 'translate-x-0' : 'translate-x-full lg:hidden'}`}>
                   <ClientIntelligence 
@@ -266,6 +309,8 @@ function App() {
                     isOpen={true} 
                     onUpdateStatus={(status) => handleUpdateStatus(selectedId, status)} 
                     onAddNote={(note) => handleAddNote(selectedId, note)}
+                    onAddTask={handleAddTask}
+                    onToggleTask={handleToggleTask}
                   />
               </div>
             </div>
