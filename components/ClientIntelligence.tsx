@@ -11,7 +11,7 @@ import {
     Stethoscope, Fingerprint, Calculator, FileSearch, ClipboardList, CheckSquare,
     Bell, Plus, ChevronLeft, ArrowRight, ShieldAlert, History as HistoryIcon,
     AlertTriangle, CheckSquare as CheckSquareIcon, ListChecks, TrendingDown,
-    StickyNote, AtSign, Tag as TagIcon, MessageSquare, History
+    StickyNote, AtSign, Tag as TagIcon, MessageSquare, History, FileBadge
 } from 'lucide-react';
 
 interface Props {
@@ -24,7 +24,7 @@ interface Props {
 const ClientIntelligence: React.FC<Props> = ({ conversation, onUpdateStatus, onAddNote }) => {
     const [activeSection, setActiveSection] = useState<'checklist' | 'gte' | 'notes' | 'audit' | 'local'>('checklist');
     const [isRequesting, setIsRequesting] = useState(false);
-    const [comparingDoc, setComparingDoc] = useState<DocumentStatus | null>(null);
+    const [isGeneratingReport, setIsGeneratingReport] = useState(false);
     const [isAddingNote, setIsAddingNote] = useState(false);
 
     // Note Form State
@@ -46,6 +46,27 @@ const ClientIntelligence: React.FC<Props> = ({ conversation, onUpdateStatus, onA
         setIsAddingNote(false);
     };
 
+    const handleGenerateReport = () => {
+        setIsGeneratingReport(true);
+        setTimeout(() => {
+            const reportData = `
+                STITCH RPL CRM - STUDENT INTELLIGENCE REPORT
+                Name: ${conversation.client.name}
+                Stage: ${conversation.currentStage}
+                GS Score: ${conversation.gsScore}%
+                Documents: ${conversation.documents.length} verified
+                Generated on: ${new Date().toLocaleString()}
+            `;
+            const blob = new Blob([reportData], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${conversation.client.name}_Student_Report.txt`;
+            a.click();
+            setIsGeneratingReport(false);
+        }, 2500);
+    };
+
     const [newRequest, setNewRequest] = useState({
         type: 'identity' as any,
         name: '',
@@ -59,20 +80,12 @@ const ClientIntelligence: React.FC<Props> = ({ conversation, onUpdateStatus, onA
     };
 
     const gsScore = conversation.gsScore || 75;
-    const riskLevel = conversation.visaRiskLevel || 'medium';
     
     const getScoreColor = (score: number) => {
         if (score >= 85) return 'text-emerald-500';
         if (score >= 70) return 'text-blue-500';
         if (score >= 50) return 'text-orange-500';
         return 'text-red-500';
-    };
-
-    const getScoreBg = (score: number) => {
-        if (score >= 85) return 'bg-emerald-500';
-        if (score >= 70) return 'bg-blue-500';
-        if (score >= 50) return 'bg-orange-500';
-        return 'bg-red-500';
     };
 
     const getNoteColorClasses = (color: InternalNote['color']) => {
@@ -289,7 +302,6 @@ const ClientIntelligence: React.FC<Props> = ({ conversation, onUpdateStatus, onA
                     </div>
                 )}
 
-                {/* --- 4. AUDIT & ACTIVITY LOG PANEL --- */}
                 {activeSection === 'audit' && (
                     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 pb-10">
                         <div className="flex items-center justify-between px-2">
@@ -330,7 +342,12 @@ const ClientIntelligence: React.FC<Props> = ({ conversation, onUpdateStatus, onA
                         </div>
 
                         <div className="pt-4 border-t border-slate-100">
-                            <button className="w-full py-3 bg-slate-100 text-slate-500 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-slate-200 transition-all">
+                            <button 
+                                onClick={handleGenerateReport}
+                                disabled={isGeneratingReport}
+                                className="w-full py-3 bg-slate-100 text-slate-500 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-slate-200 transition-all flex items-center justify-center gap-2"
+                            >
+                                {isGeneratingReport ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileBadge className="w-3.5 h-3.5" />}
                                 Export Compliance PDF
                             </button>
                         </div>
@@ -359,8 +376,13 @@ const ClientIntelligence: React.FC<Props> = ({ conversation, onUpdateStatus, onA
             </div>
 
             <div className="p-8 bg-white border-t border-slate-200 flex gap-4 z-30 shadow-[0_-15px_30px_rgba(0,0,0,0.03)] shrink-0">
-                 <button className="flex-1 py-4 bg-slate-100 text-slate-900 rounded-[20px] text-[10px] font-black uppercase tracking-widest hover:bg-slate-200 transition-all border border-slate-200 flex items-center justify-center gap-2 active:scale-95">
-                    <HistoryIcon className="w-4 h-4" /> Download Log
+                 <button 
+                    onClick={handleGenerateReport}
+                    disabled={isGeneratingReport}
+                    className="flex-1 py-4 bg-slate-100 text-slate-900 rounded-[20px] text-[10px] font-black uppercase tracking-widest hover:bg-slate-200 transition-all border border-slate-200 flex items-center justify-center gap-2 active:scale-95"
+                 >
+                    {isGeneratingReport ? <Loader2 className="w-4 h-4 animate-spin" /> : <HistoryIcon className="w-4 h-4" />} 
+                    Student Report
                  </button>
                  <button onClick={() => onUpdateStatus('visa_lodged')} className="flex-1 py-4 bg-blue-600 text-white rounded-[20px] text-[10px] font-black uppercase tracking-widest hover:bg-slate-900 transition-all shadow-2xl shadow-blue-500/20 flex items-center justify-center gap-2 active:scale-95">
                     <Send className="w-4 h-4" /> Lodge Visa

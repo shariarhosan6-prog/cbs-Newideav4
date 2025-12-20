@@ -3,10 +3,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Conversation, MessageType, SenderType, MessageThread, ApplicationStage } from '../types';
 import { 
     Info, Paperclip, Mic, Send, Sparkles, FileText, Download, Phone, Video, 
-    ChevronDown, MoreVertical, CheckCircle2, Zap, Image as ImageIcon, Loader2,
+    ChevronDown, MoreVertical, CheckCircle2, Zap, ImageIcon, Loader2,
     ShieldCheck, Building2, ExternalLink, AlertTriangle, Clock, Fingerprint, Stethoscope, 
     Calculator, Star, Search, MessageCircle, Users, FileSearch, Calendar, EyeOff, StickyNote,
-    Handshake
+    Handshake, FileDown
 } from 'lucide-react';
 import { getSmartSuggestions, fastRewrite, analyzeUploadedImage } from '../services/geminiService';
 
@@ -22,6 +22,7 @@ const ChatWindow: React.FC<Props> = ({ conversation, onSendMessage, onToggleInfo
   const [inputText, setInputText] = useState('');
   const [activeChannel, setActiveChannel] = useState<MessageThread>('source');
   const [isInternalMode, setIsInternalMode] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   
   // Show messages for the active channel (Client/Sub-Agent or Provider)
@@ -36,10 +37,23 @@ const ChatWindow: React.FC<Props> = ({ conversation, onSendMessage, onToggleInfo
 
   const handleSend = () => {
     if (!inputText.trim()) return;
-    // For Client channel: can be 'source' or 'internal'. For Provider channel: 'upstream'.
     const thread = activeChannel === 'source' ? (isInternalMode ? 'internal' : 'source') : 'upstream';
     onSendMessage(inputText, MessageType.TEXT, undefined, thread);
     setInputText('');
+  };
+
+  const handleExportPDF = () => {
+    setIsExporting(true);
+    // Simulate complex PDF generation
+    setTimeout(() => {
+        const blob = new Blob([JSON.stringify(conversation.messages, null, 2)], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Chat_Export_${conversation.client.name.replace(' ', '_')}.pdf`;
+        a.click();
+        setIsExporting(false);
+    }, 2000);
   };
 
   return (
@@ -63,7 +77,6 @@ const ChatWindow: React.FC<Props> = ({ conversation, onSendMessage, onToggleInfo
             </div>
 
             <div className="flex items-center gap-3">
-                {/* Unified Channel Switcher: Only 2 options */}
                 <div className="bg-slate-100 p-1 rounded-2xl flex items-center border border-slate-100 mr-2">
                     <button 
                         onClick={() => setActiveChannel('source')}
@@ -80,6 +93,15 @@ const ChatWindow: React.FC<Props> = ({ conversation, onSendMessage, onToggleInfo
                 </div>
 
                 <button 
+                    onClick={handleExportPDF}
+                    disabled={isExporting}
+                    className="p-3 bg-slate-50 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all relative"
+                    title="Export Conversation PDF"
+                >
+                    {isExporting ? <Loader2 className="w-5 h-5 animate-spin" /> : <FileDown className="w-5 h-5" />}
+                </button>
+
+                <button 
                     onClick={onToggleInfo}
                     className={`p-3 rounded-2xl transition-all ${isInfoOpen ? 'bg-slate-900 text-white shadow-xl' : 'bg-slate-50 text-slate-400 hover:text-slate-900'}`}
                 >
@@ -88,7 +110,7 @@ const ChatWindow: React.FC<Props> = ({ conversation, onSendMessage, onToggleInfo
             </div>
         </div>
 
-        {/* INTERNAL TOGGLE (Only visible in Client channel) */}
+        {/* INTERNAL TOGGLE */}
         {activeChannel === 'source' && (
             <div className="flex justify-center pb-2 bg-slate-50/50">
                 <button 
