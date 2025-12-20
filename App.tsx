@@ -13,9 +13,10 @@ import NewLeadModal from './components/NewLeadModal';
 import AIChatBot from './components/AIChatBot';
 import AdvancedSearch from './components/AdvancedSearch';
 import CalendarTimeline from './components/CalendarTimeline';
+import BulkActionToolbar from './components/BulkActionToolbar';
 import { MOCK_CONVERSATIONS, MOCK_COUNSELORS, MOCK_PARTNERS } from './constants';
-import { Conversation, MessageType, SenderType, MessageThread, ViewState, ApplicationStage, Counselor, TeamTask, Partner, ClientProfile, ApplicationType, SearchFilters } from './types';
-import { Menu, ChevronRight } from 'lucide-react';
+import { Conversation, MessageType, SenderType, MessageThread, ViewState, ApplicationStage, Counselor, Partner, SearchFilters } from './types';
+import { Menu } from 'lucide-react';
 
 const INITIAL_FILTERS: SearchFilters = {
   query: '',
@@ -27,14 +28,17 @@ const INITIAL_FILTERS: SearchFilters = {
 function App() {
   const [currentView, setCurrentView] = useState<ViewState>('dashboard');
   const [conversations, setConversations] = useState<Conversation[]>(MOCK_CONVERSATIONS);
-  const [counselors, setCounselors] = useState<Counselor[]>(MOCK_COUNSELORS);
-  const [partners, setPartners] = useState<Partner[]>(MOCK_PARTNERS);
+  const [counselors] = useState<Counselor[]>(MOCK_COUNSELORS);
+  const [partners] = useState<Partner[]>(MOCK_PARTNERS);
   const [selectedId, setSelectedId] = useState<string>(MOCK_CONVERSATIONS[0].id);
   const [rightPanelOpen, setRightPanelOpen] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [categories, setCategories] = useState<string[]>(['Urgent Follow-ups', 'Prospects', 'Onboarding', 'Waiting on RTO']);
   const [isNewLeadModalOpen, setIsNewLeadModalOpen] = useState(false);
   
+  // SELECTION STATE FOR BULK ACTIONS
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
   // GLOBAL SEARCH STATE
   const [filters, setFilters] = useState<SearchFilters>(INITIAL_FILTERS);
 
@@ -75,6 +79,52 @@ function App() {
     setConversations(prev => prev.map(c => c.id === selectedId ? { ...c, messages: [...c.messages, newMessage], lastActive: new Date() } : c));
   };
 
+  // --- BULK ACTION HANDLERS ---
+  const handleToggleSelection = (id: string) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
+
+  const handleSelectAll = () => {
+    if (selectedIds.length === filteredConversations.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(filteredConversations.map(c => c.id));
+    }
+  };
+
+  const handleBulkAssign = (counselorId: string) => {
+    setConversations(prev => prev.map(c => selectedIds.includes(c.id) ? { ...c, assignedCounselorId: counselorId } : c));
+    setSelectedIds([]);
+  };
+
+  const handleBulkMove = (category: string | undefined) => {
+    setConversations(prev => prev.map(c => selectedIds.includes(c.id) ? { ...c, customCategory: category } : c));
+    setSelectedIds([]);
+  };
+
+  const handleBulkMessage = (text: string) => {
+    const timestamp = new Date();
+    setConversations(prev => prev.map(c => {
+      if (selectedIds.includes(c.id)) {
+        const newMessage = { id: `bulk-${Date.now()}-${c.id}`, sender: SenderType.AGENT, type: MessageType.TEXT, content: text, timestamp, thread: 'source' as MessageThread };
+        return { ...c, messages: [...c.messages, newMessage], lastActive: timestamp };
+      }
+      return c;
+    }));
+    setSelectedIds([]);
+  };
+
+  const handleBulkExport = () => {
+    const exportData = conversations.filter(c => selectedIds.includes(c.id));
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `stitch_export_${Date.now()}.json`;
+    a.click();
+    setSelectedIds([]);
+  };
+
   const renderContent = () => {
     switch (currentView) {
       case 'dashboard': return <Dashboard onOpenNewLead={() => setIsNewLeadModalOpen(true)} />;
@@ -93,7 +143,18 @@ function App() {
             <AdvancedSearch filters={filters} onFilterChange={setFilters} onClear={() => setFilters(INITIAL_FILTERS)} />
             <div className="flex-1 flex h-full w-full overflow-hidden relative">
               <div className="hidden lg:block h-full">
-                  <ConversationList conversations={filteredConversations} selectedId={selectedId} onSelect={setSelectedId} isOpen={true} categories={categories} onMoveToCategory={() => {}} onAddCategory={() => {}} />
+                  <ConversationList 
+                    conversations={filteredConversations} 
+                    selectedId={selectedId} 
+                    onSelect={setSelectedId} 
+                    isOpen={true} 
+                    categories={categories} 
+                    onMoveToCategory={(id, cat) => setConversations(prev => prev.map(c => c.id === id ? { ...c, customCategory: cat } : c))} 
+                    onAddCategory={(name) => setCategories([...categories, name])}
+                    selectedIds={selectedIds}
+                    onToggleSelection={handleToggleSelection}
+                    onSelectAll={handleSelectAll}
+                  />
               </div>
               <div className="flex-1 flex flex-col h-full bg-white">
                    <ChatWindow key={selectedConversation.id} conversation={selectedConversation} onSendMessage={handleSendMessage} onToggleInfo={() => setRightPanelOpen(!rightPanelOpen)} onAssignCounselor={() => {}} isInfoOpen={rightPanelOpen} />
@@ -102,6 +163,17 @@ function App() {
                   <ClientIntelligence conversation={selectedConversation} isOpen={true} onUpdateStatus={(status) => handleUpdateStatus(selectedId, status)} />
               </div>
             </div>
+            {/* BULK ACTION BAR */}
+            <BulkActionToolbar 
+              selectedCount={selectedIds.length} 
+              onClear={() => setSelectedIds([])}
+              counselors={counselors}
+              categories={categories}
+              onBulkAssign={handleBulkAssign}
+              onBulkMove={handleBulkMove}
+              onBulkMessage={handleBulkMessage}
+              onBulkExport={handleBulkExport}
+            />
           </div>
         );
       case 'calendar':
