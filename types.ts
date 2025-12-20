@@ -38,6 +38,24 @@ export type ApplicationStage =
   | 'b2b_settlement'      
   | 'certified';
 
+export type ActivityType = 
+  | 'stage_change' 
+  | 'doc_uploaded' 
+  | 'doc_verified' 
+  | 'payment_received' 
+  | 'assignment_changed' 
+  | 'note_added' 
+  | 'system';
+
+export interface ActivityLog {
+  id: string;
+  type: ActivityType;
+  content: string;
+  actorName: string;
+  timestamp: Date;
+  metadata?: any;
+}
+
 export interface SearchFilters {
   query: string;
   stages: ApplicationStage[];
@@ -91,6 +109,7 @@ export interface Conversation {
   journey: JourneyMilestone[];
   messages: Message[];
   notes: InternalNote[];
+  activities: ActivityLog[];
 }
 
 export interface Message {

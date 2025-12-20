@@ -15,7 +15,7 @@ import AdvancedSearch from './components/AdvancedSearch';
 import CalendarTimeline from './components/CalendarTimeline';
 import BulkActionToolbar from './components/BulkActionToolbar';
 import { MOCK_CONVERSATIONS, MOCK_COUNSELORS, MOCK_PARTNERS } from './constants';
-import { Conversation, MessageType, SenderType, MessageThread, ViewState, ApplicationStage, Counselor, Partner, SearchFilters, InternalNote } from './types';
+import { Conversation, MessageType, SenderType, MessageThread, ViewState, ApplicationStage, Counselor, Partner, SearchFilters, InternalNote, ActivityLog } from './types';
 import { Menu } from 'lucide-react';
 
 const INITIAL_FILTERS: SearchFilters = {
@@ -36,16 +36,11 @@ function App() {
   const [categories, setCategories] = useState<string[]>(['Urgent Follow-ups', 'Prospects', 'Onboarding', 'Waiting on RTO']);
   const [isNewLeadModalOpen, setIsNewLeadModalOpen] = useState(false);
   
-  // SELECTION STATE FOR BULK ACTIONS
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-
-  // GLOBAL SEARCH STATE
   const [filters, setFilters] = useState<SearchFilters>(INITIAL_FILTERS);
 
-  // MEMOIZED FILTERING LOGIC
   const filteredConversations = useMemo(() => {
     return conversations.filter(c => {
-      // 1. Text Query (Name, Email, Sub-Agent)
       if (filters.query) {
         const q = filters.query.toLowerCase();
         const matchesName = c.client.name.toLowerCase().includes(q);
@@ -53,16 +48,9 @@ function App() {
         const matchesSubAgent = c.subAgentName?.toLowerCase().includes(q);
         if (!matchesName && !matchesEmail && !matchesSubAgent) return false;
       }
-
-      // 2. Stages
       if (filters.stages.length > 0 && !filters.stages.includes(c.currentStage)) return false;
-
-      // 3. Priority
       if (filters.priorities.length > 0 && !filters.priorities.includes(c.priority)) return false;
-
-      // 4. Sources
       if (filters.sources.length > 0 && !filters.sources.includes(c.source)) return false;
-
       return true;
     });
   }, [conversations, filters]);
@@ -71,47 +59,72 @@ function App() {
   const unreadCount = filteredConversations.reduce((acc, curr) => acc + curr.unreadCount, 0);
 
   const handleUpdateStatus = (id: string, newStage: ApplicationStage) => {
-    setConversations(prev => prev.map(c => c.id === id ? { ...c, currentStage: newStage } : c));
+    const timestamp = new Date();
+    setConversations(prev => prev.map(c => {
+      if (c.id === id) {
+        const activity: ActivityLog = {
+          id: `act-${Date.now()}`,
+          type: 'stage_change',
+          content: `Moved from ${c.currentStage.replace(/_/g, ' ')} to ${newStage.replace(/_/g, ' ')}`,
+          actorName: 'Alex (Admin)',
+          timestamp
+        };
+        return { ...c, currentStage: newStage, activities: [activity, ...c.activities] };
+      }
+      return c;
+    }));
   };
 
   const handleAddNote = (id: string, noteData: Omit<InternalNote, 'id' | 'timestamp'>) => {
-    const newNote: InternalNote = {
-      ...noteData,
-      id: `note-${Date.now()}`,
-      timestamp: new Date()
+    const timestamp = new Date();
+    const newNote: InternalNote = { ...noteData, id: `note-${Date.now()}`, timestamp };
+    const activity: ActivityLog = {
+        id: `act-note-${Date.now()}`,
+        type: 'note_added',
+        content: `Added internal note: "${noteData.content.substring(0, 30)}..."`,
+        actorName: noteData.authorName,
+        timestamp
     };
-    setConversations(prev => prev.map(c => c.id === id ? { ...c, notes: [newNote, ...c.notes] } : c));
+
+    setConversations(prev => prev.map(c => c.id === id ? { 
+        ...c, 
+        notes: [newNote, ...c.notes],
+        activities: [activity, ...c.activities]
+    } : c));
     
-    // Also post it as an internal message in the chat for the stream
     const newMessage = { 
       id: `msg-note-${Date.now()}`, 
       sender: SenderType.AGENT, 
       type: MessageType.TEXT, 
       content: `[Internal Note]: ${noteData.content}`, 
-      timestamp: new Date(), 
+      timestamp, 
       thread: 'internal' as MessageThread 
     };
     setConversations(prev => prev.map(c => c.id === id ? { ...c, messages: [...c.messages, newMessage] } : c));
   };
 
   const handleSendMessage = (text: string, type: MessageType = MessageType.TEXT, fileData?: { name: string, size: string }, thread: MessageThread = 'source') => {
-    const newMessage = { id: Date.now().toString(), sender: SenderType.AGENT, type, content: text, timestamp: new Date(), thread };
-    setConversations(prev => prev.map(c => c.id === selectedId ? { ...c, messages: [...c.messages, newMessage], lastActive: new Date() } : c));
+    const timestamp = new Date();
+    const newMessage = { id: Date.now().toString(), sender: SenderType.AGENT, type, content: text, timestamp, thread };
     
-    // If it's an internal note sent via chat, also add it to the notes history
-    if (thread === 'internal') {
-        const newNote: InternalNote = {
-            id: `note-chat-${Date.now()}`,
-            content: text,
-            authorName: "Alex (Admin)",
-            timestamp: new Date(),
-            color: 'blue'
-        };
-        setConversations(prev => prev.map(c => c.id === selectedId ? { ...c, notes: [newNote, ...c.notes] } : c));
-    }
+    setConversations(prev => prev.map(c => {
+        if (c.id === selectedId) {
+            let updatedActivities = [...c.activities];
+            if (thread === 'internal') {
+                updatedActivities = [{
+                    id: `act-chat-note-${Date.now()}`,
+                    type: 'note_added',
+                    content: 'Added internal note via chat',
+                    actorName: 'Alex (Admin)',
+                    timestamp
+                }, ...updatedActivities];
+            }
+            return { ...c, messages: [...c.messages, newMessage], lastActive: timestamp, activities: updatedActivities };
+        }
+        return c;
+    }));
   };
 
-  // --- BULK ACTION HANDLERS ---
   const handleToggleSelection = (id: string) => {
     setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
   };
@@ -125,7 +138,20 @@ function App() {
   };
 
   const handleBulkAssign = (counselorId: string) => {
-    setConversations(prev => prev.map(c => selectedIds.includes(c.id) ? { ...c, assignedCounselorId: counselorId } : c));
+    const timestamp = new Date();
+    setConversations(prev => prev.map(c => {
+        if (selectedIds.includes(c.id)) {
+            const activity: ActivityLog = {
+                id: `act-bulk-assign-${Date.now()}-${c.id}`,
+                type: 'assignment_changed',
+                content: `Bulk reassigned to counselor ID: ${counselorId}`,
+                actorName: 'Alex (Admin)',
+                timestamp
+            };
+            return { ...c, assignedCounselorId: counselorId, activities: [activity, ...c.activities] };
+        }
+        return c;
+    }));
     setSelectedIds([]);
   };
 
@@ -200,7 +226,6 @@ function App() {
                   />
               </div>
             </div>
-            {/* BULK ACTION BAR */}
             <BulkActionToolbar 
               selectedCount={selectedIds.length} 
               onClear={() => setSelectedIds([])}
@@ -213,8 +238,7 @@ function App() {
             />
           </div>
         );
-      case 'calendar':
-        return <CalendarTimeline conversations={conversations} onSelectStudent={(id) => { setSelectedId(id); setCurrentView('inbox'); }} />;
+      case 'calendar': return <CalendarTimeline conversations={conversations} onSelectStudent={(id) => { setSelectedId(id); setCurrentView('inbox'); }} />;
       case 'partners': return <Partners partners={partners} onUpdatePartner={() => {}} onAddPartner={() => {}} onViewApplications={() => {}} />;
       case 'finance': return <Finance />;
       case 'team': return <TeamManagement staff={counselors} onAddTask={() => {}} onToggleTaskStatus={() => {}} onDeleteTask={() => {}} />;
@@ -225,23 +249,13 @@ function App() {
   return (
     <div className="flex h-screen bg-slate-50 overflow-hidden font-sans">
       <div className={`transition-all duration-300 ease-in-out shrink-0 h-full bg-slate-900 z-50 overflow-hidden ${isSidebarOpen ? 'w-64' : 'w-0'}`}>
-        <Sidebar 
-          currentView={currentView} 
-          onChangeView={setCurrentView} 
-          unreadCount={unreadCount} 
-          onToggleCollapse={() => setIsSidebarOpen(false)}
-        />
+        <Sidebar currentView={currentView} onChangeView={setCurrentView} unreadCount={unreadCount} onToggleCollapse={() => setIsSidebarOpen(false)} />
       </div>
-
       {!isSidebarOpen && (
-        <button 
-          onClick={() => setIsSidebarOpen(true)}
-          className="fixed top-6 left-6 z-[60] p-3 bg-slate-900 text-white rounded-2xl shadow-2xl hover:bg-blue-600 transition-all hover:scale-105 active:scale-95 animate-in fade-in slide-in-from-left-4"
-        >
+        <button onClick={() => setIsSidebarOpen(true)} className="fixed top-6 left-6 z-[60] p-3 bg-slate-900 text-white rounded-2xl shadow-2xl hover:bg-blue-600 transition-all">
           <Menu className="w-5 h-5" />
         </button>
       )}
-
       <main className="flex-1 h-full relative overflow-hidden flex flex-col">
          {renderContent()}
       </main>
