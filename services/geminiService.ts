@@ -2,14 +2,13 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { Message, SenderType, ClientProfile, Partner, DocumentStatus } from "../types";
 
-// Initialize the Google GenAI client
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 /**
  * Fast AI responses using gemini-flash-lite-latest
  */
 export const fastRewrite = async (text: string): Promise<string> => {
   if (!process.env.API_KEY) return text;
+  // Create a new GoogleGenAI instance right before making an API call to ensure up-to-date config
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-flash-lite-latest',
@@ -26,6 +25,8 @@ export const fastRewrite = async (text: string): Promise<string> => {
  */
 export const generateMigrationStrategy = async (client: ClientProfile): Promise<string> => {
   if (!process.env.API_KEY) return "API Key missing.";
+  // Create a new GoogleGenAI instance right before making an API call
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-3-pro-preview',
@@ -52,6 +53,8 @@ export const generateMigrationStrategy = async (client: ClientProfile): Promise<
  */
 export const analyzeUploadedImage = async (base64Data: string, mimeType: string): Promise<string> => {
   if (!process.env.API_KEY) return "API Key missing.";
+  // Create a new GoogleGenAI instance right before making an API call
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   try {
     const imagePart = {
       inlineData: {
@@ -77,6 +80,8 @@ export const analyzeUploadedImage = async (base64Data: string, mimeType: string)
  */
 export const askGeminiAssistant = async (query: string): Promise<string> => {
   if (!process.env.API_KEY) return "Agent, I need an API key to help you.";
+  // Create a new GoogleGenAI instance right before making an API call
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-3-pro-preview',
@@ -91,6 +96,9 @@ export const askGeminiAssistant = async (query: string): Promise<string> => {
   }
 };
 
+/**
+ * Generate 3 smart reply suggestions using gemini-flash-lite-latest
+ */
 export const getSmartSuggestions = async (
   contextMessages: Message[],
   clientName: string,
@@ -100,6 +108,8 @@ export const getSmartSuggestions = async (
     return ["Please configure API Key", "Check Document", "Schedule Call"];
   }
 
+  // Create a new GoogleGenAI instance right before making an API call
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   try {
     const recentHistory = contextMessages
       .slice(-5)
@@ -107,7 +117,7 @@ export const getSmartSuggestions = async (
       .join('\n');
 
     const response = await ai.models.generateContent({
-      model: 'gemini-flash-lite-latest', // Updated to guideline-compliant model name
+      model: 'gemini-flash-lite-latest',
       contents: `
         Client Name: ${clientName}
         Target Qualification: ${qualification}

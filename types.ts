@@ -1,5 +1,4 @@
 
-
 export enum MessageType {
   TEXT = 'text',
   IMAGE = 'image',
@@ -24,19 +23,19 @@ export type ApplicationType = 'rpl' | 'admission' | 'visa' | 'onshore_transfer' 
 
 export type ApplicationStage = 
   | 'lead' 
-  | 'gs_assessment'       // Genuine Student Check
-  | 'financial_audit'     // Bank Statement/Source of Funds Verification
-  | 'sop_drafting'        // Statement of Purpose iterations
+  | 'gs_assessment'       
+  | 'financial_audit'     
+  | 'sop_drafting'        
   | 'rto_submission' 
   | 'conditional_offer'
   | 'payment_confirmed'
   | 'coe_issued'
   | 'visa_lodged'
-  | 'biometrics_booked'   // VFS Appointment
-  | 'medical_completed'   // IOM/Bupa Check
+  | 'biometrics_booked'   
+  | 'medical_completed'   
   | 'visa_granted'
   | 'onshore_arrival'
-  | 'b2b_settlement'      // Sub-agent commission payout
+  | 'b2b_settlement'      
   | 'certified';
 
 export interface JourneyMilestone {
@@ -67,8 +66,7 @@ export interface Conversation {
   onshoreStatus?: 'offshore' | 'landed' | 'resident';
   visaRiskLevel?: 'low' | 'medium' | 'high' | 'critical';
   customCategory?: string;
-  // Missing pieces added:
-  gsScore?: number; // 0-100 Genuine Student Score
+  gsScore?: number; 
   medicalStatus?: 'pending' | 'booked' | 'completed';
   biometricStatus?: 'pending' | 'booked' | 'completed';
   sopStatus?: 'not_started' | 'drafting' | 'review_required' | 'finalized';
@@ -88,9 +86,12 @@ export interface Message {
 export interface DocumentStatus {
   id: string;
   name: string;
-  status: 'verified' | 'pending' | 'missing' | 'rejected';
+  status: 'verified' | 'pending' | 'missing' | 'rejected' | 'requested';
   type: 'identity' | 'academic' | 'financial' | 'sop' | 'employment';
   uploadDate?: Date;
+  requestedDate?: Date;
+  deadline?: Date;
+  autoReminder?: boolean;
 }
 
 export interface EducationEntry {
@@ -119,16 +120,13 @@ export interface Partner {
   name: string;
   type: 'RTO' | 'Sub-Agent' | 'University' | 'Insurance';
   contactPerson: string;
-  email: string; // Added field for partner profile
+  email: string; 
   activeStudents: number;
   commissionRate: string;
   status: 'active' | 'inactive';
   logo: string;
 }
 
-/**
- * Team Task structure for managing counselor workloads
- */
 export interface TeamTask {
   id: string;
   title: string;
@@ -142,17 +140,14 @@ export interface Counselor {
   name: string;
   avatar: string;
   role: string;
-  department: string; // Added field for team filtering
+  department: string; 
   activeDeals: number;
-  commissionEarned: number; // Added field for financial tracking
-  totalSales: number; // Added field for performance tracking
+  commissionEarned: number; 
+  totalSales: number; 
   status: 'online' | 'offline' | 'busy';
   tasks: TeamTask[];
 }
 
-/**
- * Financial structures for the Commission Hub
- */
 export type TransactionType = 'incoming' | 'outgoing_sub_agent' | 'outgoing_staff';
 
 export interface CommissionRecord {
