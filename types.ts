@@ -91,7 +91,7 @@ export interface Conversation {
   subAgentName?: string;
   assignedCounselorId: string;
   unreadCount: number;
-  status: 'active' | 'lead' | 'review' | 'completed';
+  status: 'active' | 'lead' | 'review' | 'completed' | 'archived';
   priority: 'high' | 'medium' | 'low';
   currentStage: ApplicationStage;
   lastActive: Date;

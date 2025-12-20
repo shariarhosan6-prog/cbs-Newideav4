@@ -75,6 +75,46 @@ function App() {
     }));
   };
 
+  const handleAssignCounselor = (id: string, counselorId: string) => {
+    const timestamp = new Date();
+    const counselor = counselors.find(c => c.id === counselorId);
+    setConversations(prev => prev.map(c => {
+      if (c.id === id) {
+        const activity: ActivityLog = {
+          id: `act-assign-${Date.now()}`,
+          type: 'assignment_changed',
+          content: `File reassigned to ${counselor?.name || 'Counselor'}`,
+          actorName: 'Alex (Admin)',
+          timestamp
+        };
+        return { ...c, assignedCounselorId: counselorId, activities: [activity, ...c.activities] };
+      }
+      return c;
+    }));
+  };
+
+  const handleArchive = (id: string) => {
+    const timestamp = new Date();
+    setConversations(prev => prev.map(c => {
+      if (c.id === id) {
+        const activity: ActivityLog = {
+          id: `act-archive-${Date.now()}`,
+          type: 'system',
+          content: `File archived by Admin`,
+          actorName: 'Alex (Admin)',
+          timestamp
+        };
+        return { ...c, status: 'archived', activities: [activity, ...c.activities] };
+      }
+      return c;
+    }));
+    // If selected was archived, select another
+    if (selectedId === id) {
+      const next = conversations.find(c => c.id !== id && c.status !== 'archived');
+      if (next) setSelectedId(next.id);
+    }
+  };
+
   const handleAddNote = (id: string, noteData: Omit<InternalNote, 'id' | 'timestamp'>) => {
     const timestamp = new Date();
     const newNote: InternalNote = { ...noteData, id: `note-${Date.now()}`, timestamp };
@@ -212,10 +252,13 @@ function App() {
                     selectedIds={selectedIds}
                     onToggleSelection={handleToggleSelection}
                     onSelectAll={handleSelectAll}
+                    onUpdateStatus={handleUpdateStatus}
+                    onAssignCounselor={handleAssignCounselor}
+                    onArchive={handleArchive}
                   />
               </div>
               <div className="flex-1 flex flex-col h-full bg-white">
-                   <ChatWindow key={selectedConversation.id} conversation={selectedConversation} onSendMessage={handleSendMessage} onToggleInfo={() => setRightPanelOpen(!rightPanelOpen)} onAssignCounselor={() => {}} isInfoOpen={rightPanelOpen} />
+                   <ChatWindow key={selectedId} conversation={selectedConversation} onSendMessage={handleSendMessage} onToggleInfo={() => setRightPanelOpen(!rightPanelOpen)} onAssignCounselor={() => {}} isInfoOpen={rightPanelOpen} />
               </div>
               <div className={`absolute lg:static inset-y-0 right-0 z-30 w-full sm:w-96 bg-white border-l border-slate-200 transition-all duration-300 transform ${rightPanelOpen ? 'translate-x-0' : 'translate-x-full lg:hidden'}`}>
                   <ClientIntelligence 
