@@ -134,6 +134,7 @@ export interface Message {
   timestamp: Date;
   thread: MessageThread;
   authorName?: string;
+  authorId?: string; // For resolving avatar and role
 }
 
 export interface DocumentStatus {

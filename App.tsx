@@ -120,19 +120,30 @@ function App() {
     const activity: ActivityLog = {
         id: `act-task-${Date.now()}`,
         type: 'task_assigned',
-        content: `Case task assigned to ${taskData.assignedToName}: "${taskData.title}"`,
+        content: `Task assigned to ${taskData.assignedToName}: "${taskData.title}"`,
         actorName: 'Alex (Admin)',
         timestamp
     };
+    
+    // Auto-post to team chat for notification
+    const teamMsg: any = { 
+        id: `task-msg-${Date.now()}`, 
+        sender: SenderType.SYSTEM, 
+        type: MessageType.SYSTEM, 
+        content: `NEW TASK: ${taskData.assignedToName} assigned to "${taskData.title}"`, 
+        timestamp, 
+        thread: 'team_discussion' 
+    };
+
     setConversations(prev => prev.map(c => c.id === convId ? { 
         ...c, 
         tasks: [...(c.tasks || []), newTask],
-        activities: [activity, ...c.activities]
+        activities: [activity, ...c.activities],
+        messages: [...c.messages, teamMsg]
     } : c));
   };
 
   const handleToggleTask = (taskId: string) => {
-    const timestamp = new Date();
     setConversations(prev => prev.map(c => {
         if (c.id === selectedId) {
             const updatedTasks = (c.tasks || []).map(t => {
@@ -154,7 +165,7 @@ function App() {
     const activity: ActivityLog = {
         id: `act-note-${Date.now()}`,
         type: 'note_added',
-        content: `Added shared case note: "${noteData.content.substring(0, 30)}..."`,
+        content: `Added strategy note: "${noteData.content.substring(0, 30)}..."`,
         actorName: noteData.authorName,
         timestamp
     };
@@ -165,7 +176,6 @@ function App() {
         activities: [activity, ...c.activities]
     } : c));
     
-    // Auto-echo internal notes to team discussion if standard internal note
     const newMessage = { 
       id: `msg-note-${Date.now()}`, 
       sender: SenderType.AGENT, 
@@ -173,7 +183,8 @@ function App() {
       content: `[Case Insight]: ${noteData.content}`, 
       timestamp, 
       thread: 'team_discussion' as MessageThread,
-      authorName: noteData.authorName
+      authorName: noteData.authorName,
+      authorId: 'admin'
     };
     setConversations(prev => prev.map(c => c.id === id ? { ...c, messages: [...c.messages, newMessage] } : c));
   };
@@ -182,12 +193,13 @@ function App() {
     const timestamp = new Date();
     const newMessage = { 
         id: Date.now().toString(), 
-        sender: SenderType.AGENT, 
+        sender: thread === 'team_discussion' ? SenderType.AGENT : SenderType.AGENT, 
         type, 
         content: text, 
         timestamp, 
         thread,
-        authorName: 'Alex (Admin)'
+        authorName: 'Alex (Admin)',
+        authorId: 'admin'
     };
     
     setConversations(prev => prev.map(c => {
