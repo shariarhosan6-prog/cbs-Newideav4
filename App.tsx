@@ -17,7 +17,7 @@ import CalendarTimeline from './components/CalendarTimeline';
 import BulkActionToolbar from './components/BulkActionToolbar';
 import { MOCK_CONVERSATIONS, MOCK_COUNSELORS, MOCK_PARTNERS } from './constants';
 import { Conversation, MessageType, SenderType, MessageThread, ViewState, ApplicationStage, Counselor, Partner, SearchFilters, InternalNote, ActivityLog, FileTask, Message } from './types';
-import { Menu } from 'lucide-react';
+import { Menu, Loader2 } from 'lucide-react';
 
 const INITIAL_FILTERS: SearchFilters = {
   query: '',
@@ -26,8 +26,28 @@ const INITIAL_FILTERS: SearchFilters = {
   sources: [],
 };
 
+const SkeletonView = () => (
+    <div className="flex-1 p-10 space-y-8 animate-in fade-in duration-500">
+        <div className="flex justify-between items-center">
+            <div className="space-y-3">
+                <div className="h-8 w-64 skeleton rounded-xl"></div>
+                <div className="h-4 w-96 skeleton rounded-lg opacity-50"></div>
+            </div>
+            <div className="h-12 w-48 skeleton rounded-2xl"></div>
+        </div>
+        <div className="grid grid-cols-4 gap-6">
+            {[1,2,3,4].map(i => <div key={i} className="h-32 skeleton rounded-[32px]"></div>)}
+        </div>
+        <div className="grid grid-cols-2 gap-8">
+            <div className="h-96 skeleton rounded-[40px]"></div>
+            <div className="h-96 skeleton rounded-[40px]"></div>
+        </div>
+    </div>
+);
+
 function App() {
   const [currentView, setCurrentView] = useState<ViewState>('dashboard');
+  const [isViewLoading, setIsViewLoading] = useState(false);
   const [conversations, setConversations] = useState<Conversation[]>(MOCK_CONVERSATIONS);
   const [counselors] = useState<Counselor[]>(MOCK_COUNSELORS);
   const [partners] = useState<Partner[]>(MOCK_PARTNERS);
@@ -39,6 +59,12 @@ function App() {
   
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [filters, setFilters] = useState<SearchFilters>(INITIAL_FILTERS);
+
+  useEffect(() => {
+    setIsViewLoading(true);
+    const timer = setTimeout(() => setIsViewLoading(false), 600);
+    return () => clearTimeout(timer);
+  }, [currentView]);
 
   const filteredConversations = useMemo(() => {
     return conversations.filter(c => {
@@ -126,7 +152,6 @@ function App() {
         timestamp
     };
     
-    // Auto-post to team chat for notification
     const teamMsg: any = { 
         id: `task-msg-${Date.now()}`, 
         sender: SenderType.SYSTEM, 
@@ -209,7 +234,6 @@ function App() {
         if (c.id === selectedId) {
             let updatedActivities = [...c.activities];
             
-            // Log interaction
             if (type === MessageType.EMAIL) {
                 updatedActivities = [{
                     id: `act-email-${Date.now()}`,
@@ -298,11 +322,13 @@ function App() {
   };
 
   const renderContent = () => {
+    if (isViewLoading) return <SkeletonView />;
+
     switch (currentView) {
       case 'dashboard': return <Dashboard onOpenNewLead={() => setIsNewLeadModalOpen(true)} />;
       case 'pipeline': 
         return (
-          <div className="flex flex-col h-full">
+          <div className="flex flex-col h-full animate-in fade-in slide-in-from-bottom-2 duration-500">
             <AdvancedSearch filters={filters} onFilterChange={setFilters} onClear={() => setFilters(INITIAL_FILTERS)} />
             <div className="flex-1 overflow-hidden">
               <Kanban conversations={filteredConversations} onSelectCard={(id) => { setSelectedId(id); setCurrentView('inbox'); }} onAddLead={() => setIsNewLeadModalOpen(true)} />
@@ -311,7 +337,7 @@ function App() {
         );
       case 'inbox':
         return (
-          <div className="flex flex-col h-full">
+          <div className="flex flex-col h-full animate-in fade-in duration-500">
             <AdvancedSearch filters={filters} onFilterChange={setFilters} onClear={() => setFilters(INITIAL_FILTERS)} />
             <div className="flex-1 flex h-full w-full overflow-hidden relative">
               <div className="hidden lg:block h-full">
@@ -334,7 +360,7 @@ function App() {
               <div className="flex-1 flex flex-col h-full bg-white">
                    <ChatWindow key={selectedId} conversation={selectedConversation} onSendMessage={handleSendMessage} onToggleInfo={() => setRightPanelOpen(!rightPanelOpen)} onAssignCounselor={(cid) => handleAssignCounselor(selectedId, cid)} isInfoOpen={rightPanelOpen} />
               </div>
-              <div className={`absolute lg:static inset-y-0 right-0 z-30 w-full sm:w-96 bg-white border-l border-slate-200 transition-all duration-300 transform ${rightPanelOpen ? 'translate-x-0' : 'translate-x-full lg:hidden'}`}>
+              <div className={`absolute lg:static inset-y-0 right-0 z-30 w-full sm:w-96 bg-white border-l border-slate-200 transition-all duration-500 transform ${rightPanelOpen ? 'translate-x-0' : 'translate-x-full lg:hidden'}`}>
                   <ClientIntelligence 
                     conversation={selectedConversation} 
                     isOpen={true} 
@@ -368,8 +394,8 @@ function App() {
   };
 
   return (
-    <div className="flex h-screen bg-slate-50 overflow-hidden font-sans">
-      <div className={`transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] shrink-0 h-full bg-slate-900 z-50 overflow-hidden ${isSidebarCollapsed ? 'w-20' : 'w-72'}`}>
+    <div className="flex h-screen bg-[#F0F4F2] overflow-hidden font-sans">
+      <div className={`transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] shrink-0 h-full z-50 ${isSidebarCollapsed ? 'w-20' : 'w-72'}`}>
         <Sidebar 
           currentView={currentView} 
           onChangeView={setCurrentView} 
@@ -378,7 +404,7 @@ function App() {
           isCollapsed={isSidebarCollapsed}
         />
       </div>
-      <main className="flex-1 h-full relative overflow-hidden flex flex-col transition-all duration-500">
+      <main className="flex-1 h-full relative overflow-hidden flex flex-col transition-all duration-500 bg-[#F0F4F2]">
          {renderContent()}
       </main>
       <NewLeadModal isOpen={isNewLeadModalOpen} onClose={() => setIsNewLeadModalOpen(false)} onSubmit={() => {}} />

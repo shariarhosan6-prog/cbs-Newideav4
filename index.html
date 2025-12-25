@@ -1,12 +1,13 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#ffffff" />
+    <meta name="theme-color" content="#001a14" />
     <title>Stitch RPL CRM</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script>
       tailwind.config = {
         theme: {
@@ -16,18 +17,39 @@
             },
             boxShadow: {
               'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
-              'glow': '0 0 15px rgba(59, 130, 246, 0.5)',
+              'glow': '0 0 25px rgba(16, 185, 129, 0.2)',
+              'premium': '0 20px 50px -12px rgba(0, 26, 20, 0.4)',
+              'handle': '5px 0 15px rgba(0, 0, 0, 0.1), 0 0 20px rgba(16, 185, 129, 0.1)',
             },
             colors: {
-              messenger: {
-                blue: '#2563EB', // Vibrant tech blue
-                light: '#F8FAFC', // Slate 50
-                dark: '#0F172A', // Slate 900
-                green: '#10B981', // Emerald 500
-                orange: '#F59E0B', // Amber 500
-                red: '#EF4444', // Red 500
-                purple: '#8B5CF6', // Violet 500
-                gray: '#F1F5F9', // Slate 100
+              pine: {
+                50: '#f0fdf4',
+                100: '#dcfce7',
+                500: '#10b981',
+                600: '#059669',
+                700: '#047857',
+                800: '#065f46',
+                900: '#064e3b',
+                950: '#001a14', // Midnight Pine
+              }
+            },
+            animation: {
+              'shimmer': 'shimmer 2s infinite linear',
+              'float': 'float 3s ease-in-out infinite',
+              'pulse-glow': 'pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            },
+            keyframes: {
+              shimmer: {
+                '0%': { backgroundPosition: '-1000px 0' },
+                '100%': { backgroundPosition: '1000px 0' },
+              },
+              float: {
+                '0%, 100%': { transform: 'translateY(0)' },
+                '50%': { transform: 'translateY(-6px)' },
+              },
+              'pulse-glow': {
+                '0%, 100%': { opacity: 1, filter: 'brightness(1)' },
+                '50%': { opacity: .8, filter: 'brightness(1.3)' },
               }
             }
           }
@@ -35,25 +57,36 @@
       }
     </script>
     <style>
-      /* Custom scrollbar for Webkit */
-      ::-webkit-scrollbar {
-        width: 5px;
-        height: 5px;
-      }
-      ::-webkit-scrollbar-track {
-        background: transparent;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #E2E8F0;
-        border-radius: 10px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #CBD5E1;
-      }
+      ::-webkit-scrollbar { width: 4px; height: 4px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: #064e3b; border-radius: 10px; }
+      ::-webkit-scrollbar-thumb:hover { background: #001a14; }
+      
       .glass-panel {
-        background: rgba(255, 255, 255, 0.7);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(0, 0, 0, 0.04);
+      }
+
+      .premium-gradient {
+        background: linear-gradient(180deg, #001a14 0%, #064e3b 100%);
+      }
+
+      .sidebar-transition {
+        transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .sidebar-item-transition {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      /* Fixed the persistent toggle handle seam */
+      .action-handle {
+        position: absolute;
+        top: 2.5rem;
+        right: -14px;
+        z-index: 100;
       }
     </style>
   <script type="importmap">
@@ -68,7 +101,7 @@
 }
 </script>
 </head>
-  <body class="bg-gray-50 text-slate-900 antialiased overflow-hidden selection:bg-messenger-blue selection:text-white">
+  <body class="bg-[#F0F4F2] text-slate-900 antialiased overflow-hidden selection:bg-pine-900 selection:text-white">
     <div id="root"></div>
   </body>
 </html>
